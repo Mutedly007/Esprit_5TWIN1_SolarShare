@@ -1,4 +1,4 @@
-{{-- resources/views/partials/front/footer.blade.php --}}
+{{-- resources/views/partials/solartec/footer.blade.php --}}
 <footer class="ss-footer">
   <div class="ss-container">
     <div class="row">
@@ -67,6 +67,9 @@
     <div class="ss-footer-bottom">
       <div style="font-size: 0.85rem; color: #64748B;">
         &copy; {{ date('Y') }} SolarShare Inc. All rights reserved. Peer-to-peer clean power network.
+        <span style="display:inline-block; margin-left:1rem; font-size:0.8rem; color:#94A3B8;">
+          Template : <a href="https://htmlcodex.com/renewable-energy-website-template" target="_blank" rel="noopener" style="color: #FFB020; text-decoration: underline;">Solartec</a> par HTML Codex / ThemeWagon
+        </span>
       </div>
 
       <div class="ss-social-links">

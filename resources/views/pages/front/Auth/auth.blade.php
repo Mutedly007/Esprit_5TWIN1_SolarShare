@@ -1,5 +1,5 @@
 {{-- resources/views/pages/front/auth.blade.php --}}
-@extends('layouts.front')
+@extends('layouts.solartec')
 
 @section('title', 'Sign In or Join SolarShare — Clean Energy Sharing')
 @section('meta_description', 'Sign in to SolarShare or register a new account to rent portable solar panels, home batteries, and small wind turbines from neighbors.')

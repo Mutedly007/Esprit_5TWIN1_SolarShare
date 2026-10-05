@@ -110,7 +110,7 @@ Route::get('/', function () {
         ],
     ];
 
-    return view('pages.front.home', [
+    return view('pages.front.solartec_home', [
         'featuredEquipment' => $featuredEquipment,
         'stats' => $stats,
     ]);

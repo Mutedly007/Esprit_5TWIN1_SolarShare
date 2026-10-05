@@ -1,4 +1,4 @@
-{{-- resources/views/partials/front/navbar.blade.php --}}
+{{-- resources/views/partials/solartec/navbar.blade.php --}}
 <header id="ss-navbar" class="ss-navbar">
   <div class="ss-container">
     <nav class="ss-nav-container" aria-label="Main navigation">
