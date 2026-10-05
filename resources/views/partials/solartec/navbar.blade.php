@@ -40,10 +40,19 @@
             </button>
             <div id="ss-user-dropdown" class="ss-user-dropdown" style="display:none; position:absolute; right:0; top:calc(100% + 10px); min-width:200px; background:#fff; border:1px solid rgba(16,32,43,0.08); border-radius:14px; box-shadow:0 18px 40px -12px rgba(16,32,43,0.25); padding:0.5rem; z-index:1000;">
               <div style="padding:0.6rem 0.8rem; border-bottom:1px solid rgba(16,32,43,0.06); margin-bottom:0.4rem;">
-                <strong style="display:block; font-size:0.9rem; color:#10202B;">{{ auth()->user()->name }}</strong>
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <strong style="display:block; font-size:0.9rem; color:#10202B;">{{ auth()->user()->name }}</strong>
+                  @if(auth()->user()->isAdmin())
+                    <span style="background:#EF4444; color:#fff; font-size:0.68rem; font-weight:700; padding:0.15rem 0.45rem; border-radius:20px;">Admin</span>
+                  @endif
+                </div>
                 <span style="font-size:0.78rem; color:#64748B;">{{ auth()->user()->email }}</span>
               </div>
-              <a href="#" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none;">Dashboard</a>
+              @if(auth()->user()->isAdmin())
+                <a href="{{ route('admin.dashboard') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none;">
+                  Dashboard
+                </a>
+              @endif
               <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="ss-user-dropdown-item" style="display:block; width:100%; text-align:left; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#C2410C; background:none; border:none; cursor:pointer;">Sign out</button>

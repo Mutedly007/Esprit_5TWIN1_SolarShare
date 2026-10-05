@@ -135,5 +135,24 @@ Route::get('/auth/{provider}/callback', [AuthController::class, 'handleProviderC
 Route::middleware('auth')->group(function () {
     Route::get('/onboarding/role', [AuthController::class, 'showRoleSelection'])->name('onboarding.role');
     Route::post('/onboarding/role', [AuthController::class, 'storeRoleSelection'])->name('onboarding.role.store');
+
+    // Convenient /dashboard shortcut
+    Route::get('/dashboard', function () {
+        if (auth()->user()->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('home');
+    })->name('dashboard');
+});
+
+// Admin Back-Office (Protected: auth + admin role)
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/', function () {
+        return view('pages.admin.dashboard');
+    })->name('admin.dashboard');
+
+    Route::get('/dashboard', function () {
+        return redirect()->route('admin.dashboard');
+    });
 });
 
