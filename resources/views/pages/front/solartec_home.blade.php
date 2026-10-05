@@ -26,7 +26,7 @@
                                 <span class="badge badge-solar mb-3 text-uppercase px-3 py-2">Économie Circulaire & Énergie Propre</span>
                                 <h1 class="display-3 text-white animated slideInDown">Partagez l'Énergie Propre Entre Voisins</h1>
                                 <p class="fs-5 fw-medium text-white mb-4 pb-3">Louez des panneaux solaires portables, batteries de haute capacité et micro-éoliennes auprès de particuliers de confiance à proximité de chez vous.</p>
-                                <a href="#equipments" class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft me-3">
+                                <a href="{{ route('marketplace') }}" class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft me-3">
                                     <i class="fa fa-search me-2"></i>Louer du matériel
                                 </a>
                                 <a href="{{ route('register') }}" class="btn btn-outline-light rounded-pill py-3 px-5 animated slideInRight">
@@ -48,7 +48,7 @@
                                 <span class="badge badge-clean mb-3 text-uppercase px-3 py-2">Sans investissement lourd</span>
                                 <h1 class="display-3 text-white animated slideInDown">L'Autonomie Énergétique Pour Vos Aventures</h1>
                                 <p class="fs-5 fw-medium text-white mb-4 pb-3">Camping, vanlife, chantiers isolés ou secours d'urgence : bénéficiez d'une alimentation électrique 100% renouvelable pour quelques jours, sans acheter.</p>
-                                <a href="#equipments" class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft me-3">Voir les équipements</a>
+                                <a href="{{ route('marketplace') }}" class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft me-3">Voir les équipements</a>
                                 <a href="#how-it-works" class="btn btn-outline-light rounded-pill py-3 px-5 animated slideInRight">Comment ça marche</a>
                             </div>
                         </div>
@@ -252,7 +252,7 @@
                             </div>
                             <h4 class="mb-3">Panneaux Solaires Pliables</h4>
                             <p class="text-muted">Modules monocristallins légers de 50W à 400W, faciles à déployer pour le van, le bivouac ou le jardin.</p>
-                            <a class="small fw-bold text-primary" href="#equipments">Voir les annonces <i class="fa fa-arrow-right ms-2"></i></a>
+                            <a class="small fw-bold text-primary" href="{{ route('marketplace', ['category' => 'panneaux-solaires-portables']) }}">Voir les annonces <i class="fa fa-arrow-right ms-2"></i></a>
                         </div>
                     </div>
                 </div>
@@ -267,7 +267,7 @@
                             </div>
                             <h4 class="mb-3">Micro-Éoliennes Portables</h4>
                             <p class="text-muted">Turbines éoliennes compactes à monter sur mât télescopique pour produire même la nuit et par temps couvert.</p>
-                            <a class="small fw-bold text-primary" href="#equipments">Voir les annonces <i class="fa fa-arrow-right ms-2"></i></a>
+                            <a class="small fw-bold text-primary" href="{{ route('marketplace', ['category' => 'micro-eoliennes']) }}">Voir les annonces <i class="fa fa-arrow-right ms-2"></i></a>
                         </div>
                     </div>
                 </div>
@@ -282,7 +282,7 @@
                             </div>
                             <h4 class="mb-3">Stations d'Énergie & Batteries</h4>
                             <p class="text-muted">Générateurs LiFePO4 de 500Wh à 3000Wh avec prises 220V pures, USB-C Power Delivery et recharge solaire rapide.</p>
-                            <a class="small fw-bold text-primary" href="#equipments">Voir les annonces <i class="fa fa-arrow-right ms-2"></i></a>
+                            <a class="small fw-bold text-primary" href="{{ route('marketplace', ['category' => 'stations-energie-batteries']) }}">Voir les annonces <i class="fa fa-arrow-right ms-2"></i></a>
                         </div>
                     </div>
                 </div>
@@ -297,7 +297,7 @@
                             </div>
                             <h4 class="mb-3">Régulateurs MPPT & Onduleurs</h4>
                             <p class="text-muted">Boîtiers d'optimisation de charge solaire et convertisseurs pur sinus 12V/24V vers 230V.</p>
-                            <a class="small fw-bold text-primary" href="#equipments">Voir les annonces <i class="fa fa-arrow-right ms-2"></i></a>
+                            <a class="small fw-bold text-primary" href="{{ route('marketplace', ['category' => 'onduleurs-nomades']) }}">Voir les annonces <i class="fa fa-arrow-right ms-2"></i></a>
                         </div>
                     </div>
                 </div>
@@ -338,7 +338,7 @@
 
 
     <!-- ==================== FEATURED EQUIPMENT LISTINGS ==================== -->
-    <div class="container-xxl py-5" id="equipments">
+    <div class="container-xxl py-5" id="equipment">
         <div class="container">
             <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 650px;">
                 <h6 class="text-primary text-uppercase fw-bold">Disponibles Immédiatement</h6>
@@ -460,6 +460,13 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Explore Marketplace CTA -->
+            <div class="text-center mt-5">
+                <a href="{{ route('marketplace') }}" class="btn btn-primary rounded-pill py-3 px-5 shadow-sm" style="font-weight: 700; font-size: 1.05rem;">
+                    <i class="fa fa-th-large me-2"></i> Explorer toute la Marketplace & Catégories &rarr;
+                </a>
             </div>
         </div>
     </div>

@@ -116,6 +116,10 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+// Public Marketplace (Catalogue & Equipment details)
+Route::get('/marketplace', [\App\Http\Controllers\MarketplaceController::class, 'index'])->name('marketplace');
+Route::get('/marketplace/{equipment}', [\App\Http\Controllers\MarketplaceController::class, 'show'])->name('marketplace.show');
+
 Route::get('/login', [AuthController::class, 'show'])->defaults('tab', 'login')->name('login');
 Route::get('/register', [AuthController::class, 'show'])->defaults('tab', 'register')->name('register');
 
@@ -141,8 +145,13 @@ Route::middleware('auth')->group(function () {
         if (auth()->user()->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
-        return redirect()->route('home');
+        return redirect()->route('lender.dashboard');
     })->name('dashboard');
+
+    // Lender Space (Category & Equipment CRUD)
+    Route::get('/lender', [\App\Http\Controllers\LenderDashboardController::class, 'index'])->name('lender.dashboard');
+    Route::resource('categories', \App\Http\Controllers\CategoryController::class);
+    Route::resource('equipment', \App\Http\Controllers\EquipmentController::class);
 });
 
 // Admin Back-Office (Protected: auth + admin role)
