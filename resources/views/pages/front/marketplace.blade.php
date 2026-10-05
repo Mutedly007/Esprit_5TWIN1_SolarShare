@@ -127,105 +127,14 @@
             <div class="row g-4">
                 @foreach($equipment as $item)
                     <div class="col-md-6 col-lg-4">
-                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden equipment-card" style="transition: transform 0.2s ease, box-shadow 0.2s ease; background: #FFFFFF;">
-                            
-                            <!-- Image Container -->
-                            <div style="height: 220px; position: relative; overflow: hidden; background: #0F172A;">
-                                @if($item->image_url)
-                                    <img src="{{ $item->image_url }}" alt="{{ $item->name }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;">
-                                @else
-                                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0F5C6B, #083E49); color: #FFB020; font-size: 3rem;">
-                                        ☀️
-                                    </div>
-                                @endif
-
-                                <!-- Category Badge -->
-                                <span style="position: absolute; top: 12px; left: 12px; background: rgba(16, 32, 43, 0.85); backdrop-filter: blur(8px); color: #FFFFFF; font-size: 0.74rem; font-weight: 700; padding: 0.3rem 0.75rem; border-radius: 9999px;">
-                                    {{ $item->category?->name ?? 'Énergie' }}
-                                </span>
-
-                                <!-- Availability Badge -->
-                                <span style="position: absolute; top: 12px; right: 12px; background: {{ $item->is_available ? '#DCFCE7' : '#FEE2E2' }}; color: {{ $item->is_available ? '#166534' : '#991B1B' }}; font-size: 0.74rem; font-weight: 700; padding: 0.3rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.3rem;">
-                                    <span style="width: 6px; height: 6px; border-radius: 50%; background: {{ $item->is_available ? '#16A34A' : '#EF4444' }};"></span>
-                                    {{ $item->is_available ? 'Disponible' : 'Réservé' }}
-                                </span>
-                            </div>
-
-                            <!-- Card Body -->
-                            <div class="card-body p-4 d-flex flex-column justify-content-between">
-                                <div>
-                                    <!-- Brand -->
-                                    <div style="font-size: 0.78rem; font-weight: 700; color: #0F5C6B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;">
-                                        {{ $item->brand ?? 'Matériel certifié' }}
-                                    </div>
-
-                                    <!-- Name -->
-                                    <h5 class="card-title fw-bold text-dark mb-2" style="font-size: 1.15rem; line-height: 1.35;">
-                                        {{ $item->name }}
-                                    </h5>
-
-                                    <!-- Description snippet -->
-                                    <p class="text-muted small mb-3" style="line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                        {{ $item->description ?: 'Aucune description spécifique fournie pour cet équipement.' }}
-                                    </p>
-
-                                    <!-- Specs Pills -->
-                                    <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
-                                        @if($item->power_watts)
-                                            <span style="display: inline-flex; align-items: center; gap: 0.3rem; background: #F1F5F9; color: #1E293B; font-size: 0.76rem; font-weight: 700; padding: 0.25rem 0.55rem; border-radius: 8px;">
-                                                ⚡ {{ $item->power_watts }} W
-                                            </span>
-                                        @endif
-                                        @if($item->capacity_wh)
-                                            <span style="display: inline-flex; align-items: center; gap: 0.3rem; background: #F1F5F9; color: #1E293B; font-size: 0.76rem; font-weight: 700; padding: 0.25rem 0.55rem; border-radius: 8px;">
-                                                🔋 {{ $item->capacity_wh }} Wh
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                <!-- Pricing & Action -->
-                                <div style="border-top: 1px solid #F1F5F9; padding-top: 1rem; display: flex; align-items: center; justify-content: space-between;">
-                                    <div>
-                                        <div style="display: flex; align-items: baseline; gap: 0.25rem;">
-                                            <span style="font-size: 1.35rem; font-weight: 800; color: #10202B;">
-                                                {{ number_format($item->daily_rate, 2) }}
-                                            </span>
-                                            <span style="font-size: 0.8rem; color: #64748B; font-weight: 600;">TND / jour</span>
-                                        </div>
-                                        <span style="display: block; font-size: 0.75rem; color: #94A3B8;">
-                                            Caution : {{ number_format($item->deposit_amount, 2) }} TND
-                                        </span>
-                                    </div>
-
-                                    <a href="{{ route('marketplace.show', $item) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-2" style="font-weight: 700; font-size: 0.85rem; border-color: #0F5C6B; color: #0F5C6B;">
-                                        Détails &rarr;
-                                    </a>
-                                </div>
-
-                            </div>
-
-                            <!-- Card Footer: Owner Info -->
-                            <div style="background: #FAFCFE; border-top: 1px solid #F1F5F9; padding: 0.65rem 1.25rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: #64748B;">
-                                <div style="display: flex; align-items: center; gap: 0.45rem;">
-                                    <span style="width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #FFB020, #FF6B3D); color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700;">
-                                        {{ strtoupper(substr($item->user?->name ?? 'P', 0, 1)) }}
-                                    </span>
-                                    <span>{{ $item->user?->name ?? 'Prêteur partenaire' }}</span>
-                                </div>
-                                <span style="font-size: 0.72rem; color: #94A3B8;">
-                                    {{ $item->created_at?->diffForHumans() }}
-                                </span>
-                            </div>
-
-                        </div>
+                        <x-equipment-card :equipment="$item" />
                     </div>
                 @endforeach
             </div>
 
             <!-- Pagination -->
-            <div class="mt-5 d-flex justify-content-center">
-                {{ $equipment->links() }}
+            <div class="d-flex justify-content-center">
+                {{ $equipment->links('partials.pagination') }}
             </div>
 
         @else
@@ -298,6 +207,116 @@
     }
     .equipment-card:hover img {
         transform: scale(1.05);
+    }
+
+    /* ==================== CUSTOM SOLARSHARE PAGINATION ==================== */
+    nav[role="navigation"] svg {
+        max-width: 18px !important;
+        max-height: 18px !important;
+    }
+    .ss-pagination-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.25rem;
+        margin-top: 3.5rem;
+        margin-bottom: 1rem;
+    }
+    .ss-pagination-info {
+        font-size: 0.88rem;
+        color: #64748B;
+        font-weight: 500;
+    }
+    .ss-pagination-info span {
+        font-weight: 700;
+        color: #10202B;
+    }
+    .ss-pagination-list {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .ss-page-item {
+        display: inline-flex;
+    }
+    .ss-page-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.55rem 1.15rem;
+        border-radius: 9999px;
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        color: #10202B;
+        font-size: 0.88rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 1px 3px rgba(16, 32, 43, 0.05);
+    }
+    .ss-page-btn svg {
+        width: 16px !important;
+        height: 16px !important;
+        max-width: 16px !important;
+        max-height: 16px !important;
+        flex-shrink: 0;
+    }
+    .ss-page-item:not(.is-disabled) .ss-page-btn:hover {
+        background: #0F5C6B;
+        border-color: #0F5C6B;
+        color: #FFFFFF;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px -2px rgba(15, 92, 107, 0.3);
+    }
+    .ss-page-item.is-disabled .ss-page-btn {
+        background: #F8FAFC;
+        border-color: #E2E8F0;
+        color: #94A3B8;
+        cursor: not-allowed;
+        opacity: 0.65;
+    }
+    .ss-page-link {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        color: #10202B;
+        font-size: 0.92rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 1px 3px rgba(16, 32, 43, 0.04);
+    }
+    .ss-page-item:not(.is-active) .ss-page-link:hover {
+        background: #F1F5F9;
+        border-color: #CBD5E1;
+        color: #0F5C6B;
+        transform: translateY(-2px);
+    }
+    .ss-page-item.is-active .ss-page-link {
+        background: linear-gradient(135deg, #0F5C6B, #083E49);
+        border-color: #0F5C6B;
+        color: #FFFFFF;
+        box-shadow: 0 6px 18px -2px rgba(15, 92, 107, 0.35);
+    }
+    .ss-page-dots {
+        width: 36px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #94A3B8;
+        font-weight: 800;
+        letter-spacing: 0.1em;
     }
 </style>
 @endpush
