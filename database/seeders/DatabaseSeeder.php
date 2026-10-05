@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             EquipmentSeeder::class,
             RentalSeeder::class,
+            EnergyKitSeeder::class,
         ]);
     }
 }
