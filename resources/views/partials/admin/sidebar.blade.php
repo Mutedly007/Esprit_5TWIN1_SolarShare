@@ -28,11 +28,11 @@
                     </a>
                 </li>
 
-                <!-- Module 2: Locations -->
+                <!-- Module 2: Locations & Cycle de Location -->
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#rentals" aria-expanded="false">
+                    <a class="sidebar-link {{ request()->routeIs('admin.rentals.*') ? 'active' : '' }}" href="{{ route('admin.rentals.index') }}" aria-expanded="false">
                         <i data-feather="clipboard" class="feather-icon text-muted"></i>
-                        <span class="hide-menu">Locations</span>
+                        <span class="hide-menu">Locations & États</span>
                     </a>
                 </li>
 

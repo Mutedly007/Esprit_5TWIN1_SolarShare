@@ -37,6 +37,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Relationship: Rentals created by this user as borrower/renter.
+     */
+    public function rentals(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Rental::class);
+    }
+
+    /**
+     * Relationship: Rentals received for equipment owned by this user.
+     */
+    public function lentRentals(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(Rental::class, Equipment::class);
+    }
+
+    /**
      * Check if the user is an administrator.
      */
     public function isAdmin(): bool

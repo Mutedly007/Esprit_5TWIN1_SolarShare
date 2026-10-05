@@ -74,6 +74,14 @@ class Equipment extends Model
     }
 
     /**
+     * Relationship: An equipment can have many rentals.
+     */
+    public function rentals(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Rental::class);
+    }
+
+    /**
      * Friendly status label in French as requested:
      * pending -> Non traité
      */

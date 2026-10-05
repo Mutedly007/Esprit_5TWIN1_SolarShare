@@ -116,9 +116,16 @@
 
                     <!-- Rental Action Button -->
                     @if($equipment->is_available)
-                        <button type="button" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 1.05rem; box-shadow: 0 6px 20px rgba(255, 107, 61, 0.35);" onclick="alert('Module de réservation en cours de finalisation !')">
-                            ⚡ Louer cet équipement
-                        </button>
+                        @auth
+                            <a href="{{ route('rentals.create', ['equipment_id' => $equipment->id]) }}" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 1.05rem; box-shadow: 0 6px 20px rgba(255, 107, 61, 0.35); text-decoration: none;">
+                                ⚡ Réserver cet équipement
+                            </a>
+                        @endauth
+                        @guest
+                            <a href="{{ route('login') }}" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 1.05rem; box-shadow: 0 6px 20px rgba(255, 107, 61, 0.35); text-decoration: none;">
+                                ⚡ Connectez-vous pour louer
+                            </a>
+                        @endguest
                     @else
                         <button type="button" class="btn btn-secondary w-100 rounded-pill py-3 fw-bold mb-3" disabled>
                             Actuellement indisponible

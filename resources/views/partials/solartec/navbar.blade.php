@@ -50,8 +50,14 @@
                 </div>
                 <span style="font-size:0.78rem; color:#64748B;">{{ auth()->user()->email }}</span>
               </div>
+              <a href="{{ route('rentals.index') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none; font-weight:600;">
+                ⚡ Mes Réservations
+              </a>
               <a href="{{ route('lender.dashboard') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none;">
                 Tableau de bord
+              </a>
+              <a href="{{ route('lender.rentals.index') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none;">
+                Prêts reçus
               </a>
               <a href="{{ route('equipment.index') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none;">
                 Mes Équipements

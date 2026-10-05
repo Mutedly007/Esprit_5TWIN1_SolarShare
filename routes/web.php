@@ -152,6 +152,23 @@ Route::middleware('auth')->group(function () {
     Route::get('/lender', [\App\Http\Controllers\LenderDashboardController::class, 'index'])->name('lender.dashboard');
     Route::resource('categories', \App\Http\Controllers\CategoryController::class);
     Route::resource('equipment', \App\Http\Controllers\EquipmentController::class);
+
+    // Rentals & Inspections (Cycle de location - Developer 2 Module)
+    Route::resource('rentals', \App\Http\Controllers\RentalController::class);
+    Route::post('/rentals/{rental}/confirm', [\App\Http\Controllers\RentalController::class, 'confirm'])->name('rentals.confirm');
+    Route::post('/rentals/{rental}/cancel', [\App\Http\Controllers\RentalController::class, 'cancel'])->name('rentals.cancel');
+
+    // Inspection Reports (Check-in & Check-out)
+    Route::get('/rentals/{rental}/inspections/create', [\App\Http\Controllers\InspectionReportController::class, 'create'])->name('inspections.create');
+    Route::post('/rentals/{rental}/inspections', [\App\Http\Controllers\InspectionReportController::class, 'store'])->name('inspections.store');
+    Route::get('/inspections/{inspection}', [\App\Http\Controllers\InspectionReportController::class, 'show'])->name('inspections.show');
+    Route::get('/inspections/{inspection}/edit', [\App\Http\Controllers\InspectionReportController::class, 'edit'])->name('inspections.edit');
+    Route::put('/inspections/{inspection}', [\App\Http\Controllers\InspectionReportController::class, 'update'])->name('inspections.update');
+    Route::post('/inspections/{inspection}/validate', [\App\Http\Controllers\InspectionReportController::class, 'validateReport'])->name('inspections.validate');
+    Route::delete('/inspections/{inspection}', [\App\Http\Controllers\InspectionReportController::class, 'destroy'])->name('inspections.destroy');
+
+    // Lender Space - Received Rentals
+    Route::get('/lender/rentals', [\App\Http\Controllers\LenderRentalController::class, 'index'])->name('lender.rentals.index');
 });
 
 // Admin Back-Office (Protected: auth + admin role)
@@ -163,5 +180,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
         return redirect()->route('admin.dashboard');
     });
+
+    Route::get('/rentals', [\App\Http\Controllers\AdminRentalController::class, 'index'])->name('admin.rentals.index');
 });
 
