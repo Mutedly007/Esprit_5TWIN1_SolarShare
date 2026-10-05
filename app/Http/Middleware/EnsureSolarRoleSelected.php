@@ -17,7 +17,7 @@ class EnsureSolarRoleSelected
     {
         $user = $request->user();
 
-        if ($user && empty($user->solar_role)) {
+        if ($user && ! $user->isAdmin() && empty($user->solar_role)) {
             // Routes the user must still be able to reach while un-onboarded.
             $allowed = [
                 'onboarding.role',

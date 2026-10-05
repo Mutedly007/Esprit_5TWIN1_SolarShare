@@ -22,10 +22,20 @@ class User extends Authenticatable
         'email',
         'password',
         'solar_role',
+        'role',
         'provider',
         'provider_id',
         'avatar',
     ];
+
+    /**
+     * Check if the user is an administrator.
+     */
+    public function isAdmin(): bool
+    {
+        return strtolower((string) ($this->role ?? '')) === 'admin'
+            || strtolower((string) ($this->solar_role ?? '')) === 'admin';
+    }
 
     /**
      * The attributes that should be hidden for serialization.

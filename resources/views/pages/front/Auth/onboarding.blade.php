@@ -1,4 +1,4 @@
-@extends('layouts.front')
+@extends('layouts.solartec')
 
 @section('title', 'Complete Your SolarShare Profile — Choose Your Role')
 @section('meta_description', 'Tell SolarShare how you plan to use clean energy sharing: rent gear from neighbors, lend your own equipment, or both.')
