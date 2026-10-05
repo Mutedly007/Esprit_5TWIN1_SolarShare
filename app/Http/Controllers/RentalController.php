@@ -78,8 +78,8 @@ class RentalController extends Controller
 
         $equipment = Equipment::findOrFail($validated['equipment_id']);
 
-        // Check if user is trying to rent their own equipment
-        if ($equipment->user_id === Auth::id() && ! Auth::user()->isAdmin()) {
+        // Check if user is trying to rent their own equipment (bypassed in local dev to ease testing)
+        if ($equipment->user_id === Auth::id() && ! Auth::user()->isAdmin() && ! app()->environment('local')) {
             return back()->withInput()->with('error', 'Vous ne pouvez pas louer votre propre équipement.');
         }
 

@@ -34,6 +34,24 @@
                         </p>
                     </div>
 
+                    @if(session('error'))
+                        <div class="alert alert-danger rounded-3 mb-4 d-flex align-items-center gap-2">
+                            <span>⚠️</span>
+                            <div>{{ session('error') }}</div>
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="alert alert-danger rounded-3 mb-4">
+                            <div class="fw-bold mb-1">Attention :</div>
+                            <ul class="mb-0 ps-3">
+                                @foreach($errors->all() as $err)
+                                    <li>{{ $err }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <form action="{{ route('rentals.store') }}" method="POST" id="rental-form">
                         @csrf
 
