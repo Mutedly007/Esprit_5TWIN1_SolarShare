@@ -49,9 +49,15 @@
                         
                         @auth
                             @if(auth()->user()->isAdmin() || auth()->id() === $energyKit->user_id)
-                                <div class="d-flex gap-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <form action="{{ route('energy-kits.toggle', $energyKit) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm rounded-pill px-3 fw-bold {{ $energyKit->is_active ? 'btn-success text-white' : 'btn-secondary text-white' }}" title="Cliquer pour basculer Actif / Inactif">
+                                            {{ $energyKit->is_active ? '✓ Actif (En ligne)' : '✕ Inactif (Masqué)' }}
+                                        </button>
+                                    </form>
                                     <a href="{{ route('energy-kits.edit', $energyKit) }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-                                        ✏️ Modifier le pack
+                                        ✏️ Modifier
                                     </a>
                                     <form action="{{ route('energy-kits.destroy', $energyKit) }}" method="POST" class="d-inline" onsubmit="return confirm('Supprimer ce pack ?');">
                                         @csrf

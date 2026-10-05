@@ -110,6 +110,12 @@
                                         -{{ rtrim(rtrim(number_format($kit->discount_percentage, 1), '0'), '.') }}% Remise Pack
                                     </span>
                                 @endif
+
+                                @if(! $kit->is_active)
+                                    <span style="position: absolute; bottom: 12px; left: 14px; background: rgba(15, 23, 42, 0.88); color: #FCA5A5; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; border: 1px solid rgba(248, 113, 113, 0.4); backdrop-filter: blur(4px);">
+                                        ✕ Inactif (Masqué au public)
+                                    </span>
+                                @endif
                             </div>
 
                             <!-- Body -->
@@ -163,9 +169,21 @@
                                         </div>
                                     </div>
 
-                                    <a href="{{ route('energy-kits.show', $kit) }}" class="btn btn-outline-dark rounded-pill btn-sm px-3 py-2 fw-semibold">
-                                        Découvrir &rarr;
-                                    </a>
+                                    <div class="d-flex gap-1 align-items-center">
+                                        @auth
+                                            @if((auth()->user()->isAdmin() || auth()->id() === $kit->user_id) && ! $kit->is_active)
+                                                <form action="{{ route('energy-kits.toggle', $kit) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-2 py-1" style="font-size: 0.75rem;" title="Cliquer pour réactiver ce pack">
+                                                        ✓ Réactiver
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        @endauth
+                                        <a href="{{ route('energy-kits.show', $kit) }}" class="btn btn-outline-dark rounded-pill btn-sm px-3 py-2 fw-semibold">
+                                            Découvrir &rarr;
+                                        </a>
+                                    </div>
                                 </div>
 
                             </div>

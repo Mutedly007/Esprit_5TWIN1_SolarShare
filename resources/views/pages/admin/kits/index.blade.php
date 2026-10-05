@@ -38,15 +38,17 @@
             <div class="col-sm-6 col-lg-3">
                 <div class="card border-end">
                     <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div>
-                                <h2 class="text-dark mb-1 font-weight-medium">{{ $stats['total'] }}</h2>
-                                <h6 class="text-muted font-weight-normal mb-0 w-100 text-truncate">Total Packs</h6>
+                        <a href="{{ route('admin.energy-kits.index') }}" class="text-decoration-none">
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <h2 class="text-dark mb-1 font-weight-medium">{{ $stats['total'] }}</h2>
+                                    <h6 class="text-muted font-weight-normal mb-0 w-100 text-truncate">Total Packs</h6>
+                                </div>
+                                <div class="ms-auto">
+                                    <span class="text-muted opacity-7"><i data-feather="package" class="text-muted"></i></span>
+                                </div>
                             </div>
-                            <div class="ms-auto">
-                                <span class="text-muted opacity-7"><i data-feather="package" class="text-muted"></i></span>
-                            </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -54,15 +56,22 @@
             <div class="col-sm-6 col-lg-3">
                 <div class="card border-end">
                     <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div>
-                                <h2 class="text-success mb-1 font-weight-medium">{{ $stats['active'] }}</h2>
-                                <h6 class="text-muted font-weight-normal mb-0 w-100 text-truncate">Packs Actifs</h6>
+                        <a href="{{ route('admin.energy-kits.index', ['status' => 'active']) }}" class="text-decoration-none">
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <h2 class="text-success mb-1 font-weight-medium">
+                                        {{ $stats['active'] }} 
+                                        @if($stats['inactive'] > 0)
+                                            <span class="badge bg-secondary fs-6 text-white align-middle ms-1" title="{{ $stats['inactive'] }} pack(s) inactif(s)">{{ $stats['inactive'] }} inactif</span>
+                                        @endif
+                                    </h2>
+                                    <h6 class="text-muted font-weight-normal mb-0 w-100 text-truncate">Packs Actifs</h6>
+                                </div>
+                                <div class="ms-auto">
+                                    <span class="text-muted opacity-7"><i data-feather="check-circle" class="text-success"></i></span>
+                                </div>
                             </div>
-                            <div class="ms-auto">
-                                <span class="text-muted opacity-7"><i data-feather="check-circle" class="text-success"></i></span>
-                            </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -104,8 +113,15 @@
         <div class="card mb-4">
             <div class="card-body p-3">
                 <form action="{{ route('admin.energy-kits.index') }}" method="GET" class="row g-2 align-items-center">
-                    <div class="col-md-6">
-                        <input type="text" name="q" class="form-control" placeholder="Rechercher par titre ou description de pack..." value="{{ $search }}">
+                    <div class="col-md-5">
+                        <input type="text" name="q" id="admin_kit_search" class="form-control" placeholder="Rechercher par titre ou description de pack (ex: Vanlife)..." value="{{ $search }}" autocomplete="off">
+                    </div>
+                    <div class="col-md-2">
+                        <select name="status" class="form-select">
+                            <option value="">Tous statuts ({{ $stats['total'] }})</option>
+                            <option value="active" {{ $status === 'active' ? 'selected' : '' }}>🟢 Actifs ({{ $stats['active'] }})</option>
+                            <option value="inactive" {{ $status === 'inactive' ? 'selected' : '' }}>⚪ Inactifs ({{ $stats['inactive'] }})</option>
+                        </select>
                     </div>
                     <div class="col-md-3">
                         <select name="target_use" class="form-select">
@@ -117,9 +133,9 @@
                             <option value="evenement" {{ $targetUse === 'evenement' ? 'selected' : '' }}>🎉 Événementiel</option>
                         </select>
                     </div>
-                    <div class="col-md-3 d-flex gap-2">
+                    <div class="col-md-2 d-flex gap-2">
                         <button type="submit" class="btn btn-primary w-100">Filtrer</button>
-                        @if($search || $targetUse)
+                        @if($search || $targetUse || $status)
                             <a href="{{ route('admin.energy-kits.index') }}" class="btn btn-outline-secondary">Reset</a>
                         @endif
                     </div>
@@ -133,7 +149,7 @@
                 <h4 class="card-title mb-3">Packs d'énergie renouvelable configurés</h4>
 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
+                    <table class="table table-hover align-middle" id="admin_kits_table">
                         <thead class="table-light">
                             <tr>
                                 <th>Pack</th>
@@ -248,4 +264,34 @@
     </div>
 
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('admin_kit_search');
+    const table = document.getElementById('admin_kits_table');
+    
+    if (searchInput && table) {
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            const rows = table.querySelectorAll('tbody tr');
+            let matchCount = 0;
+            
+            rows.forEach(function(row) {
+                // If it's a message row like "Aucun pack...", skip
+                if (row.querySelector('td[colspan]')) return;
+                
+                const text = row.innerText.toLowerCase();
+                if (query === '' || text.indexOf(query) !== -1) {
+                    row.style.display = '';
+                    matchCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+@endpush
 @endsection

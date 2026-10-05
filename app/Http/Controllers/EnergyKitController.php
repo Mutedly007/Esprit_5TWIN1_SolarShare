@@ -19,9 +19,15 @@ class EnergyKitController extends Controller
         $targetUse = $request->query('target_use');
         $search = $request->query('q');
 
+        $isAdmin = auth()->check() && auth()->user()->isAdmin();
+
         $query = EnergyKit::with(['equipment.category', 'user'])
-            ->where('is_active', true)
             ->withCount('equipment');
+
+        // Non-admin visitors only see active kits; Admins see all kits (with inactive badge)
+        if (! $isAdmin) {
+            $query->where('is_active', true);
+        }
 
         if ($targetUse && in_array($targetUse, ['camping', 'chantier', 'urgence', 'vanlife', 'evenement'])) {
             $query->where('target_use', $targetUse);
@@ -38,12 +44,12 @@ class EnergyKitController extends Controller
 
         // Count per target_use for quick filter tabs
         $counts = [
-            'all' => EnergyKit::where('is_active', true)->count(),
-            'camping' => EnergyKit::where('is_active', true)->where('target_use', 'camping')->count(),
-            'vanlife' => EnergyKit::where('is_active', true)->where('target_use', 'vanlife')->count(),
-            'chantier' => EnergyKit::where('is_active', true)->where('target_use', 'chantier')->count(),
-            'urgence' => EnergyKit::where('is_active', true)->where('target_use', 'urgence')->count(),
-            'evenement' => EnergyKit::where('is_active', true)->where('target_use', 'evenement')->count(),
+            'all' => $isAdmin ? EnergyKit::count() : EnergyKit::where('is_active', true)->count(),
+            'camping' => ($isAdmin ? EnergyKit::where('target_use', 'camping') : EnergyKit::where('is_active', true)->where('target_use', 'camping'))->count(),
+            'vanlife' => ($isAdmin ? EnergyKit::where('target_use', 'vanlife') : EnergyKit::where('is_active', true)->where('target_use', 'vanlife'))->count(),
+            'chantier' => ($isAdmin ? EnergyKit::where('target_use', 'chantier') : EnergyKit::where('is_active', true)->where('target_use', 'chantier'))->count(),
+            'urgence' => ($isAdmin ? EnergyKit::where('target_use', 'urgence') : EnergyKit::where('is_active', true)->where('target_use', 'urgence'))->count(),
+            'evenement' => ($isAdmin ? EnergyKit::where('target_use', 'evenement') : EnergyKit::where('is_active', true)->where('target_use', 'evenement'))->count(),
         ];
 
         return view('pages.front.kits.index', compact('kits', 'counts', 'targetUse', 'search'));
@@ -269,5 +275,19 @@ class EnergyKitController extends Controller
 
         return redirect()->route('energy-kits.show', $energyKit)
             ->with('success', "🎉 Félicitations ! Votre réservation pour le pack '{$energyKit->title}' a bien été enregistrée pour {$daysCount} jour(s) (du {$startDate->format('d/m/Y')} au {$endDate->format('d/m/Y')}). Montant total : " . number_format($totalPrice, 2) . " TND.");
+    }
+
+    /**
+     * Toggle active status.
+     */
+    public function toggle(EnergyKit $energyKit)
+    {
+        if (!auth()->user()->isAdmin() && auth()->id() !== $energyKit->user_id) {
+            abort(403, 'Action non autorisée.');
+        }
+
+        $energyKit->update(['is_active' => !$energyKit->is_active]);
+
+        return back()->with('success', 'Statut du pack mis à jour avec succès : ' . ($energyKit->is_active ? 'Actif (Publié)' : 'Inactif (Masqué)'));
     }
 }

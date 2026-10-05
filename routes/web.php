@@ -178,6 +178,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/packs/{energyKit}/attach', [\App\Http\Controllers\EnergyKitController::class, 'attachEquipment'])->name('energy-kits.attach');
     Route::delete('/packs/{energyKit}/equipment/{equipment}', [\App\Http\Controllers\EnergyKitController::class, 'detachEquipment'])->name('energy-kits.detach');
     Route::post('/packs/{energyKit}/reserve', [\App\Http\Controllers\EnergyKitController::class, 'reserve'])->name('energy-kits.reserve');
+    Route::post('/packs/{energyKit}/toggle', [\App\Http\Controllers\EnergyKitController::class, 'toggle'])->name('energy-kits.toggle');
 });
 
 // Public Packs Solaires (Energy Kits)
