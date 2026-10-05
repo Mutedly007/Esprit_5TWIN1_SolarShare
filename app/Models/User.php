@@ -29,6 +29,14 @@ class User extends Authenticatable
     ];
 
     /**
+     * Relationship: A user can own many equipment.
+     */
+    public function equipment(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Equipment::class);
+    }
+
+    /**
      * Check if the user is an administrator.
      */
     public function isAdmin(): bool
