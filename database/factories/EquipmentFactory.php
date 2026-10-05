@@ -48,4 +48,34 @@ class EquipmentFactory extends Factory
             'status' => 'pending', // Automatic default
         ];
     }
+
+    /**
+     * Indicate that the equipment is approved.
+     */
+    public function approved(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'approved',
+        ]);
+    }
+
+    /**
+     * Indicate that the equipment is rejected.
+     */
+    public function rejected(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'rejected',
+        ]);
+    }
+
+    /**
+     * Indicate that the equipment is unavailable.
+     */
+    public function unavailable(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_available' => false,
+        ]);
+    }
 }
