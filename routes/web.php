@@ -152,7 +152,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/lender', [\App\Http\Controllers\LenderDashboardController::class, 'index'])->name('lender.dashboard');
     Route::resource('categories', \App\Http\Controllers\CategoryController::class);
     Route::resource('equipment', \App\Http\Controllers\EquipmentController::class);
+    // Energy Kits CRUD & Equipment Management (Developer 3 Module)
+    Route::get('/packs/create', [\App\Http\Controllers\EnergyKitController::class, 'create'])->name('energy-kits.create');
+    Route::post('/packs', [\App\Http\Controllers\EnergyKitController::class, 'store'])->name('energy-kits.store');
+    Route::get('/packs/{energyKit}/edit', [\App\Http\Controllers\EnergyKitController::class, 'edit'])->name('energy-kits.edit');
+    Route::put('/packs/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'update'])->name('energy-kits.update');
+    Route::delete('/packs/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'destroy'])->name('energy-kits.destroy');
+    Route::post('/packs/{energyKit}/attach', [\App\Http\Controllers\EnergyKitController::class, 'attachEquipment'])->name('energy-kits.attach');
+    Route::delete('/packs/{energyKit}/equipment/{equipment}', [\App\Http\Controllers\EnergyKitController::class, 'detachEquipment'])->name('energy-kits.detach');
+    Route::post('/packs/{energyKit}/reserve', [\App\Http\Controllers\EnergyKitController::class, 'reserve'])->name('energy-kits.reserve');
 });
+
+// Public Packs Solaires (Energy Kits)
+Route::get('/energy-kits', [\App\Http\Controllers\EnergyKitController::class, 'index'])->name('energy-kits.index');
+Route::get('/energy-kits/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'show'])->name('energy-kits.show');
 
 // Admin Back-Office (Protected: auth + admin role)
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
@@ -163,5 +176,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
         return redirect()->route('admin.dashboard');
     });
+
+    Route::get('/energy-kits', [\App\Http\Controllers\AdminEnergyKitController::class, 'index'])->name('admin.energy-kits.index');
+    Route::post('/energy-kits/{energyKit}/toggle', [\App\Http\Controllers\AdminEnergyKitController::class, 'toggle'])->name('admin.energy-kits.toggle');
 });
 

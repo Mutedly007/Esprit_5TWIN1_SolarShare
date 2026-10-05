@@ -36,9 +36,9 @@
                     </a>
                 </li>
 
-                <!-- Module 3: Packs Solaires -->
+                <!-- Module 3: Packs Solaires (Kits Combinés N-N) -->
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#packs" aria-expanded="false">
+                    <a class="sidebar-link {{ request()->routeIs('admin.energy-kits.*') ? 'active' : '' }}" href="{{ route('admin.energy-kits.index') }}" aria-expanded="false">
                         <i data-feather="package" class="feather-icon text-muted"></i>
                         <span class="hide-menu">Packs Solaires</span>
                     </a>
