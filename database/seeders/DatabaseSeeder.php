@@ -11,9 +11,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Do not automatically create dummy users or dummy equipment
         $this->call([
             CategorySeeder::class,
+            EquipmentSeeder::class,
         ]);
     }
 }
