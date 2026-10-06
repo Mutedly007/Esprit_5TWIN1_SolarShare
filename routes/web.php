@@ -185,6 +185,10 @@ Route::middleware('auth')->group(function () {
 Route::get('/energy-kits', [\App\Http\Controllers\EnergyKitController::class, 'index'])->name('energy-kits.index');
 Route::get('/energy-kits/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'show'])->name('energy-kits.show');
 
+// Public Points Relais & Hubs Solaires (Developer 4 Module)
+Route::get('/hubs', [\App\Http\Controllers\CollectionHubController::class, 'index'])->name('hubs.index');
+Route::get('/hubs/{hub}', [\App\Http\Controllers\CollectionHubController::class, 'show'])->name('hubs.show');
+
 // Admin Back-Office (Protected: auth + admin role)
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/', function () {
@@ -198,5 +202,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/rentals', [\App\Http\Controllers\AdminRentalController::class, 'index'])->name('admin.rentals.index');
     Route::get('/energy-kits', [\App\Http\Controllers\AdminEnergyKitController::class, 'index'])->name('admin.energy-kits.index');
     Route::post('/energy-kits/{energyKit}/toggle', [\App\Http\Controllers\AdminEnergyKitController::class, 'toggle'])->name('admin.energy-kits.toggle');
+
+    // Module 4: Hubs de Retrait Locaux & Créneaux de Permanence
+    Route::resource('hubs', \App\Http\Controllers\AdminCollectionHubController::class)->names('admin.hubs');
+    Route::post('/hubs/{hub}/toggle', [\App\Http\Controllers\AdminCollectionHubController::class, 'toggle'])->name('admin.hubs.toggle');
+    Route::post('/hubs/{hub}/slots', [\App\Http\Controllers\AdminCollectionHubController::class, 'storeSlot'])->name('admin.hubs.slots.store');
+    Route::put('/slots/{slot}', [\App\Http\Controllers\AdminCollectionHubController::class, 'updateSlot'])->name('admin.hubs.slots.update');
+    Route::delete('/slots/{slot}', [\App\Http\Controllers\AdminCollectionHubController::class, 'destroySlot'])->name('admin.hubs.slots.destroy');
+    Route::post('/slots/{slot}/toggle', [\App\Http\Controllers\AdminCollectionHubController::class, 'toggleSlot'])->name('admin.hubs.slots.toggle');
 });
 
