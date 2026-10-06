@@ -18,6 +18,7 @@
         <li role="none"><a href="{{ url('/#how-it-works') }}" class="ss-nav-link" role="menuitem">How it works</a></li>
         <li role="none"><a href="{{ route('marketplace') }}" class="ss-nav-link {{ request()->routeIs('marketplace*') ? 'is-active' : '' }}" role="menuitem">Equipment</a></li>
         <li role="none"><a href="{{ route('energy-kits.index') }}" class="ss-nav-link {{ request()->routeIs('energy-kits.*') ? 'is-active' : '' }}" role="menuitem">Packs Solaires</a></li>
+        <li role="none"><a href="{{ route('hubs.index') }}" class="ss-nav-link {{ request()->routeIs('hubs.*') ? 'is-active' : '' }}" role="menuitem">Points Relais</a></li>
         <li role="none"><a href="{{ url('/#impact') }}" class="ss-nav-link" role="menuitem">Impact</a></li>
         <li role="none"><a href="{{ url('/#community') }}" class="ss-nav-link" role="menuitem">Community</a></li>
         <li role="none"><a href="{{ url('/#faq') }}" class="ss-nav-link" role="menuitem">FAQ</a></li>
@@ -68,6 +69,9 @@
               </a>
               <a href="{{ route('energy-kits.index') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none;">
                 📦 Packs Solaires
+              </a>
+              <a href="{{ route('hubs.index') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none;">
+                📍 Points Relais (Hubs)
               </a>
               <a href="{{ url('/') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#64748B; text-decoration:none; border-top:1px solid rgba(16,32,43,0.06); margin-top:0.3rem;">
                 Site Public
