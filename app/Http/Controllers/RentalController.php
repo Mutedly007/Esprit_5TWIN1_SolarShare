@@ -38,7 +38,17 @@ class RentalController extends Controller
             'cancelled' => Rental::where('user_id', $user->id)->where('status', 'cancelled')->count(),
         ];
 
-        return view('pages.front.rentals.index', compact('rentals', 'counts', 'status'));
+        $kitQuery = \App\Models\EnergyKitReservation::with(['energyKit.equipment.category', 'energyKit.user'])
+            ->where('user_id', $user->id)
+            ->latest();
+
+        if ($status && in_array($status, ['pending', 'confirmed', 'active', 'completed', 'cancelled'])) {
+            $kitQuery->where('status', $status);
+        }
+
+        $kitReservations = $kitQuery->get();
+
+        return view('pages.front.rentals.index', compact('rentals', 'counts', 'status', 'kitReservations'));
     }
 
     /**

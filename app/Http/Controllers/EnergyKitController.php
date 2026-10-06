@@ -70,7 +70,15 @@ class EnergyKitController extends Controller
      */
     public function create()
     {
-        $equipments = Equipment::where('status', 'approved')->orderBy('name')->get();
+        if (!auth()->user()->isLender()) {
+            abort(403, 'Accès réservé aux prêteurs (rôle Lend ou Both) et aux administrateurs.');
+        }
+
+        $query = Equipment::where('status', 'approved')->orderBy('name');
+        if (!auth()->user()->isAdmin()) {
+            $query->where('user_id', auth()->id());
+        }
+        $equipments = $query->get();
 
         return view('pages.front.kits.create', compact('equipments'));
     }
@@ -80,6 +88,10 @@ class EnergyKitController extends Controller
      */
     public function store(Request $request)
     {
+        if (!auth()->user()->isLender()) {
+            abort(403, 'Accès réservé aux prêteurs (rôle Lend ou Both) et aux administrateurs.');
+        }
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
@@ -95,6 +107,22 @@ class EnergyKitController extends Controller
             'items.required' => 'Vous devez sélectionner au moins un équipement pour composer ce pack.',
             'items.min' => 'Un pack doit contenir au moins 1 équipement.',
         ]);
+
+        // Restriction : un prêteur ne peut composer un pack qu'avec ses propres équipements approuvés
+        if (!auth()->user()->isAdmin()) {
+            $ownedEquipmentIds = Equipment::where('user_id', auth()->id())
+                ->where('status', 'approved')
+                ->pluck('id')
+                ->toArray();
+
+            foreach ($validated['items'] as $item) {
+                if (!in_array($item['equipment_id'], $ownedEquipmentIds)) {
+                    return back()->withInput()->withErrors([
+                        'items' => 'Vous ne pouvez composer un pack solaire qu\'avec vos propres équipements approuvés.'
+                    ]);
+                }
+            }
+        }
 
         $imagePath = null;
         if ($request->hasFile('image')) {
@@ -130,8 +158,20 @@ class EnergyKitController extends Controller
      */
     public function edit(EnergyKit $energyKit)
     {
+        if (!auth()->user()->isLender()) {
+            abort(403, 'Accès réservé aux prêteurs et aux administrateurs.');
+        }
+
+        if (!auth()->user()->isAdmin() && auth()->id() !== $energyKit->user_id) {
+            abort(403, 'Vous ne pouvez modifier que vos propres packs solaires.');
+        }
+
         $energyKit->load(['equipment']);
-        $equipments = Equipment::where('status', 'approved')->orderBy('name')->get();
+        $query = Equipment::where('status', 'approved')->orderBy('name');
+        if (!auth()->user()->isAdmin()) {
+            $query->where('user_id', auth()->id());
+        }
+        $equipments = $query->get();
 
         return view('pages.front.kits.edit', compact('energyKit', 'equipments'));
     }
@@ -141,6 +181,14 @@ class EnergyKitController extends Controller
      */
     public function update(Request $request, EnergyKit $energyKit)
     {
+        if (!auth()->user()->isLender()) {
+            abort(403, 'Accès réservé aux prêteurs et aux administrateurs.');
+        }
+
+        if (!auth()->user()->isAdmin() && auth()->id() !== $energyKit->user_id) {
+            abort(403, 'Vous ne pouvez modifier que vos propres packs solaires.');
+        }
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
@@ -153,6 +201,21 @@ class EnergyKitController extends Controller
             'items.*.quantity' => ['required', 'integer', 'min:1', 'max:20'],
             'items.*.options' => ['nullable', 'string', 'max:255'],
         ]);
+
+        if (!auth()->user()->isAdmin()) {
+            $ownedEquipmentIds = Equipment::where('user_id', auth()->id())
+                ->where('status', 'approved')
+                ->pluck('id')
+                ->toArray();
+
+            foreach ($validated['items'] as $item) {
+                if (!in_array($item['equipment_id'], $ownedEquipmentIds)) {
+                    return back()->withInput()->withErrors([
+                        'items' => 'Vous ne pouvez associer que vos propres équipements approuvés à ce pack.'
+                    ]);
+                }
+            }
+        }
 
         $imagePath = $energyKit->image;
         if ($request->hasFile('image')) {
@@ -190,11 +253,30 @@ class EnergyKitController extends Controller
      */
     public function attachEquipment(Request $request, EnergyKit $energyKit)
     {
+        if (!auth()->user()->isLender()) {
+            abort(403, 'Accès réservé aux prêteurs et aux administrateurs.');
+        }
+
+        if (!auth()->user()->isAdmin() && auth()->id() !== $energyKit->user_id) {
+            abort(403, 'Vous ne pouvez modifier que vos propres packs solaires.');
+        }
+
         $validated = $request->validate([
             'equipment_id' => ['required', 'exists:equipment,id'],
             'quantity' => ['required', 'integer', 'min:1', 'max:20'],
             'options' => ['nullable', 'string', 'max:255'],
         ]);
+
+        if (!auth()->user()->isAdmin()) {
+            $isOwned = Equipment::where('id', $validated['equipment_id'])
+                ->where('user_id', auth()->id())
+                ->where('status', 'approved')
+                ->exists();
+
+            if (!$isOwned) {
+                return back()->withErrors(['items' => 'Vous ne pouvez ajouter que vos propres équipements approuvés.']);
+            }
+        }
 
         $energyKit->equipment()->syncWithoutDetaching([
             $validated['equipment_id'] => [
@@ -211,6 +293,14 @@ class EnergyKitController extends Controller
      */
     public function detachEquipment(EnergyKit $energyKit, Equipment $equipment)
     {
+        if (!auth()->user()->isLender()) {
+            abort(403, 'Accès réservé aux prêteurs et aux administrateurs.');
+        }
+
+        if (!auth()->user()->isAdmin() && auth()->id() !== $energyKit->user_id) {
+            abort(403, 'Action non autorisée.');
+        }
+
         $energyKit->equipment()->detach($equipment->id);
 
         return back()->with('success', 'L\'équipement a été retiré du pack.');
@@ -221,6 +311,14 @@ class EnergyKitController extends Controller
      */
     public function destroy(EnergyKit $energyKit)
     {
+        if (!auth()->user()->isLender()) {
+            abort(403, 'Accès réservé aux prêteurs et aux administrateurs.');
+        }
+
+        if (!auth()->user()->isAdmin() && auth()->id() !== $energyKit->user_id) {
+            abort(403, 'Vous ne pouvez supprimer que vos propres packs solaires.');
+        }
+
         if ($energyKit->image && Storage::disk('public')->exists($energyKit->image)) {
             Storage::disk('public')->delete($energyKit->image);
         }

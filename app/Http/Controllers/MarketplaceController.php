@@ -13,9 +13,12 @@ class MarketplaceController extends Controller
      */
     public function index(Request $request)
     {
-        $categories = Category::withCount('equipment')->get();
+        $categories = Category::withCount(['equipment' => function ($q) {
+            $q->where('status', 'approved');
+        }])->get();
 
-        $query = Equipment::with(['category', 'user']);
+        $query = Equipment::with(['category', 'user'])
+            ->where('status', 'approved');
 
         // Search by keyword, title, brand or description
         if ($request->filled('search')) {
@@ -53,7 +56,7 @@ class MarketplaceController extends Controller
         }
 
         $equipment = $query->paginate(9)->withQueryString();
-        $totalCount = Equipment::count();
+        $totalCount = Equipment::where('status', 'approved')->count();
 
         return view('pages.front.marketplace', compact(
             'categories',
@@ -68,9 +71,18 @@ class MarketplaceController extends Controller
      */
     public function show(Equipment $equipment)
     {
+        // Non-approved equipment can only be previewed by its owner or an admin
+        if ($equipment->status !== 'approved') {
+            $canPreview = auth()->check() && (auth()->user()->isAdmin() || auth()->id() === $equipment->user_id);
+            if (! $canPreview) {
+                abort(404, 'Cet équipement est en cours de validation par un administrateur.');
+            }
+        }
+
         $equipment->load(['category', 'user']);
 
         $related = Equipment::with(['category', 'user'])
+            ->where('status', 'approved')
             ->where('category_id', $equipment->category_id)
             ->where('id', '!=', $equipment->id)
             ->take(3)

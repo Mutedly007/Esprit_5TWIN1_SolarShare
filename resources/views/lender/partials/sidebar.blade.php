@@ -59,6 +59,12 @@
                 $lenderPendingRentals = \App\Models\Rental::whereHas('equipment', function($q) {
                     $q->where('user_id', auth()->id());
                 })->where('status', 'pending')->count();
+                $lenderPendingPacks = \App\Models\EnergyKitReservation::whereHas('energyKit', function($q) {
+                    $q->where('user_id', auth()->id());
+                })->where('status', 'pending')->count();
+                $totalPending = $lenderPendingRentals + $lenderPendingPacks;
+                $totalAll = \App\Models\Rental::whereHas('equipment', fn($q) => $q->where('user_id', auth()->id()))->count()
+                    + \App\Models\EnergyKitReservation::whereHas('energyKit', fn($q) => $q->where('user_id', auth()->id()))->count();
             @endphp
             <a href="{{ route('lender.rentals.index') }}"
                class="sidebar-nav-link {{ request()->routeIs('lender.rentals.*') ? 'is-active' : '' }}"
@@ -73,13 +79,13 @@
                     </svg>
                 </span>
                 <span class="sidebar-nav-title">Prêts & Contrats</span>
-                @if($lenderPendingRentals > 0)
+                @if($totalPending > 0)
                     <span class="sidebar-nav-badge" style="background:#EF4444; color:#fff;" title="Demandes en attente de validation">
-                        {{ $lenderPendingRentals }}
+                        {{ $totalPending }}
                     </span>
                 @else
                     <span class="sidebar-nav-badge" title="Total réservations">
-                        {{ \App\Models\Rental::whereHas('equipment', fn($q) => $q->where('user_id', auth()->id()))->count() }}
+                        {{ $totalAll }}
                     </span>
                 @endif
             </a>

@@ -125,16 +125,33 @@
                                 </button>
                             </div>
 
+                            @if($equipments->isEmpty())
+                                <div class="alert alert-warning rounded-3 p-3 mb-3 border-0 d-flex align-items-start gap-3" style="background: #FFFBEB; color: #92400E; border-left: 4px solid #F59E0B !important;">
+                                    <span style="font-size: 1.3rem; line-height: 1;">⚠️</span>
+                                    <div>
+                                        <strong class="d-block mb-1">Aucun équipement disponible dans votre catalogue :</strong>
+                                        <p class="mb-2 small">
+                                            En tant que prêteur, vous ne pouvez composer un pack solaire qu'à partir de <strong>vos propres équipements approuvés</strong>. Vous n'avez actuellement aucun matériel validé.
+                                        </p>
+                                        <a href="{{ route('equipment.create') }}" class="btn btn-sm btn-dark rounded-pill px-3 fw-bold">
+                                            + Ajouter un équipement
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
+
                             <div id="equipment-rows-container">
                                 <!-- Row 0 -->
                                 <div class="row g-2 align-items-end mb-3 equipment-row p-3 rounded-3 bg-white border">
                                     <div class="col-md-5">
                                         <label class="form-label fw-bold small text-dark mb-1">Équipement <span class="text-danger">*</span></label>
-                                        <select name="items[0][equipment_id]" class="form-select rounded-3 py-2 equipment-select {{ $errors->has('items.0.equipment_id') || $errors->has('items.*.equipment_id') ? 'is-invalid' : '' }}" required>
-                                            <option value="" disabled {{ old('items.0.equipment_id') ? '' : 'selected' }}>-- Choisir un équipement --</option>
+                                        <select name="items[0][equipment_id]" class="form-select rounded-3 py-2 equipment-select {{ $errors->has('items.0.equipment_id') || $errors->has('items.*.equipment_id') ? 'is-invalid' : '' }}" required {{ $equipments->isEmpty() ? 'disabled' : '' }}>
+                                            <option value="" disabled {{ old('items.0.equipment_id') ? '' : 'selected' }}>
+                                                {{ $equipments->isEmpty() ? '-- Aucun équipement approuvé dans votre catalogue --' : '-- Choisir un équipement --' }}
+                                            </option>
                                             @foreach($equipments as $eq)
                                                 <option value="{{ $eq->id }}" {{ old('items.0.equipment_id') == $eq->id ? 'selected' : '' }}>
-                                                    {{ $eq->name }} ({{ $eq->category?->name }}) — {{ number_format($eq->daily_rate, 2) }} TND/j
+                                                    {{ $eq->name }} ({{ $eq->category?->name }}) — {{ number_format($eq->daily_rate, 2) }} TND/j {{ auth()->user()->isAdmin() && $eq->user ? '— Par: ' . $eq->user->name : '' }}
                                                 </option>
                                             @endforeach
                                         </select>

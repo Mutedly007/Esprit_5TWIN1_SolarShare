@@ -30,9 +30,11 @@
             </div>
             <div class="d-flex flex-wrap gap-2">
                 @auth
-                    <a href="{{ route('energy-kits.create') }}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 0.92rem; box-shadow: 0 4px 14px rgba(255, 107, 61, 0.3);">
-                        + Composer un Pack Solaire
-                    </a>
+                    @if(auth()->user()->isLender())
+                        <a href="{{ route('energy-kits.create') }}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 0.92rem; box-shadow: 0 4px 14px rgba(255, 107, 61, 0.3);">
+                            + Composer un Pack Solaire
+                        </a>
+                    @endif
                 @else
                     <a href="{{ route('login') }}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 0.92rem;">
                         + Connectez-vous pour composer un Pack
@@ -78,9 +80,11 @@
                 </p>
                 <div>
                     @auth
-                        <a href="{{ route('energy-kits.create') }}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520;">
-                            + Créer un Pack Solaire
-                        </a>
+                        @if(auth()->user()->isLender())
+                            <a href="{{ route('energy-kits.create') }}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520;">
+                                + Créer un Pack Solaire
+                            </a>
+                        @endif
                     @endauth
                 </div>
             </div>

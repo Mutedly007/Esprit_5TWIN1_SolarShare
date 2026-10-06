@@ -131,7 +131,7 @@
                                             <select name="items[{{ $idx }}][equipment_id]" class="form-select rounded-3 py-2" required>
                                                 @foreach($equipments as $eq)
                                                     <option value="{{ $eq->id }}" {{ $item->id === $eq->id ? 'selected' : '' }}>
-                                                        {{ $eq->name }} ({{ $eq->category?->name }}) — {{ number_format($eq->daily_rate, 2) }} TND/j
+                                                        {{ $eq->name }} ({{ $eq->category?->name }}) — {{ number_format($eq->daily_rate, 2) }} TND/j {{ auth()->user()->isAdmin() && $eq->user ? '— Par: ' . $eq->user->name : '' }}
                                                     </option>
                                                 @endforeach
                                             </select>

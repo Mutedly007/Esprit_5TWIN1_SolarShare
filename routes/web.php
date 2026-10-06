@@ -157,6 +157,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('categories', \App\Http\Controllers\CategoryController::class);
         Route::resource('equipment', \App\Http\Controllers\EquipmentController::class);
         Route::get('/lender/rentals', [\App\Http\Controllers\LenderRentalController::class, 'index'])->name('lender.rentals.index');
+        Route::patch('/lender/pack-reservations/{reservation}/status', [\App\Http\Controllers\LenderRentalController::class, 'updateKitReservationStatus'])->name('lender.kit-reservations.status');
     });
 
     // Rentals & Inspections (Cycle de location - Developer 2 Module)
@@ -178,16 +179,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/inspections/{inspection}/validate', [\App\Http\Controllers\InspectionReportController::class, 'validateReport'])->name('inspections.validate');
     Route::delete('/inspections/{inspection}', [\App\Http\Controllers\InspectionReportController::class, 'destroy'])->name('inspections.destroy');
 
-    // Energy Kits CRUD & Equipment Management (Developer 3 Module)
-    Route::get('/packs/create', [\App\Http\Controllers\EnergyKitController::class, 'create'])->name('energy-kits.create');
-    Route::post('/packs', [\App\Http\Controllers\EnergyKitController::class, 'store'])->name('energy-kits.store');
-    Route::get('/packs/{energyKit}/edit', [\App\Http\Controllers\EnergyKitController::class, 'edit'])->name('energy-kits.edit');
-    Route::put('/packs/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'update'])->name('energy-kits.update');
-    Route::delete('/packs/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'destroy'])->name('energy-kits.destroy');
-    Route::post('/packs/{energyKit}/attach', [\App\Http\Controllers\EnergyKitController::class, 'attachEquipment'])->name('energy-kits.attach');
-    Route::delete('/packs/{energyKit}/equipment/{equipment}', [\App\Http\Controllers\EnergyKitController::class, 'detachEquipment'])->name('energy-kits.detach');
+    // Energy Kits CRUD & Equipment Management (Developer 3 Module - Restricted to Lenders & Admins)
+    Route::get('/packs/create', [\App\Http\Controllers\EnergyKitController::class, 'create'])->middleware('lender')->name('energy-kits.create');
+    Route::post('/packs', [\App\Http\Controllers\EnergyKitController::class, 'store'])->middleware('lender')->name('energy-kits.store');
+    Route::get('/packs/{energyKit}/edit', [\App\Http\Controllers\EnergyKitController::class, 'edit'])->middleware('lender')->name('energy-kits.edit');
+    Route::put('/packs/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'update'])->middleware('lender')->name('energy-kits.update');
+    Route::delete('/packs/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'destroy'])->middleware('lender')->name('energy-kits.destroy');
+    Route::post('/packs/{energyKit}/attach', [\App\Http\Controllers\EnergyKitController::class, 'attachEquipment'])->middleware('lender')->name('energy-kits.attach');
+    Route::delete('/packs/{energyKit}/equipment/{equipment}', [\App\Http\Controllers\EnergyKitController::class, 'detachEquipment'])->middleware('lender')->name('energy-kits.detach');
     Route::post('/packs/{energyKit}/reserve', [\App\Http\Controllers\EnergyKitController::class, 'reserve'])->middleware('renter')->name('energy-kits.reserve');
-    Route::post('/packs/{energyKit}/toggle', [\App\Http\Controllers\EnergyKitController::class, 'toggle'])->name('energy-kits.toggle');
+    Route::post('/packs/{energyKit}/toggle', [\App\Http\Controllers\EnergyKitController::class, 'toggle'])->middleware('lender')->name('energy-kits.toggle');
 });
 
 // Public Packs Solaires (Energy Kits)

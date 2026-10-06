@@ -724,6 +724,9 @@
             <div class="rentals-kpi-info">
                 <span class="kpi-label">Total Réservations</span>
                 <span class="kpi-value">{{ $stats['total'] }}</span>
+                <span class="d-block text-muted" style="font-size: 0.72rem; margin-top: 0.25rem;">
+                    {{ $stats['equipment_total'] }} matériel(s) · {{ $stats['packs_total'] }} pack(s)
+                </span>
             </div>
             <div class="rentals-kpi-icon" style="background: rgba(15, 92, 107, 0.08); color: #0F5C6B;">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -740,6 +743,9 @@
             <div class="rentals-kpi-info">
                 <span class="kpi-label">À Confirmer</span>
                 <span class="kpi-value" style="color: #D97706;">{{ $stats['pending'] }}</span>
+                <span class="d-block text-muted" style="font-size: 0.72rem; margin-top: 0.25rem;">
+                    {{ $stats['equipment_pending'] }} mat. · {{ $stats['packs_pending'] }} pack(s)
+                </span>
             </div>
             <div class="rentals-kpi-icon" style="background: #FEF3C7; color: #D97706;">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -780,42 +786,86 @@
         </div>
     </div>
 
+    <!-- Segment Switcher: Matériel Individuel vs Packs Solaires -->
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <div class="d-inline-flex p-1 bg-white border rounded-pill shadow-sm">
+            <a href="{{ route('lender.rentals.index', array_filter(['tab' => 'equipment', 'status' => request('status'), 'search' => request('search')])) }}" 
+               class="btn btn-sm rounded-pill px-3 py-2 fw-bold text-decoration-none d-flex align-items-center gap-2 {{ $tab !== 'packs' ? 'btn-dark' : 'text-secondary' }}"
+               id="tab-switcher-equipment"
+               style="{{ $tab !== 'packs' ? 'background: #0F5C6B; border-color: #0F5C6B; color: #FFFFFF !important;' : '' }}">
+                <span>⚡ Équipements Individuels</span>
+                <span class="badge {{ $tab !== 'packs' ? 'bg-white text-dark' : 'bg-light text-secondary border' }}">
+                    {{ $rentalStats['total'] }}
+                </span>
+                @if($rentalStats['pending'] > 0)
+                    <span class="badge bg-warning text-dark">{{ $rentalStats['pending'] }} en attente</span>
+                @endif
+            </a>
+
+            <a href="{{ route('lender.rentals.index', array_filter(['tab' => 'packs', 'status' => request('status'), 'search' => request('search')])) }}" 
+               class="btn btn-sm rounded-pill px-3 py-2 fw-bold text-decoration-none d-flex align-items-center gap-2 {{ $tab === 'packs' ? 'btn-dark' : 'text-secondary' }}"
+               id="tab-switcher-packs"
+               style="{{ $tab === 'packs' ? 'background: #C2410C; border-color: #C2410C; color: #FFFFFF !important;' : '' }}">
+                <span>📦 Packs Solaires Clé-en-main</span>
+                <span class="badge {{ $tab === 'packs' ? 'bg-white text-dark' : 'bg-light text-secondary border' }}">
+                    {{ $kitStats['total'] }}
+                </span>
+                @if($kitStats['pending'] > 0)
+                    <span class="badge bg-danger text-white">{{ $kitStats['pending'] }} à valider</span>
+                @endif
+            </a>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('energy-kits.create') }}" class="btn btn-sm btn-outline-warning rounded-pill px-3 py-2 fw-bold d-flex align-items-center gap-1 shadow-sm" style="color: #92400E; border-color: #F59E0B; background: #FFFBEB; text-decoration: none;">
+                <span>✨ Créer un Pack Solaire</span>
+            </a>
+            <a href="{{ route('energy-kits.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 py-2 fw-bold text-secondary shadow-sm" target="_blank" style="text-decoration: none;">
+                <span>Catalogue Packs ↗</span>
+            </a>
+        </div>
+    </div>
+
     <!-- Filter & Search Toolbar -->
     <div class="table-toolbar-wrap">
+        @php
+            $currentStats = ($tab === 'packs') ? $kitStats : $rentalStats;
+        @endphp
         <div class="filter-tabs-strip">
-            <a href="{{ route('lender.rentals.index', array_filter(['search' => request('search')])) }}" 
+            <a href="{{ route('lender.rentals.index', array_filter(['tab' => $tab, 'search' => request('search')])) }}" 
                class="filter-tab-btn {{ empty($status) ? 'is-active' : '' }}">
                 <span>Toutes</span>
-                <span class="tab-count">{{ $stats['total'] }}</span>
+                <span class="tab-count">{{ $currentStats['total'] }}</span>
             </a>
-            <a href="{{ route('lender.rentals.index', array_filter(['status' => 'pending', 'search' => request('search')])) }}" 
+            <a href="{{ route('lender.rentals.index', array_filter(['tab' => $tab, 'status' => 'pending', 'search' => request('search')])) }}" 
                class="filter-tab-btn tab-pending {{ $status === 'pending' ? 'is-active' : '' }}">
                 <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #F59E0B;"></span>
                 <span>En attente</span>
-                <span class="tab-count">{{ $stats['pending'] }}</span>
+                <span class="tab-count">{{ $currentStats['pending'] }}</span>
             </a>
-            <a href="{{ route('lender.rentals.index', array_filter(['status' => 'confirmed', 'search' => request('search')])) }}" 
+            <a href="{{ route('lender.rentals.index', array_filter(['tab' => $tab, 'status' => 'confirmed', 'search' => request('search')])) }}" 
                class="filter-tab-btn tab-confirmed {{ $status === 'confirmed' ? 'is-active' : '' }}">
                 <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #0284C7;"></span>
                 <span>Confirmées</span>
-                <span class="tab-count">{{ $stats['confirmed'] }}</span>
+                <span class="tab-count">{{ $currentStats['confirmed'] }}</span>
             </a>
-            <a href="{{ route('lender.rentals.index', array_filter(['status' => 'active', 'search' => request('search')])) }}" 
+            <a href="{{ route('lender.rentals.index', array_filter(['tab' => $tab, 'status' => 'active', 'search' => request('search')])) }}" 
                class="filter-tab-btn tab-active {{ $status === 'active' ? 'is-active' : '' }}">
                 <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #16A34A;"></span>
                 <span>En cours</span>
-                <span class="tab-count">{{ $stats['active'] }}</span>
+                <span class="tab-count">{{ $currentStats['active'] }}</span>
             </a>
-            <a href="{{ route('lender.rentals.index', array_filter(['status' => 'completed', 'search' => request('search')])) }}" 
+            <a href="{{ route('lender.rentals.index', array_filter(['tab' => $tab, 'status' => 'completed', 'search' => request('search')])) }}" 
                class="filter-tab-btn tab-completed {{ $status === 'completed' ? 'is-active' : '' }}">
                 <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #64748B;"></span>
                 <span>Terminées</span>
-                <span class="tab-count">{{ $stats['completed'] }}</span>
+                <span class="tab-count">{{ $currentStats['completed'] }}</span>
             </a>
         </div>
 
         <!-- Search Bar -->
         <form method="GET" action="{{ route('lender.rentals.index') }}" class="search-filter-box">
+            <input type="hidden" name="tab" value="{{ $tab }}">
             @if(!empty($status))
                 <input type="hidden" name="status" value="{{ $status }}">
             @endif
@@ -826,11 +876,290 @@
             <input type="text" 
                    name="search" 
                    value="{{ request('search') }}" 
-                   placeholder="Rechercher (contrat, client, matériel)..." 
+                   placeholder="{{ $tab === 'packs' ? 'Rechercher (pack, client)...' : 'Rechercher (contrat, client, matériel)...' }}" 
                    class="search-filter-input">
         </form>
     </div>
 
+    @if($tab === 'packs')
+    <!-- Packs Solaires Table Card -->
+    <div class="rentals-card-wrap">
+        <div class="rentals-card-header">
+            <div class="d-flex align-items-center gap-2">
+                <h3 class="rentals-card-title">
+                    <span style="font-size: 1.25rem;">📦</span>
+                    <span>Packs Solaires : Réservations Reçues</span>
+                </h3>
+                <span class="rentals-card-badge" style="background: rgba(234, 88, 12, 0.1); color: #C2410C;">
+                    {{ $kitReservations->total() }} au total
+                </span>
+            </div>
+
+            @if(request('search'))
+                <div class="d-flex align-items-center gap-2">
+                    <span style="font-size: 0.8rem; color: #64748B;">
+                        Résultats pour : <strong style="color: #0F172A;">« {{ request('search') }} »</strong>
+                    </span>
+                    <a href="{{ route('lender.rentals.index', array_filter(['tab' => 'packs', 'status' => $status])) }}" 
+                       class="text-decoration-none small fw-bold" style="color: #C2410C;">
+                        Effacer ✕
+                    </a>
+                </div>
+            @endif
+        </div>
+
+        @if($kitReservations->isEmpty())
+            <div class="p-5 text-center bg-white">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: #FFF7ED; border: 1px dashed #FDBA74; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1rem; color: #EA580C; font-size: 1.75rem;">
+                    📦
+                </div>
+                <h5 class="fw-bold text-dark mb-1">Aucune réservation de pack trouvée</h5>
+                <p class="text-muted small mx-auto mb-3" style="max-width: 440px;">
+                    @if(request('search') || !empty($status))
+                        Aucune réservation de pack ne correspond aux critères sélectionnés. Vous pouvez réinitialiser les filtres pour revoir toutes vos réservations.
+                    @else
+                        Vous n'avez pas encore reçu de demande de réservation pour vos Packs Solaires. Dès qu'un emprunteur réserve l'un de vos kits clés-en-main avec le tarif remisé, sa demande apparaîtra ici.
+                    @endif
+                </p>
+                @if(request('search') || !empty($status))
+                    <a href="{{ route('lender.rentals.index', ['tab' => 'packs']) }}" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-1">
+                        Réinitialiser tous les filtres
+                    </a>
+                @endif
+            </div>
+        @else
+            <div class="rentals-table-container">
+                <table class="rentals-custom-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 140px;">Réf. Pack</th>
+                            <th style="min-width: 200px;">Locataire</th>
+                            <th style="min-width: 240px;">Pack Solaire Inclus</th>
+                            <th style="min-width: 175px;">Période & Durée</th>
+                            <th style="min-width: 150px;">Tarif & Remise</th>
+                            <th style="min-width: 130px;">Statut</th>
+                            <th style="text-align: right; min-width: 180px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($kitReservations as $kitRes)
+                            <tr>
+                                <!-- Réf Réservation Pack -->
+                                <td>
+                                    <span class="contract-ref-pill" style="background: rgba(234, 88, 12, 0.1); color: #C2410C;">
+                                        #PACK-{{ str_pad($kitRes->id, 5, '0', STR_PAD_LEFT) }}
+                                    </span>
+                                    <span class="contract-date-sub">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                        </svg>
+                                        {{ $kitRes->created_at->format('d/m/Y') }}
+                                    </span>
+                                </td>
+
+                                <!-- Locataire -->
+                                <td>
+                                    <div class="locataire-cell">
+                                        <div class="locataire-avatar" title="{{ $kitRes->user->name }}" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); color: #071520;">
+                                            {{ strtoupper(substr($kitRes->user->name, 0, 2)) }}
+                                        </div>
+                                        <div class="locataire-info">
+                                            <span class="locataire-name">{{ $kitRes->user->name }}</span>
+                                            <span class="locataire-email">{{ $kitRes->user->email }}</span>
+                                            @if($kitRes->notes)
+                                                <span class="text-muted d-block mt-1" style="font-size: 0.73rem; font-style: italic;" title="{{ $kitRes->notes }}">
+                                                    💬 « {{ Str::limit($kitRes->notes, 35) }} »
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Pack Solaire Concerné -->
+                                <td>
+                                    <div>
+                                        <a href="{{ route('energy-kits.show', $kitRes->energyKit->slug) }}" 
+                                           class="fw-bold text-decoration-none d-block mb-1" 
+                                           style="color: #0F5C6B; font-size: 0.92rem;" 
+                                           target="_blank">
+                                            📦 {{ $kitRes->energyKit->title }} ↗
+                                        </a>
+                                        <div class="d-flex align-items-center gap-1 flex-wrap">
+                                            <span class="badge rounded-pill" style="background: #FEF3C7; color: #92400E; font-size: 0.72rem; border: 1px solid #FCD34D;">
+                                                Remise -{{ rtrim(rtrim(number_format($kitRes->energyKit->discount_percentage, 1), '0'), '.') }}%
+                                            </span>
+                                            <span class="text-muted" style="font-size: 0.74rem;">
+                                                ({{ $kitRes->energyKit->equipment->count() }} équipement(s))
+                                            </span>
+                                        </div>
+                                        @if($kitRes->energyKit->equipment->isNotEmpty())
+                                            <div class="mt-1 text-muted" style="font-size: 0.72rem; line-height: 1.3;">
+                                                @foreach($kitRes->energyKit->equipment->take(2) as $bundled)
+                                                    <span>• {{ $bundled->pivot->quantity }}x {{ Str::limit($bundled->name, 28) }}</span><br>
+                                                @endforeach
+                                                @if($kitRes->energyKit->equipment->count() > 2)
+                                                    <span class="text-secondary">+{{ $kitRes->energyKit->equipment->count() - 2 }} autre(s)</span>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
+                                </td>
+
+                                <!-- Période & Durée -->
+                                <td>
+                                    <div class="period-cell">
+                                        <div class="period-dates">
+                                            <span>{{ $kitRes->start_date->format('d/m/Y') }}</span>
+                                            <span class="period-arrow">&rarr;</span>
+                                            <span>{{ $kitRes->end_date->format('d/m/Y') }}</span>
+                                        </div>
+                                        <span class="period-duration">
+                                            {{ $kitRes->days_count }} {{ Str::plural('jour', $kitRes->days_count) }}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <!-- Montant & Caution avec remise Pack -->
+                                <td>
+                                    <div class="amount-cell">
+                                        <span class="amount-total" style="color: #C2410C;">
+                                            {{ number_format($kitRes->total_price, 2) }}
+                                        </span>
+                                        <span class="amount-currency">TND</span>
+                                        <span class="d-block text-muted" style="font-size: 0.72rem;">
+                                            {{ number_format($kitRes->daily_rate, 2) }} TND / jour
+                                        </span>
+                                        <span class="amount-deposit">
+                                            Caution : <strong style="color: #475569;">{{ number_format($kitRes->deposit_amount, 2) }} TND</strong>
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <!-- Statut -->
+                                <td>
+                                    @if($kitRes->status === 'pending')
+                                        <span class="status-pill status-pending">
+                                            <span class="status-dot"></span>
+                                            En attente
+                                        </span>
+                                    @elseif($kitRes->status === 'confirmed')
+                                        <span class="status-pill status-confirmed">
+                                            <span class="status-dot"></span>
+                                            Confirmée
+                                        </span>
+                                    @elseif($kitRes->status === 'active')
+                                        <span class="status-pill status-active">
+                                            <span class="status-dot"></span>
+                                            En cours
+                                        </span>
+                                    @elseif($kitRes->status === 'completed')
+                                        <span class="status-pill status-completed">
+                                            <span class="status-dot"></span>
+                                            Terminée
+                                        </span>
+                                    @elseif($kitRes->status === 'cancelled')
+                                        <span class="status-pill status-cancelled">
+                                            <span class="status-dot"></span>
+                                            Annulée
+                                        </span>
+                                    @else
+                                        <span class="badge bg-secondary">{{ ucfirst($kitRes->status) }}</span>
+                                    @endif
+                                </td>
+
+                                <!-- Actions -->
+                                <td>
+                                    <div class="actions-cell-wrap">
+                                        @if($kitRes->status === 'pending')
+                                            {{-- Bouton Confirmer --}}
+                                            <form method="POST" action="{{ route('lender.kit-reservations.status', $kitRes) }}" class="d-inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="status" value="confirmed">
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-success rounded-pill px-3 py-1 fw-bold d-inline-flex align-items-center gap-1 shadow-sm"
+                                                        title="Valider et confirmer cette réservation">
+                                                    <span>✓</span>
+                                                    <span>Confirmer</span>
+                                                </button>
+                                            </form>
+
+                                            {{-- Bouton Refuser --}}
+                                            <form method="POST" action="{{ route('lender.kit-reservations.status', $kitRes) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir refuser/annuler cette réservation ?');">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="status" value="cancelled">
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1"
+                                                        title="Refuser cette réservation">
+                                                    <span>✕</span>
+                                                </button>
+                                            </form>
+                                        @elseif($kitRes->status === 'confirmed')
+                                            {{-- Bouton Démarrer --}}
+                                            <form method="POST" action="{{ route('lender.kit-reservations.status', $kitRes) }}" class="d-inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="status" value="active">
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-primary rounded-pill px-3 py-1 fw-bold d-inline-flex align-items-center gap-1"
+                                                        style="background: #0284C7; border-color: #0284C7;"
+                                                        title="Marquer le pack comme remis au locataire">
+                                                    <span>▶ En cours</span>
+                                                </button>
+                                            </form>
+
+                                            <form method="POST" action="{{ route('lender.kit-reservations.status', $kitRes) }}" class="d-inline" onsubmit="return confirm('Annuler cette réservation ?');">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="status" value="cancelled">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1" title="Annuler">
+                                                    ✕
+                                                </button>
+                                            </form>
+                                        @elseif($kitRes->status === 'active')
+                                            {{-- Bouton Terminer --}}
+                                            <form method="POST" action="{{ route('lender.kit-reservations.status', $kitRes) }}" class="d-inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="status" value="completed">
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-secondary rounded-pill px-3 py-1 fw-bold d-inline-flex align-items-center gap-1"
+                                                        title="Marquer comme restitué avec succès">
+                                                    <span>✓ Restitué</span>
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        {{-- Lien vers la fiche du Pack --}}
+                                        <a href="{{ route('energy-kits.show', $kitRes->energyKit->slug) }}" 
+                                           class="btn-action-custom btn-action-view" 
+                                           target="_blank"
+                                           title="Voir la page publique du pack">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                <polyline points="15 3 21 3 21 9"></polyline>
+                                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                                            </svg>
+                                            <span>Fiche Pack</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            @if($kitReservations->hasPages())
+                <div class="mt-4 d-flex justify-content-center">
+                    {{ $kitReservations->links() }}
+                </div>
+            @endif
+        @endif
+    </div>
+    @else
     <!-- Rentals Table Card -->
     <div class="rentals-card-wrap">
         <div class="rentals-card-header">
@@ -1146,6 +1475,7 @@
         <div class="mt-4 d-flex justify-content-center">
             {{ $rentals->links() }}
         </div>
+    @endif
     @endif
 
 </div>

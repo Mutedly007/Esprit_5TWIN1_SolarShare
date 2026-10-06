@@ -204,6 +204,87 @@
             </div>
         @endif
 
+        @if(isset($kitReservations) && $kitReservations->isNotEmpty())
+            <!-- Packs Solaires Réservés Section -->
+            <div class="mt-5 pt-4 border-top">
+                <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                    <div>
+                        <span class="badge rounded-pill text-uppercase fw-bold px-3 py-2 mb-2" style="background: rgba(234, 88, 12, 0.15); color: #C2410C; font-size: 0.75rem; letter-spacing: 0.05em;">
+                            📦 Formules Clé-en-main
+                        </span>
+                        <h2 class="h4 fw-bold mb-1" style="color: #10202B;">Mes Packs Solaires Réservés ({{ $kitReservations->count() }})</h2>
+                        <p class="text-muted mb-0 small">
+                            Suivez vos réservations de kits groupés avec remise pack appliquée.
+                        </p>
+                    </div>
+                    <a href="{{ route('energy-kits.index') }}" class="btn btn-outline-secondary rounded-pill px-3 py-2" style="font-size: 0.88rem;">
+                        ✨ Voir tous les Packs Solaires
+                    </a>
+                </div>
+
+                <div class="row g-4">
+                    @foreach($kitReservations as $kRes)
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white overflow-hidden d-flex flex-column">
+                                <div class="p-3 border-bottom d-flex align-items-center justify-content-between" style="background: #FFF7ED;">
+                                    <span style="font-size: 0.78rem; font-weight: 700; color: #C2410C;">
+                                        #PACK-{{ str_pad($kRes->id, 5, '0', STR_PAD_LEFT) }}
+                                    </span>
+                                    {!! $kRes->status_badge !!}
+                                </div>
+
+                                <div class="p-4 flex-grow-1">
+                                    <h5 class="fw-bold mb-2">
+                                        <a href="{{ route('energy-kits.show', $kRes->energyKit->slug) }}" class="text-decoration-none" style="color: #0F5C6B;">
+                                            {{ $kRes->energyKit->title }}
+                                        </a>
+                                    </h5>
+
+                                    <div class="d-flex align-items-center gap-2 mb-3">
+                                        <span class="badge" style="background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D;">
+                                            Remise -{{ rtrim(rtrim(number_format($kRes->energyKit->discount_percentage, 1), '0'), '.') }}%
+                                        </span>
+                                        <span class="text-muted small">
+                                            ({{ $kRes->energyKit->equipment->count() }} équipement(s))
+                                        </span>
+                                    </div>
+
+                                    <div class="p-3 rounded-3 mb-3" style="background: #F8FAFC; border: 1px solid #E2E8F0; font-size: 0.85rem;">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">Période :</span>
+                                            <span class="fw-bold text-dark">{{ $kRes->start_date->format('d/m/Y') }} &rarr; {{ $kRes->end_date->format('d/m/Y') }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">Durée :</span>
+                                            <span class="fw-bold text-dark">{{ $kRes->days_count }} jour(s)</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">Tarif jour :</span>
+                                            <span class="fw-bold text-dark">{{ number_format($kRes->daily_rate, 2) }} TND/j</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between pt-2 border-top">
+                                            <span class="fw-bold text-dark">Montant Total :</span>
+                                            <span class="fw-bold" style="color: #C2410C; font-size: 1.05rem;">{{ number_format($kRes->total_price, 2) }} TND</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-1 text-muted small">
+                                            <span>Caution :</span>
+                                            <span>{{ number_format($kRes->deposit_amount, 2) }} TND</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-3 border-top bg-light text-end">
+                                    <a href="{{ route('energy-kits.show', $kRes->energyKit->slug) }}" class="btn btn-outline-dark rounded-pill btn-sm fw-bold px-3">
+                                        Consulter le Pack &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
     </div>
 </section>
 @endsection

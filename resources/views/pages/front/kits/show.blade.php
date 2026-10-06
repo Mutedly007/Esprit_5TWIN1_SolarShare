@@ -216,6 +216,127 @@
                         </div>
                     @endif
 
+                    <!-- Lender & Admin: Received Reservations Table for this Pack -->
+                    @auth
+                        @if(auth()->id() === $energyKit->user_id || auth()->user()->isAdmin())
+                            @php
+                                $receivedKitReservations = $energyKit->reservations()->with('user')->latest()->get();
+                            @endphp
+                            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mt-4" style="border-left: 4px solid #FF6B3D !important;">
+                                <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span style="font-size: 1.2rem;">📥</span>
+                                            <h5 class="fw-bold mb-0 text-dark">Réservations Reçues sur ce Pack Solaire</h5>
+                                            <span class="badge rounded-pill bg-light text-dark border">
+                                                {{ $receivedKitReservations->count() }} au total
+                                            </span>
+                                        </div>
+                                        <p class="text-muted small mb-0 mt-1">
+                                            En tant que propriétaire du pack, retrouvez les réservations enregistrées avec la remise pack appliquée (-{{ rtrim(rtrim(number_format($energyKit->discount_percentage, 1), '0'), '.') }}%).
+                                        </p>
+                                    </div>
+                                    <a href="{{ route('lender.rentals.index', ['tab' => 'packs']) }}" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-1 fw-bold text-decoration-none">
+                                        Espace Prêteur &rarr;
+                                    </a>
+                                </div>
+
+                                @if($receivedKitReservations->isEmpty())
+                                    <div class="p-4 text-center rounded-3" style="background: #F8FAFC; border: 1px dashed #CBD5E1;">
+                                        <p class="text-muted small mb-0">
+                                            Aucun emprunteur n'a encore réservé ce pack solaire. Dès qu'une réservation est validée, elle apparaîtra ici avec son détail financier.
+                                        </p>
+                                    </div>
+                                @else
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0" style="font-size: 0.88rem;">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Réf.</th>
+                                                    <th>Locataire</th>
+                                                    <th>Période & Durée</th>
+                                                    <th>Tarif Remisé</th>
+                                                    <th>Statut</th>
+                                                    <th style="text-align: right;">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($receivedKitReservations as $rRes)
+                                                    <tr>
+                                                        <td>
+                                                            <span class="fw-bold" style="color: #C2410C;">
+                                                                #PACK-{{ str_pad($rRes->id, 5, '0', STR_PAD_LEFT) }}
+                                                            </span>
+                                                            <span class="d-block text-muted" style="font-size: 0.72rem;">
+                                                                {{ $rRes->created_at->format('d/m/Y') }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <div class="fw-bold text-dark">{{ $rRes->user->name }}</div>
+                                                            <div class="text-muted" style="font-size: 0.78rem;">{{ $rRes->user->email }}</div>
+                                                            @if($rRes->notes)
+                                                                <div class="text-muted small mt-1" style="font-style: italic;">
+                                                                    💬 « {{ Str::limit($rRes->notes, 40) }} »
+                                                                </div>
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            <div>{{ $rRes->start_date->format('d/m/Y') }} &rarr; {{ $rRes->end_date->format('d/m/Y') }}</div>
+                                                            <span class="badge bg-light text-dark border">{{ $rRes->days_count }} jour(s)</span>
+                                                        </td>
+                                                        <td>
+                                                            <div class="fw-bold" style="color: #C2410C; font-size: 1rem;">
+                                                                {{ number_format($rRes->total_price, 2) }} TND
+                                                            </div>
+                                                            <span class="d-block text-muted" style="font-size: 0.75rem;">
+                                                                {{ number_format($rRes->daily_rate, 2) }} TND/j · Caution: {{ number_format($rRes->deposit_amount, 2) }} TND
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            {!! $rRes->status_badge !!}
+                                                        </td>
+                                                        <td style="text-align: right;">
+                                                            @if($rRes->status === 'pending')
+                                                                <form method="POST" action="{{ route('lender.kit-reservations.status', $rRes) }}" class="d-inline">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <input type="hidden" name="status" value="confirmed">
+                                                                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 py-1 fw-bold">
+                                                                        ✓ Confirmer
+                                                                    </button>
+                                                                </form>
+                                                            @elseif($rRes->status === 'confirmed')
+                                                                <form method="POST" action="{{ route('lender.kit-reservations.status', $rRes) }}" class="d-inline">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <input type="hidden" name="status" value="active">
+                                                                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 py-1 fw-bold" style="background:#0284C7; border-color:#0284C7;">
+                                                                        ▶ En cours
+                                                                    </button>
+                                                                </form>
+                                                            @elseif($rRes->status === 'active')
+                                                                <form method="POST" action="{{ route('lender.kit-reservations.status', $rRes) }}" class="d-inline">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <input type="hidden" name="status" value="completed">
+                                                                    <button type="submit" class="btn btn-sm btn-secondary rounded-pill px-3 py-1 fw-bold">
+                                                                        ✓ Restitué
+                                                                    </button>
+                                                                </form>
+                                                            @else
+                                                                <span class="text-muted small">-</span>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+                    @endauth
+
                 </div>
             </div>
 
@@ -296,6 +417,43 @@
                     @endif
 
                     @auth
+                        {{-- Incoming reservations for pack owner or admin --}}
+                        @if(auth()->id() === $energyKit->user_id || auth()->user()->isAdmin())
+                            @php
+                                $sidebarReceivedReservations = $energyKit->reservations()->with('user')->latest()->get();
+                            @endphp
+                            <div class="mb-3 p-3 rounded-3" style="background: #FFFBEB; border: 1.5px solid #FCD34D;">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="fw-bold text-dark" style="font-size: 0.85rem;">
+                                        📥 Réservations reçues ({{ $sidebarReceivedReservations->count() }}) :
+                                    </div>
+                                    @if($sidebarReceivedReservations->where('status', 'pending')->count() > 0)
+                                        <span class="badge bg-warning text-dark">{{ $sidebarReceivedReservations->where('status', 'pending')->count() }} en attente</span>
+                                    @endif
+                                </div>
+                                @if($sidebarReceivedReservations->isNotEmpty())
+                                    @foreach($sidebarReceivedReservations->take(3) as $rRes)
+                                        <div class="py-2 border-bottom border-warning-subtle" style="font-size: 0.8rem;">
+                                            <div class="d-flex justify-content-between fw-bold text-dark">
+                                                <span>{{ $rRes->user->name }}</span>
+                                                <span style="color: #C2410C;">{{ number_format($rRes->total_price, 2) }} TND</span>
+                                            </div>
+                                            <div class="text-muted d-flex justify-content-between align-items-center mt-1">
+                                                <span>{{ $rRes->start_date->format('d/m/y') }} &rarr; {{ $rRes->end_date->format('d/m/y') }} ({{ $rRes->days_count }}j)</span>
+                                                {!! $rRes->status_badge !!}
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    <a href="{{ route('lender.rentals.index', ['tab' => 'packs']) }}" class="btn btn-sm btn-dark w-100 mt-2 rounded-pill fw-bold" style="font-size: 0.78rem;">
+                                        Gérer dans l'Espace Prêteur &rarr;
+                                    </a>
+                                @else
+                                    <span class="text-muted small">Aucune réservation pour le moment.</span>
+                                @endif
+                            </div>
+                        @endif
+
+                        {{-- Outgoing reservations made by the current user --}}
                         @php
                             $userReservations = $energyKit->reservations()->where('user_id', auth()->id())->latest()->get();
                         @endphp

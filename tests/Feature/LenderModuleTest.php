@@ -192,7 +192,7 @@ class LenderModuleTest extends TestCase
     {
         Storage::fake('public');
 
-        $imageFile = UploadedFile::fake()->image('solar-panel.jpg', 600, 600);
+        $imageFile = UploadedFile::fake()->create('solar-panel.jpg', 100, 'image/jpeg');
 
         $response = $this->actingAs($this->lender)
             ->post(route('equipment.store'), [
