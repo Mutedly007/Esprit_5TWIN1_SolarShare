@@ -51,7 +51,7 @@
 
                 <!-- Module 4: Hubs Relais -->
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#hubs" aria-expanded="false">
+                    <a class="sidebar-link {{ request()->routeIs('admin.hubs.*') ? 'active' : '' }}" href="{{ route('admin.hubs.index') }}" aria-expanded="false">
                         <i data-feather="map-pin" class="feather-icon text-muted"></i>
                         <span class="hide-menu">Hubs Relais</span>
                     </a>
