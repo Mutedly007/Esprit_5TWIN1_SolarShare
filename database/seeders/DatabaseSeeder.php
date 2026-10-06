@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             EquipmentSeeder::class,
             RentalSeeder::class,
             EnergyKitSeeder::class,
+            CollectionHubSeeder::class,
         ]);
     }
 }
