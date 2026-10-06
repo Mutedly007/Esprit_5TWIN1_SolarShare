@@ -4,8 +4,7 @@
 @section('title', 'SolarShare Admin — Hubs de Retrait Locaux & Créneaux')
 
 @section('content')
-<div class="page-wrapper">
-    
+
     <!-- Page Breadcrumb -->
     <div class="page-breadcrumb">
         <div class="row">
@@ -268,5 +267,4 @@
         </div>
 
     </div>
-</div>
 @endsection

@@ -32,9 +32,11 @@
                 <a href="{{ route('marketplace') }}" class="btn btn-outline-secondary rounded-pill px-3 py-2" style="font-size: 0.9rem;">
                     🔍 Explorer le Catalogue
                 </a>
-                <a href="{{ route('rentals.create') }}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 0.9rem; box-shadow: 0 4px 14px rgba(255, 107, 61, 0.3);">
-                    + Nouvelle Réservation
-                </a>
+                @if(auth()->user()->isRenter())
+                    <a href="{{ route('rentals.create') }}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 0.9rem; box-shadow: 0 4px 14px rgba(255, 107, 61, 0.3);">
+                        + Nouvelle Réservation
+                    </a>
+                @endif
             </div>
         </div>
 

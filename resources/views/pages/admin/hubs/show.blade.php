@@ -4,8 +4,7 @@
 @section('title', 'SolarShare Admin — Fiche Hub Relais & Créneaux')
 
 @section('content')
-<div class="page-wrapper">
-    
+
     <div class="page-breadcrumb">
         <div class="row">
             <div class="col-7 align-self-center">
@@ -309,7 +308,6 @@
         </div>
 
     </div>
-</div>
 
 <!-- Delete Hub Modal Confirmation -->
 <div class="modal fade" id="deleteHubModal" tabindex="-1" aria-hidden="true">

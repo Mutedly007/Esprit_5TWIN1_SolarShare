@@ -88,6 +88,29 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user can reserve/rent equipment (renter, both, or admin).
+     */
+    public function canReserveEquipment(): bool
+    {
+        return $this->isRenter();
+    }
+
+    /**
+     * Get human-readable label for solar role.
+     */
+    public function getSolarRoleLabelAttribute(): string
+    {
+        $role = strtolower((string) ($this->solar_role ?? $this->role ?? ''));
+        return match ($role) {
+            'admin' => 'Administrateur',
+            'lend' => 'Prêteur (Lend)',
+            'rent' => 'Emprunteur (Rent)',
+            'both' => 'Mixte (Lend & Rent)',
+            default => 'Non défini',
+        };
+    }
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>

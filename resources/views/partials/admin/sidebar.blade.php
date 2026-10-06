@@ -7,10 +7,10 @@
             <ul id="sidebarnav">
                 <!-- Main Dashboard link matching FreeDash pill style -->
                 <li class="sidebar-item my-1">
-                    <a class="sidebar-link active text-white d-flex align-items-center" href="{{ route('admin.dashboard') }}" 
-                        style="background: linear-gradient(135deg, #5f76e8, #7b8ff5) !important; border-radius: 8px !important; margin: 0 12px; padding: 10px 16px; box-shadow: 0 4px 15px rgba(95, 118, 232, 0.35);" 
+                    <a class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active text-white' : '' }} d-flex align-items-center" href="{{ route('admin.dashboard') }}" 
+                        style="{{ request()->routeIs('admin.dashboard') ? 'background: linear-gradient(135deg, #5f76e8, #7b8ff5) !important; border-radius: 8px !important; margin: 0 12px; padding: 10px 16px; box-shadow: 0 4px 15px rgba(95, 118, 232, 0.35);' : 'margin: 0 12px; padding: 10px 16px;' }}" 
                         aria-expanded="false">
-                        <i data-feather="home" class="feather-icon text-white me-2" style="width: 18px; height: 18px;"></i>
+                        <i data-feather="home" class="feather-icon {{ request()->routeIs('admin.dashboard') ? 'text-white' : 'text-muted' }} me-2" style="width: 18px; height: 18px;"></i>
                         <span class="hide-menu fw-bold">Dashboard</span>
                     </a>
                 </li>
@@ -22,8 +22,8 @@
 
                 <!-- Module 1: Équipements -->
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#equipments" aria-expanded="false">
-                        <i data-feather="sun" class="feather-icon text-muted"></i>
+                    <a class="sidebar-link {{ request()->routeIs('admin.equipment.*') ? 'active' : '' }}" href="{{ route('admin.equipment.index') }}" aria-expanded="false">
+                        <i data-feather="sun" class="feather-icon {{ request()->routeIs('admin.equipment.*') ? 'text-primary' : 'text-muted' }}"></i>
                         <span class="hide-menu">Équipements</span>
                     </a>
                 </li>
@@ -59,8 +59,8 @@
 
                 <!-- Administration: Utilisateurs -->
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#users" aria-expanded="false">
-                        <i data-feather="users" class="feather-icon text-muted"></i>
+                    <a class="sidebar-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}" aria-expanded="false">
+                        <i data-feather="users" class="feather-icon {{ request()->routeIs('admin.users.*') ? 'text-primary' : 'text-muted' }}"></i>
                         <span class="hide-menu">Utilisateurs</span>
                     </a>
                 </li>

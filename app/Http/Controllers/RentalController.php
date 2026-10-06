@@ -46,6 +46,12 @@ class RentalController extends Controller
      */
     public function create(Request $request)
     {
+        $user = Auth::user();
+
+        if (! $user || ! $user->isRenter()) {
+            abort(403, 'Accès réservé aux emprunteurs (rôle Rent ou Both). Votre rôle actuel de prêteur ne vous permet pas de réserver des équipements.');
+        }
+
         $equipmentId = $request->query('equipment_id');
         $selectedEquipment = null;
 
@@ -66,6 +72,12 @@ class RentalController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+
+        if (! $user || ! $user->isRenter()) {
+            abort(403, 'Accès réservé aux emprunteurs (rôle Rent ou Both). Votre rôle actuel de prêteur ne vous permet pas de réserver des équipements.');
+        }
+
         $validated = $request->validate([
             'equipment_id' => ['required', 'exists:equipment,id'],
             'start_date' => ['required', 'date', 'after_or_equal:today'],

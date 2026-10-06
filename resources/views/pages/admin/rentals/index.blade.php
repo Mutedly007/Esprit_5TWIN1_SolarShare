@@ -4,8 +4,7 @@
 @section('title', 'SolarShare Admin — Gestion des Locations & États des Lieux')
 
 @section('content')
-<div class="page-wrapper">
-    
+
     <!-- Page Breadcrumb -->
     <div class="page-breadcrumb">
         <div class="row">
@@ -236,6 +235,4 @@
         </div>
 
     </div>
-
-</div>
 @endsection

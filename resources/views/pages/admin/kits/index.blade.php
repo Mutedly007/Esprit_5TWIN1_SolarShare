@@ -4,8 +4,7 @@
 @section('title', 'SolarShare Admin — Packs Solaires Clé-en-main')
 
 @section('content')
-<div class="page-wrapper">
-    
+
     <!-- Page Breadcrumb -->
     <div class="page-breadcrumb">
         <div class="row">
@@ -262,8 +261,6 @@
         </div>
 
     </div>
-
-</div>
 
 @push('scripts')
 <script>

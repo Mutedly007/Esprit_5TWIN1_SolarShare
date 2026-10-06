@@ -263,11 +263,26 @@
                     <!-- Direct Rental Button -->
                     @if($energyKit->equipment->isNotEmpty())
                         @auth
-                            <button type="button" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" 
-                                    data-bs-toggle="modal" data-bs-target="#reserveKitModal"
-                                    style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 1.05rem; box-shadow: 0 6px 20px rgba(255, 107, 61, 0.35); cursor: pointer;">
-                                ⚡ Réserver ce Pack Solaire
-                            </button>
+                            @if(auth()->user()->isRenter())
+                                <button type="button" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" 
+                                        data-bs-toggle="modal" data-bs-target="#reserveKitModal"
+                                        style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 1.05rem; box-shadow: 0 6px 20px rgba(255, 107, 61, 0.35); cursor: pointer;">
+                                    ⚡ Réserver ce Pack Solaire
+                                </button>
+                            @else
+                                <div class="alert alert-warning border-0 rounded-4 p-3 mb-3 text-start shadow-sm" style="background: #FFFBEB; border-left: 4px solid #F59E0B !important; color: #92400E; font-size: 0.88rem;">
+                                    <div class="d-flex align-items-center gap-2 fw-bold mb-1" style="font-size: 0.92rem;">
+                                        <span>🔒</span>
+                                        <span>Réservation non autorisée</span>
+                                    </div>
+                                    <p class="mb-0" style="line-height: 1.45;">
+                                        Votre compte a le rôle <strong>Prêteur (Lend)</strong>. Seuls les utilisateurs avec le rôle <strong>Emprunteur (Rent)</strong> ou <strong>Les deux (Both)</strong> peuvent réserver ce pack solaire.
+                                    </p>
+                                </div>
+                                <button type="button" class="btn btn-secondary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" disabled style="opacity: 0.7; cursor: not-allowed; background: #94A3B8; border: none;">
+                                    ⚡ Réservation réservée aux emprunteurs
+                                </button>
+                            @endif
                         @else
                             <a href="{{ route('login') }}" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" 
                                style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 1.05rem; box-shadow: 0 6px 20px rgba(255, 107, 61, 0.35); text-decoration: none;">

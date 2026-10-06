@@ -4,8 +4,7 @@
 @section('title', 'SolarShare Admin — Modifier le Hub Relais')
 
 @section('content')
-<div class="page-wrapper">
-    
+
     <div class="page-breadcrumb">
         <div class="row">
             <div class="col-7 align-self-center">
@@ -145,5 +144,4 @@
             </div>
         </div>
     </div>
-</div>
 @endsection

@@ -241,6 +241,10 @@ class EnergyKitController extends Controller
                 ->with('error', 'Veuillez vous connecter pour réserver ce pack solaire.');
         }
 
+        if (!auth()->user()->isRenter()) {
+            abort(403, 'Accès réservé aux emprunteurs (rôle Rent ou Both). Votre rôle actuel de prêteur ne vous permet pas de réserver des packs solaires.');
+        }
+
         $validated = $request->validate([
             'start_date' => ['required', 'date', 'after_or_equal:today'],
             'end_date'   => ['required', 'date', 'after_or_equal:start_date'],
