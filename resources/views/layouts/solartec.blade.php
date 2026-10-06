@@ -115,12 +115,46 @@
     <!-- Separated Navbar Partial (Exact same design across all pages) -->
     @includeUnless(request()->routeIs('onboarding.*'), 'partials.solartec.navbar')
 
-    <!-- Flash message if session contains success -->
+    <!-- Flash messages -->
     @if (session('success'))
     <div class="container mt-4">
         <div class="alert alert-success alert-dismissible fade show d-flex align-items-center rounded-3 shadow-sm" role="alert">
             <i class="bi bi-check-circle-fill me-2 fs-5"></i>
             <div>{{ session('success') }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+    @endif
+
+    @if (session('error'))
+    <div class="container mt-4">
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center rounded-3 shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+            <div>{{ session('error') }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+    @endif
+
+    @if (session('warning'))
+    <div class="container mt-4">
+        <div class="alert alert-warning alert-dismissible fade show d-flex align-items-center rounded-3 shadow-sm" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+            <div>{{ session('warning') }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+    @endif
+
+    @if (isset($errors) && $errors->any())
+    <div class="container mt-4">
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+            <div class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>Veuillez corriger les erreurs suivantes :</div>
+            <ul class="mb-0 ps-3">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     </div>

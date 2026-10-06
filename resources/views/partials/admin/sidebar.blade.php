@@ -28,17 +28,17 @@
                     </a>
                 </li>
 
-                <!-- Module 2: Locations -->
+                <!-- Module 2: Locations & Cycle de Location -->
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#rentals" aria-expanded="false">
+                    <a class="sidebar-link {{ request()->routeIs('admin.rentals.*') ? 'active' : '' }}" href="{{ route('admin.rentals.index') }}" aria-expanded="false">
                         <i data-feather="clipboard" class="feather-icon text-muted"></i>
-                        <span class="hide-menu">Locations</span>
+                        <span class="hide-menu">Locations & États</span>
                     </a>
                 </li>
 
-                <!-- Module 3: Packs Solaires -->
+                <!-- Module 3: Packs Solaires (Kits Combinés N-N) -->
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#packs" aria-expanded="false">
+                    <a class="sidebar-link {{ request()->routeIs('admin.energy-kits.*') ? 'active' : '' }}" href="{{ route('admin.energy-kits.index') }}" aria-expanded="false">
                         <i data-feather="package" class="feather-icon text-muted"></i>
                         <span class="hide-menu">Packs Solaires</span>
                     </a>
@@ -51,7 +51,7 @@
 
                 <!-- Module 4: Hubs Relais -->
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#hubs" aria-expanded="false">
+                    <a class="sidebar-link {{ request()->routeIs('admin.hubs.*') ? 'active' : '' }}" href="{{ route('admin.hubs.index') }}" aria-expanded="false">
                         <i data-feather="map-pin" class="feather-icon text-muted"></i>
                         <span class="hide-menu">Hubs Relais</span>
                     </a>

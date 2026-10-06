@@ -152,7 +152,42 @@ Route::middleware('auth')->group(function () {
     Route::get('/lender', [\App\Http\Controllers\LenderDashboardController::class, 'index'])->name('lender.dashboard');
     Route::resource('categories', \App\Http\Controllers\CategoryController::class);
     Route::resource('equipment', \App\Http\Controllers\EquipmentController::class);
+    // Rentals & Inspections (Cycle de location - Developer 2 Module)
+    Route::resource('rentals', \App\Http\Controllers\RentalController::class);
+    Route::post('/rentals/{rental}/confirm', [\App\Http\Controllers\RentalController::class, 'confirm'])->name('rentals.confirm');
+    Route::post('/rentals/{rental}/cancel', [\App\Http\Controllers\RentalController::class, 'cancel'])->name('rentals.cancel');
+
+    // Inspection Reports (Check-in & Check-out)
+    Route::get('/rentals/{rental}/inspections/create', [\App\Http\Controllers\InspectionReportController::class, 'create'])->name('inspections.create');
+    Route::post('/rentals/{rental}/inspections', [\App\Http\Controllers\InspectionReportController::class, 'store'])->name('inspections.store');
+    Route::get('/inspections/{inspection}', [\App\Http\Controllers\InspectionReportController::class, 'show'])->name('inspections.show');
+    Route::get('/inspections/{inspection}/edit', [\App\Http\Controllers\InspectionReportController::class, 'edit'])->name('inspections.edit');
+    Route::put('/inspections/{inspection}', [\App\Http\Controllers\InspectionReportController::class, 'update'])->name('inspections.update');
+    Route::post('/inspections/{inspection}/validate', [\App\Http\Controllers\InspectionReportController::class, 'validateReport'])->name('inspections.validate');
+    Route::delete('/inspections/{inspection}', [\App\Http\Controllers\InspectionReportController::class, 'destroy'])->name('inspections.destroy');
+
+    // Lender Space - Received Rentals
+    Route::get('/lender/rentals', [\App\Http\Controllers\LenderRentalController::class, 'index'])->name('lender.rentals.index');
+
+    // Energy Kits CRUD & Equipment Management (Developer 3 Module)
+    Route::get('/packs/create', [\App\Http\Controllers\EnergyKitController::class, 'create'])->name('energy-kits.create');
+    Route::post('/packs', [\App\Http\Controllers\EnergyKitController::class, 'store'])->name('energy-kits.store');
+    Route::get('/packs/{energyKit}/edit', [\App\Http\Controllers\EnergyKitController::class, 'edit'])->name('energy-kits.edit');
+    Route::put('/packs/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'update'])->name('energy-kits.update');
+    Route::delete('/packs/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'destroy'])->name('energy-kits.destroy');
+    Route::post('/packs/{energyKit}/attach', [\App\Http\Controllers\EnergyKitController::class, 'attachEquipment'])->name('energy-kits.attach');
+    Route::delete('/packs/{energyKit}/equipment/{equipment}', [\App\Http\Controllers\EnergyKitController::class, 'detachEquipment'])->name('energy-kits.detach');
+    Route::post('/packs/{energyKit}/reserve', [\App\Http\Controllers\EnergyKitController::class, 'reserve'])->name('energy-kits.reserve');
+    Route::post('/packs/{energyKit}/toggle', [\App\Http\Controllers\EnergyKitController::class, 'toggle'])->name('energy-kits.toggle');
 });
+
+// Public Packs Solaires (Energy Kits)
+Route::get('/energy-kits', [\App\Http\Controllers\EnergyKitController::class, 'index'])->name('energy-kits.index');
+Route::get('/energy-kits/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'show'])->name('energy-kits.show');
+
+// Public Points Relais & Hubs Solaires (Developer 4 Module)
+Route::get('/hubs', [\App\Http\Controllers\CollectionHubController::class, 'index'])->name('hubs.index');
+Route::get('/hubs/{hub}', [\App\Http\Controllers\CollectionHubController::class, 'show'])->name('hubs.show');
 
 // Admin Back-Office (Protected: auth + admin role)
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
@@ -163,5 +198,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
         return redirect()->route('admin.dashboard');
     });
+
+    Route::get('/rentals', [\App\Http\Controllers\AdminRentalController::class, 'index'])->name('admin.rentals.index');
+    Route::get('/energy-kits', [\App\Http\Controllers\AdminEnergyKitController::class, 'index'])->name('admin.energy-kits.index');
+    Route::post('/energy-kits/{energyKit}/toggle', [\App\Http\Controllers\AdminEnergyKitController::class, 'toggle'])->name('admin.energy-kits.toggle');
+
+    // Module 4: Hubs de Retrait Locaux & Créneaux de Permanence
+    Route::resource('hubs', \App\Http\Controllers\AdminCollectionHubController::class)->names('admin.hubs');
+    Route::post('/hubs/{hub}/toggle', [\App\Http\Controllers\AdminCollectionHubController::class, 'toggle'])->name('admin.hubs.toggle');
+    Route::post('/hubs/{hub}/slots', [\App\Http\Controllers\AdminCollectionHubController::class, 'storeSlot'])->name('admin.hubs.slots.store');
+    Route::put('/slots/{slot}', [\App\Http\Controllers\AdminCollectionHubController::class, 'updateSlot'])->name('admin.hubs.slots.update');
+    Route::delete('/slots/{slot}', [\App\Http\Controllers\AdminCollectionHubController::class, 'destroySlot'])->name('admin.hubs.slots.destroy');
+    Route::post('/slots/{slot}/toggle', [\App\Http\Controllers\AdminCollectionHubController::class, 'toggleSlot'])->name('admin.hubs.slots.toggle');
 });
 

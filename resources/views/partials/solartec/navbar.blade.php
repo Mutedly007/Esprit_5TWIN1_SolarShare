@@ -17,6 +17,8 @@
       <ul class="ss-nav-menu" role="menubar" style="margin: 0 auto;">
         <li role="none"><a href="{{ url('/#how-it-works') }}" class="ss-nav-link" role="menuitem">How it works</a></li>
         <li role="none"><a href="{{ route('marketplace') }}" class="ss-nav-link {{ request()->routeIs('marketplace*') ? 'is-active' : '' }}" role="menuitem">Equipment</a></li>
+        <li role="none"><a href="{{ route('energy-kits.index') }}" class="ss-nav-link {{ request()->routeIs('energy-kits.*') ? 'is-active' : '' }}" role="menuitem">Packs Solaires</a></li>
+        <li role="none"><a href="{{ route('hubs.index') }}" class="ss-nav-link {{ request()->routeIs('hubs.*') ? 'is-active' : '' }}" role="menuitem">Points Relais</a></li>
         <li role="none"><a href="{{ url('/#impact') }}" class="ss-nav-link" role="menuitem">Impact</a></li>
         <li role="none"><a href="{{ url('/#community') }}" class="ss-nav-link" role="menuitem">Community</a></li>
         <li role="none"><a href="{{ url('/#faq') }}" class="ss-nav-link" role="menuitem">FAQ</a></li>
@@ -50,14 +52,26 @@
                 </div>
                 <span style="font-size:0.78rem; color:#64748B;">{{ auth()->user()->email }}</span>
               </div>
+              <a href="{{ route('rentals.index') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none; font-weight:600;">
+                ⚡ Mes Réservations
+              </a>
               <a href="{{ route('lender.dashboard') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none;">
                 Tableau de bord
+              </a>
+              <a href="{{ route('lender.rentals.index') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none;">
+                Prêts reçus
               </a>
               <a href="{{ route('equipment.index') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none;">
                 Mes Équipements
               </a>
               <a href="{{ route('categories.index') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none;">
                 Catégories
+              </a>
+              <a href="{{ route('energy-kits.index') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none;">
+                📦 Packs Solaires
+              </a>
+              <a href="{{ route('hubs.index') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none;">
+                📍 Points Relais (Hubs)
               </a>
               <a href="{{ url('/') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#64748B; text-decoration:none; border-top:1px solid rgba(16,32,43,0.06); margin-top:0.3rem;">
                 Site Public
@@ -95,6 +109,7 @@
     <ul class="ss-mobile-nav-list">
       <li class="ss-mobile-nav-item"><a href="{{ url('/#how-it-works') }}" class="ss-mobile-nav-link">How it works</a></li>
       <li class="ss-mobile-nav-item"><a href="{{ route('marketplace') }}" class="ss-mobile-nav-link">Equipment</a></li>
+      <li class="ss-mobile-nav-item"><a href="{{ route('energy-kits.index') }}" class="ss-mobile-nav-link">Packs Solaires</a></li>
       <li class="ss-mobile-nav-item"><a href="{{ url('/#impact') }}" class="ss-mobile-nav-link">Impact</a></li>
       <li class="ss-mobile-nav-item"><a href="{{ url('/#community') }}" class="ss-mobile-nav-link">Community</a></li>
       <li class="ss-mobile-nav-item"><a href="{{ url('/#faq') }}" class="ss-mobile-nav-link">FAQ</a></li>
