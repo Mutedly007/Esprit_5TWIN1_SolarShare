@@ -543,5 +543,42 @@ class LenderModuleTest extends TestCase
         $response->assertRedirect(route('equipment.edit', $equipment));
         $response->assertSessionHasErrors(['name', 'brand', 'category_id', 'daily_rate', 'deposit_amount']);
     }
+
+    public function test_user_with_rent_role_cannot_access_lender_space(): void
+    {
+        $renter = User::factory()->create([
+            'role' => 'user',
+            'solar_role' => 'rent',
+        ]);
+
+        $this->actingAs($renter)->get(route('lender.dashboard'))->assertForbidden();
+        $this->actingAs($renter)->get(route('categories.index'))->assertForbidden();
+        $this->actingAs($renter)->get(route('equipment.index'))->assertForbidden();
+        $this->actingAs($renter)->get(route('equipment.create'))->assertForbidden();
+    }
+
+    public function test_renter_dashboard_redirect_points_to_rentals(): void
+    {
+        $renter = User::factory()->create([
+            'role' => 'user',
+            'solar_role' => 'rent',
+        ]);
+
+        $this->actingAs($renter)
+            ->get(route('dashboard'))
+            ->assertRedirect(route('rentals.index'));
+    }
+
+    public function test_user_with_both_role_can_access_lender_space(): void
+    {
+        $bothUser = User::factory()->create([
+            'role' => 'user',
+            'solar_role' => 'both',
+        ]);
+
+        $this->actingAs($bothUser)
+            ->get(route('lender.dashboard'))
+            ->assertOk();
+    }
 }
 

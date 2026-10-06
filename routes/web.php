@@ -145,13 +145,20 @@ Route::middleware('auth')->group(function () {
         if (auth()->user()->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
-        return redirect()->route('lender.dashboard');
+        if (auth()->user()->isLender()) {
+            return redirect()->route('lender.dashboard');
+        }
+        return redirect()->route('rentals.index');
     })->name('dashboard');
 
-    // Lender Space (Category & Equipment CRUD)
-    Route::get('/lender', [\App\Http\Controllers\LenderDashboardController::class, 'index'])->name('lender.dashboard');
-    Route::resource('categories', \App\Http\Controllers\CategoryController::class);
-    Route::resource('equipment', \App\Http\Controllers\EquipmentController::class);
+    // Lender Space (Category & Equipment CRUD - Protected for 'lend', 'both', or 'admin' roles)
+    Route::middleware('lender')->group(function () {
+        Route::get('/lender', [\App\Http\Controllers\LenderDashboardController::class, 'index'])->name('lender.dashboard');
+        Route::resource('categories', \App\Http\Controllers\CategoryController::class);
+        Route::resource('equipment', \App\Http\Controllers\EquipmentController::class);
+        Route::get('/lender/rentals', [\App\Http\Controllers\LenderRentalController::class, 'index'])->name('lender.rentals.index');
+    });
+
     // Rentals & Inspections (Cycle de location - Developer 2 Module)
     Route::resource('rentals', \App\Http\Controllers\RentalController::class);
     Route::post('/rentals/{rental}/confirm', [\App\Http\Controllers\RentalController::class, 'confirm'])->name('rentals.confirm');
@@ -165,9 +172,6 @@ Route::middleware('auth')->group(function () {
     Route::put('/inspections/{inspection}', [\App\Http\Controllers\InspectionReportController::class, 'update'])->name('inspections.update');
     Route::post('/inspections/{inspection}/validate', [\App\Http\Controllers\InspectionReportController::class, 'validateReport'])->name('inspections.validate');
     Route::delete('/inspections/{inspection}', [\App\Http\Controllers\InspectionReportController::class, 'destroy'])->name('inspections.destroy');
-
-    // Lender Space - Received Rentals
-    Route::get('/lender/rentals', [\App\Http\Controllers\LenderRentalController::class, 'index'])->name('lender.rentals.index');
 
     // Energy Kits CRUD & Equipment Management (Developer 3 Module)
     Route::get('/packs/create', [\App\Http\Controllers\EnergyKitController::class, 'create'])->name('energy-kits.create');

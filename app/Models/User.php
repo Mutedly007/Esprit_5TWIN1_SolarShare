@@ -62,6 +62,32 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if the user has the lender role (lend, both, or admin).
+     */
+    public function isLender(): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $role = strtolower((string) ($this->solar_role ?? $this->role ?? ''));
+        return in_array($role, ['lend', 'both'], true);
+    }
+
+    /**
+     * Check if the user has the renter role (rent, both, or admin).
+     */
+    public function isRenter(): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $role = strtolower((string) ($this->solar_role ?? $this->role ?? ''));
+        return in_array($role, ['rent', 'both'], true);
+    }
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>

@@ -15,6 +15,7 @@ class LenderRentalController extends Controller
     {
         $user = Auth::user();
         $status = $request->query('status');
+        $search = $request->query('search');
 
         $query = Rental::whereHas('equipment', function ($q) use ($user) {
             $q->where('user_id', $user->id);
@@ -24,6 +25,21 @@ class LenderRentalController extends Controller
 
         if ($status && in_array($status, ['pending', 'confirmed', 'active', 'completed', 'cancelled'])) {
             $query->where('status', $status);
+        }
+
+        if ($request->filled('search')) {
+            $term = trim($search);
+            $query->where(function ($q) use ($term) {
+                $q->where('id', 'like', "%{$term}%")
+                  ->orWhereHas('user', function ($uq) use ($term) {
+                      $uq->where('name', 'like', "%{$term}%")
+                         ->orWhere('email', 'like', "%{$term}%");
+                  })
+                  ->orWhereHas('equipment', function ($eq) use ($term) {
+                      $eq->where('name', 'like', "%{$term}%")
+                         ->orWhere('brand', 'like', "%{$term}%");
+                  });
+            });
         }
 
         $rentals = $query->paginate(10)->withQueryString();
@@ -42,6 +58,6 @@ class LenderRentalController extends Controller
             'revenue' => (clone $baseQuery)->whereIn('status', ['confirmed', 'active', 'completed'])->sum('total_price'),
         ];
 
-        return view('lender.rentals.index', compact('rentals', 'stats', 'status'));
+        return view('lender.rentals.index', compact('rentals', 'stats', 'status', 'search'));
     }
 }

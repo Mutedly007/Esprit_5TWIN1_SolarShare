@@ -11,7 +11,7 @@ class UpdateEquipmentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if (! auth()->check()) {
+        if (! auth()->check() || ! auth()->user()->isLender()) {
             return false;
         }
 
