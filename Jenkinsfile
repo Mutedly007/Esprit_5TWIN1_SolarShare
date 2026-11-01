@@ -10,7 +10,6 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         disableConcurrentBuilds()
         timeout(time: 30, unit: 'MINUTES')
-        timestamps()
     }
 
     environment {
@@ -168,7 +167,7 @@ pipeline {
             echo "================================================================="
         }
         always {
-            cleanWs deleteDirs: false, notFailBuild: true
+            echo "--> Build execution finished."
         }
     }
 }
