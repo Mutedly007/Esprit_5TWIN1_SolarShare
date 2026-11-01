@@ -455,6 +455,13 @@
                     <span>Lend & earn</span>
                   </span>
                 </label>
+                <label class="ss-role-pill">
+                  <input type="radio" name="solar_role" value="both" {{ old('solar_role') === 'both' ? 'checked' : '' }}>
+                  <span class="ss-role-btn">
+                    <span class="ss-role-icon">🔁</span>
+                    <span>Both</span>
+                  </span>
+                </label>
               </div>
             </div>
 

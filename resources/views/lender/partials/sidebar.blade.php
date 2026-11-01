@@ -54,6 +54,42 @@
                 </span>
             </a>
 
+            <!-- Rentals & Inspections Link (Module 2) -->
+            @php
+                $lenderPendingRentals = \App\Models\Rental::whereHas('equipment', function($q) {
+                    $q->where('user_id', auth()->id());
+                })->where('status', 'pending')->count();
+                $lenderPendingPacks = \App\Models\EnergyKitReservation::whereHas('energyKit', function($q) {
+                    $q->where('user_id', auth()->id());
+                })->where('status', 'pending')->count();
+                $totalPending = $lenderPendingRentals + $lenderPendingPacks;
+                $totalAll = \App\Models\Rental::whereHas('equipment', fn($q) => $q->where('user_id', auth()->id()))->count()
+                    + \App\Models\EnergyKitReservation::whereHas('energyKit', fn($q) => $q->where('user_id', auth()->id()))->count();
+            @endphp
+            <a href="{{ route('lender.rentals.index') }}"
+               class="sidebar-nav-link {{ request()->routeIs('lender.rentals.*') ? 'is-active' : '' }}"
+               id="sidebar-link-lender-rentals">
+                <span class="sidebar-nav-icon">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </span>
+                <span class="sidebar-nav-title">Prêts & Contrats</span>
+                @if($totalPending > 0)
+                    <span class="sidebar-nav-badge" style="background:#EF4444; color:#fff;" title="Demandes en attente de validation">
+                        {{ $totalPending }}
+                    </span>
+                @else
+                    <span class="sidebar-nav-badge" title="Total réservations">
+                        {{ $totalAll }}
+                    </span>
+                @endif
+            </a>
+
         </nav>
     </div>
 

@@ -44,7 +44,7 @@ class MarketplaceTest extends TestCase
             'daily_rate' => 50.00,
             'deposit_amount' => 100.00,
             'is_available' => true,
-            'status' => 'pending',
+            'status' => 'approved',
         ]);
     }
 
@@ -58,6 +58,36 @@ class MarketplaceTest extends TestCase
             ->assertSee('test solaire 200W')
             ->assertSee('Bluetti')
             ->assertSee('50.00');
+    }
+
+    public function test_pending_equipment_is_not_displayed_on_marketplace(): void
+    {
+        $pendingEquipment = Equipment::create([
+            'user_id' => $this->lender->id,
+            'category_id' => $this->category->id,
+            'name' => 'Equipement En Attente 999W',
+            'brand' => 'EcoFlow',
+            'daily_rate' => 30.00,
+            'deposit_amount' => 100.00,
+            'is_available' => true,
+            'status' => 'pending',
+        ]);
+
+        // Public marketplace index must NOT show it
+        $response = $this->get(route('marketplace'));
+        $response->assertOk();
+        $response->assertDontSee('Equipement En Attente 999W');
+
+        // Guest attempting to visit detail page gets 404
+        $detailResponse = $this->get(route('marketplace.show', $pendingEquipment));
+        $detailResponse->assertStatus(404);
+
+        // Owner can preview it
+        $ownerResponse = $this->actingAs($this->lender)
+            ->get(route('marketplace.show', $pendingEquipment));
+        $ownerResponse->assertOk();
+        $ownerResponse->assertSee('Equipement En Attente 999W');
+        $ownerResponse->assertSee('Non validé');
     }
 
     public function test_navbar_equipment_link_points_to_marketplace(): void

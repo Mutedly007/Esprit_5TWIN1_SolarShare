@@ -755,7 +755,7 @@
                         </div>
                     @endif
 
-                    @if($errors->any())
+                    @if(isset($errors) && $errors->any())
                         <div class="alert-box alert-error" role="alert">
                             <div>
                                 <strong style="display:block; margin-bottom:0.3rem;">Veuillez corriger les erreurs ci-dessous :</strong>

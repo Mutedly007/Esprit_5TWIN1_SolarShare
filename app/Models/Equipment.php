@@ -74,6 +74,24 @@ class Equipment extends Model
     }
 
     /**
+     * Relationship: An equipment can have many rentals.
+     */
+    public function rentals(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Rental::class);
+    }
+
+    /**
+     * Relationship: An equipment can belong to many EnergyKits (N - N).
+     */
+    public function energyKits(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(EnergyKit::class, 'energy_kit_equipment')
+            ->withPivot(['quantity', 'options'])
+            ->withTimestamps();
+    }
+
+    /**
      * Friendly status label in French as requested:
      * pending -> Non traité
      */

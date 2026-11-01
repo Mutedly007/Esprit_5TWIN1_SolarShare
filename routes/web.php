@@ -145,14 +145,59 @@ Route::middleware('auth')->group(function () {
         if (auth()->user()->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
-        return redirect()->route('lender.dashboard');
+        if (auth()->user()->isLender()) {
+            return redirect()->route('lender.dashboard');
+        }
+        return redirect()->route('rentals.index');
     })->name('dashboard');
 
-    // Lender Space (Category & Equipment CRUD)
-    Route::get('/lender', [\App\Http\Controllers\LenderDashboardController::class, 'index'])->name('lender.dashboard');
-    Route::resource('categories', \App\Http\Controllers\CategoryController::class);
-    Route::resource('equipment', \App\Http\Controllers\EquipmentController::class);
+    // Lender Space (Category & Equipment CRUD - Protected for 'lend', 'both', or 'admin' roles)
+    Route::middleware('lender')->group(function () {
+        Route::get('/lender', [\App\Http\Controllers\LenderDashboardController::class, 'index'])->name('lender.dashboard');
+        Route::resource('categories', \App\Http\Controllers\CategoryController::class);
+        Route::resource('equipment', \App\Http\Controllers\EquipmentController::class);
+        Route::get('/lender/rentals', [\App\Http\Controllers\LenderRentalController::class, 'index'])->name('lender.rentals.index');
+        Route::patch('/lender/pack-reservations/{reservation}/status', [\App\Http\Controllers\LenderRentalController::class, 'updateKitReservationStatus'])->name('lender.kit-reservations.status');
+    });
+
+    // Rentals & Inspections (Cycle de location - Developer 2 Module)
+    Route::middleware('renter')->group(function () {
+        Route::get('/rentals/create', [\App\Http\Controllers\RentalController::class, 'create'])->name('rentals.create');
+        Route::post('/rentals', [\App\Http\Controllers\RentalController::class, 'store'])->name('rentals.store');
+    });
+
+    Route::resource('rentals', \App\Http\Controllers\RentalController::class)->except(['create', 'store']);
+    Route::post('/rentals/{rental}/confirm', [\App\Http\Controllers\RentalController::class, 'confirm'])->name('rentals.confirm');
+    Route::post('/rentals/{rental}/cancel', [\App\Http\Controllers\RentalController::class, 'cancel'])->name('rentals.cancel');
+
+    // Inspection Reports (Check-in & Check-out)
+    Route::get('/rentals/{rental}/inspections/create', [\App\Http\Controllers\InspectionReportController::class, 'create'])->name('inspections.create');
+    Route::post('/rentals/{rental}/inspections', [\App\Http\Controllers\InspectionReportController::class, 'store'])->name('inspections.store');
+    Route::get('/inspections/{inspection}', [\App\Http\Controllers\InspectionReportController::class, 'show'])->name('inspections.show');
+    Route::get('/inspections/{inspection}/edit', [\App\Http\Controllers\InspectionReportController::class, 'edit'])->name('inspections.edit');
+    Route::put('/inspections/{inspection}', [\App\Http\Controllers\InspectionReportController::class, 'update'])->name('inspections.update');
+    Route::post('/inspections/{inspection}/validate', [\App\Http\Controllers\InspectionReportController::class, 'validateReport'])->name('inspections.validate');
+    Route::delete('/inspections/{inspection}', [\App\Http\Controllers\InspectionReportController::class, 'destroy'])->name('inspections.destroy');
+
+    // Energy Kits CRUD & Equipment Management (Developer 3 Module - Restricted to Lenders & Admins)
+    Route::get('/packs/create', [\App\Http\Controllers\EnergyKitController::class, 'create'])->middleware('lender')->name('energy-kits.create');
+    Route::post('/packs', [\App\Http\Controllers\EnergyKitController::class, 'store'])->middleware('lender')->name('energy-kits.store');
+    Route::get('/packs/{energyKit}/edit', [\App\Http\Controllers\EnergyKitController::class, 'edit'])->middleware('lender')->name('energy-kits.edit');
+    Route::put('/packs/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'update'])->middleware('lender')->name('energy-kits.update');
+    Route::delete('/packs/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'destroy'])->middleware('lender')->name('energy-kits.destroy');
+    Route::post('/packs/{energyKit}/attach', [\App\Http\Controllers\EnergyKitController::class, 'attachEquipment'])->middleware('lender')->name('energy-kits.attach');
+    Route::delete('/packs/{energyKit}/equipment/{equipment}', [\App\Http\Controllers\EnergyKitController::class, 'detachEquipment'])->middleware('lender')->name('energy-kits.detach');
+    Route::post('/packs/{energyKit}/reserve', [\App\Http\Controllers\EnergyKitController::class, 'reserve'])->middleware('renter')->name('energy-kits.reserve');
+    Route::post('/packs/{energyKit}/toggle', [\App\Http\Controllers\EnergyKitController::class, 'toggle'])->middleware('lender')->name('energy-kits.toggle');
 });
+
+// Public Packs Solaires (Energy Kits)
+Route::get('/energy-kits', [\App\Http\Controllers\EnergyKitController::class, 'index'])->name('energy-kits.index');
+Route::get('/energy-kits/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'show'])->name('energy-kits.show');
+
+// Public Points Relais & Hubs Solaires (Developer 4 Module)
+Route::get('/hubs', [\App\Http\Controllers\CollectionHubController::class, 'index'])->name('hubs.index');
+Route::get('/hubs/{hub}', [\App\Http\Controllers\CollectionHubController::class, 'show'])->name('hubs.show');
 
 // Admin Back-Office (Protected: auth + admin role)
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
@@ -163,5 +208,31 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
         return redirect()->route('admin.dashboard');
     });
+
+    // Module 1: Équipements & Validation (Inventaire & Détails)
+    Route::get('/equipment', [\App\Http\Controllers\AdminEquipmentController::class, 'index'])->name('admin.equipment.index');
+    Route::get('/equipment/{equipment}', [\App\Http\Controllers\AdminEquipmentController::class, 'show'])->name('admin.equipment.show');
+    Route::post('/equipment/{equipment}/approve', [\App\Http\Controllers\AdminEquipmentController::class, 'approve'])->name('admin.equipment.approve');
+    Route::post('/equipment/{equipment}/reject', [\App\Http\Controllers\AdminEquipmentController::class, 'reject'])->name('admin.equipment.reject');
+    Route::post('/equipment/{equipment}/toggle-availability', [\App\Http\Controllers\AdminEquipmentController::class, 'toggleAvailability'])->name('admin.equipment.toggle-availability');
+    Route::delete('/equipment/{equipment}', [\App\Http\Controllers\AdminEquipmentController::class, 'destroy'])->name('admin.equipment.destroy');
+
+    Route::get('/rentals', [\App\Http\Controllers\AdminRentalController::class, 'index'])->name('admin.rentals.index');
+    Route::get('/energy-kits', [\App\Http\Controllers\AdminEnergyKitController::class, 'index'])->name('admin.energy-kits.index');
+    Route::post('/energy-kits/{energyKit}/toggle', [\App\Http\Controllers\AdminEnergyKitController::class, 'toggle'])->name('admin.energy-kits.toggle');
+
+    // Module 4: Hubs de Retrait Locaux & Créneaux de Permanence
+    Route::resource('hubs', \App\Http\Controllers\AdminCollectionHubController::class)->names('admin.hubs');
+    Route::post('/hubs/{hub}/toggle', [\App\Http\Controllers\AdminCollectionHubController::class, 'toggle'])->name('admin.hubs.toggle');
+    Route::post('/hubs/{hub}/slots', [\App\Http\Controllers\AdminCollectionHubController::class, 'storeSlot'])->name('admin.hubs.slots.store');
+    Route::put('/slots/{slot}', [\App\Http\Controllers\AdminCollectionHubController::class, 'updateSlot'])->name('admin.hubs.slots.update');
+    Route::delete('/slots/{slot}', [\App\Http\Controllers\AdminCollectionHubController::class, 'destroySlot'])->name('admin.hubs.slots.destroy');
+    Route::post('/slots/{slot}/toggle', [\App\Http\Controllers\AdminCollectionHubController::class, 'toggleSlot'])->name('admin.hubs.slots.toggle');
+
+    // Administration des Utilisateurs
+    Route::get('/users', [\App\Http\Controllers\AdminUserController::class, 'index'])->name('admin.users.index');
+    Route::get('/users/{user}', [\App\Http\Controllers\AdminUserController::class, 'show'])->name('admin.users.show');
+    Route::patch('/users/{user}/role', [\App\Http\Controllers\AdminUserController::class, 'updateRole'])->name('admin.users.update-role');
+    Route::delete('/users/{user}', [\App\Http\Controllers\AdminUserController::class, 'destroy'])->name('admin.users.destroy');
 });
 

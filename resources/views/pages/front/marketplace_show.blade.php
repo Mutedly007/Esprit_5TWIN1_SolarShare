@@ -20,6 +20,15 @@
             </ol>
         </nav>
 
+        @if($equipment->status !== 'approved')
+            <div class="alert alert-warning rounded-4 p-3 mb-4 shadow-sm border-0 d-flex align-items-center gap-3" style="background: #FFFBEB; color: #92400E; border-left: 5px solid #F59E0B !important;">
+                <span style="font-size: 1.6rem; line-height: 1;">⏳</span>
+                <div>
+                    <strong>Aperçu privé pour le propriétaire ou l'administrateur :</strong> Cet équipement a le statut <strong>« Non traité »</strong>. Il n'est pas publié sur la Marketplace publique tant qu'il n'a pas été validé par un administrateur.
+                </div>
+            </div>
+        @endif
+
         <div class="row g-4">
             
             <!-- Left Column: Image & Specs -->
@@ -115,10 +124,45 @@
                     </div>
 
                     <!-- Rental Action Button -->
-                    @if($equipment->is_available)
-                        <button type="button" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 1.05rem; box-shadow: 0 6px 20px rgba(255, 107, 61, 0.35);" onclick="alert('Module de réservation en cours de finalisation !')">
-                            ⚡ Louer cet équipement
+                    @if($equipment->status !== 'approved')
+                        <div class="alert alert-warning border-0 rounded-4 p-3 mb-3 text-start shadow-sm" style="background: #FFFBEB; border-left: 4px solid #F59E0B !important; color: #92400E; font-size: 0.88rem;">
+                            <div class="d-flex align-items-center gap-2 fw-bold mb-1" style="font-size: 0.92rem;">
+                                <span>⏳</span>
+                                <span>En cours de validation administrateur</span>
+                            </div>
+                            <p class="mb-0" style="line-height: 1.45;">
+                                Cet équipement est actuellement avec le statut <strong>« Non traité »</strong> et n'est pas encore publié sur le catalogue public. Il ne peut être réservé qu'une fois approuvé.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" disabled style="opacity: 0.7; cursor: not-allowed; background: #94A3B8; border: none;">
+                            ⏳ Réservation bloquée (Non validé)
                         </button>
+                    @elseif($equipment->is_available)
+                        @auth
+                            @if(auth()->user()->isRenter())
+                                <a href="{{ route('rentals.create', ['equipment_id' => $equipment->id]) }}" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 1.05rem; box-shadow: 0 6px 20px rgba(255, 107, 61, 0.35); text-decoration: none;">
+                                    ⚡ Réserver cet équipement
+                                </a>
+                            @else
+                                <div class="alert alert-warning border-0 rounded-4 p-3 mb-3 text-start shadow-sm" style="background: #FFFBEB; border-left: 4px solid #F59E0B !important; color: #92400E; font-size: 0.88rem;">
+                                    <div class="d-flex align-items-center gap-2 fw-bold mb-1" style="font-size: 0.92rem;">
+                                        <span>🔒</span>
+                                        <span>Réservation non autorisée</span>
+                                    </div>
+                                    <p class="mb-0" style="line-height: 1.45;">
+                                        Votre compte a le rôle <strong>Prêteur (Lend)</strong>. Seuls les utilisateurs ayant le rôle <strong>Emprunteur (Rent)</strong> ou <strong>Les deux (Both)</strong> peuvent réserver des équipements.
+                                    </p>
+                                </div>
+                                <button type="button" class="btn btn-secondary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" disabled style="opacity: 0.7; cursor: not-allowed; background: #94A3B8; border: none;">
+                                    ⚡ Réservation réservée aux emprunteurs
+                                </button>
+                            @endif
+                        @endauth
+                        @guest
+                            <a href="{{ route('login') }}" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 1.05rem; box-shadow: 0 6px 20px rgba(255, 107, 61, 0.35); text-decoration: none;">
+                                ⚡ Connectez-vous pour louer
+                            </a>
+                        @endguest
                     @else
                         <button type="button" class="btn btn-secondary w-100 rounded-pill py-3 fw-bold mb-3" disabled>
                             Actuellement indisponible

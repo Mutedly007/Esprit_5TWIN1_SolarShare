@@ -37,12 +37,77 @@ class User extends Authenticatable
     }
 
     /**
+     * Relationship: Rentals created by this user as borrower/renter.
+     */
+    public function rentals(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Rental::class);
+    }
+
+    /**
+     * Relationship: Rentals received for equipment owned by this user.
+     */
+    public function lentRentals(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(Rental::class, Equipment::class);
+    }
+
+    /**
      * Check if the user is an administrator.
      */
     public function isAdmin(): bool
     {
         return strtolower((string) ($this->role ?? '')) === 'admin'
             || strtolower((string) ($this->solar_role ?? '')) === 'admin';
+    }
+
+    /**
+     * Check if the user has the lender role (lend, both, or admin).
+     */
+    public function isLender(): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $role = strtolower((string) ($this->solar_role ?? $this->role ?? ''));
+        return in_array($role, ['lend', 'both'], true);
+    }
+
+    /**
+     * Check if the user has the renter role (rent, both, or admin).
+     */
+    public function isRenter(): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $role = strtolower((string) ($this->solar_role ?? $this->role ?? ''));
+        return in_array($role, ['rent', 'both'], true);
+    }
+
+    /**
+     * Check if user can reserve/rent equipment (renter, both, or admin).
+     */
+    public function canReserveEquipment(): bool
+    {
+        return $this->isRenter();
+    }
+
+    /**
+     * Get human-readable label for solar role.
+     */
+    public function getSolarRoleLabelAttribute(): string
+    {
+        $role = strtolower((string) ($this->solar_role ?? $this->role ?? ''));
+        return match ($role) {
+            'admin' => 'Administrateur',
+            'lend' => 'Prêteur (Lend)',
+            'rent' => 'Emprunteur (Rent)',
+            'both' => 'Mixte (Lend & Rent)',
+            default => 'Non défini',
+        };
     }
 
     /**
