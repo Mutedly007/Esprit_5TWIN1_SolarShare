@@ -21,3 +21,8 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# DevOps, Test Coverage & Quality Scanner
+coverage.xml
+.coverage
+.scannerwork/

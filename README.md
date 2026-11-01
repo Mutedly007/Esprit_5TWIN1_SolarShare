@@ -85,4 +85,5 @@ php artisan migrate
 
 # 5. Démarrer le serveur
 php artisan serve
+test
 ```

@@ -1,0 +1,251 @@
+services:
+  # =====================================================================
+  # SolarShare Monolith Application (PHP 8.2-FPM)
+  # =====================================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: solarshare-app
+    restart: unless-stopped
+    environment:
+      APP_NAME: "SolarShare"
+      APP_ENV: "production"
+      APP_DEBUG: "false"
+      APP_URL: "http://localhost:8088"
+      APP_KEY: "base64:FWLQ8I29e3KhyQaBXLNYPXCB5YhZJ3xny5OQlhov8ds="
+      LOG_CHANNEL: "stack"
+      LOG_LEVEL: "debug"
+      DB_CONNECTION: "mysql"
+      DB_HOST: "db"
+      DB_PORT: "3306"
+      DB_DATABASE: "solarsharedb"
+      DB_USERNAME: "solaruser"
+      DB_PASSWORD: "solarpass"
+      SESSION_DRIVER: "database"
+      CACHE_STORE: "database"
+      QUEUE_CONNECTION: "database"
+    volumes:
+      - solarshare-storage:/var/www/html/storage/app/public
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - solarshare-network
+
+  # =====================================================================
+  # Web Ingress / Reverse Proxy (Nginx)
+  # =====================================================================
+  web:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    container_name: solarshare-web
+    restart: unless-stopped
+    ports:
+      - "8088:80"
+    volumes:
+      - solarshare-storage:/var/www/html/public/storage:ro
+    depends_on:
+      - app
+    networks:
+      - solarshare-network
+
+  # =====================================================================
+  # Database (MySQL 8.0)
+  # =====================================================================
+  db:
+    image: mysql:8.0
+    container_name: solarshare-db
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: "solarsharedb"
+      MYSQL_USER: "solaruser"
+      MYSQL_PASSWORD: "solarpass"
+      MYSQL_ROOT_PASSWORD: "solarroot"
+    ports:
+      - "3308:3306"
+    volumes:
+      - solarshare-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -psolarroot || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+    networks:
+      - solarshare-network
+
+  # =====================================================================
+  # Background Worker (Queue: Emails, Asynchronous Tasks)
+  # =====================================================================
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: solarshare-worker
+    restart: unless-stopped
+    command: ["php", "artisan", "queue:work", "--tries=3", "--timeout=90"]
+    environment:
+      APP_NAME: "SolarShare"
+      APP_ENV: "production"
+      APP_DEBUG: "false"
+      APP_KEY: "base64:FWLQ8I29e3KhyQaBXLNYPXCB5YhZJ3xny5OQlhov8ds="
+      DB_CONNECTION: "mysql"
+      DB_HOST: "db"
+      DB_PORT: "3306"
+      DB_DATABASE: "solarsharedb"
+      DB_USERNAME: "solaruser"
+      DB_PASSWORD: "solarpass"
+      QUEUE_CONNECTION: "database"
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_started
+    networks:
+      - solarshare-network
+
+  # =====================================================================
+  # Observability: Container Metrics (cAdvisor)
+  # =====================================================================
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: solarshare-cadvisor
+    restart: unless-stopped
+    ports:
+      - "8085:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys:/sys:ro
+    networks:
+      - solarshare-network
+
+  # =====================================================================
+  # Observability: Blackbox HTTP Prober
+  # =====================================================================
+  blackbox-exporter:
+    image: prom/blackbox-exporter:latest
+    container_name: solarshare-blackbox
+    restart: unless-stopped
+    ports:
+      - "9115:9115"
+    volumes:
+      - ./docker/prometheus/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    networks:
+      - solarshare-network
+
+  # =====================================================================
+  # Observability: Time-Series Database (Prometheus)
+  # =====================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: solarshare-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - solarshare-prom-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    depends_on:
+      - cadvisor
+      - blackbox-exporter
+    networks:
+      - solarshare-network
+
+  # =====================================================================
+  # Observability: Visualization & Dashboards (Grafana)
+  # =====================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: solarshare-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: "admin"
+      GF_SECURITY_ADMIN_PASSWORD: "admin"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+      - solarshare-grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - solarshare-network
+
+  # =====================================================================
+  # Code Quality & Static Analysis (SonarQube Community Edition)
+  # =====================================================================
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: solarshare-sonarqube
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+    volumes:
+      - solarshare-sonar-data:/opt/sonarqube/data
+      - solarshare-sonar-extensions:/opt/sonarqube/extensions
+      - solarshare-sonar-logs:/opt/sonarqube/logs
+    networks:
+      - solarshare-network
+
+  # =====================================================================
+  # CI/CD Automation Server (Jenkins Controller)
+  # =====================================================================
+  jenkins:
+    build:
+      context: ./docker/jenkins
+      dockerfile: Dockerfile
+    container_name: solarshare-jenkins
+    user: root
+    restart: unless-stopped
+    ports:
+      - "8082:8080"
+      - "50000:50000"
+    environment:
+      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false -Xms256m -Xmx512m"
+    volumes:
+      - solarshare-jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - solarshare-network
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+
+# =====================================================================
+# Persistent Storage & Networks
+# =====================================================================
+volumes:
+  solarshare-db-data:
+    name: solarshare-db-data
+  solarshare-storage:
+    name: solarshare-storage
+  solarshare-prom-data:
+    name: solarshare-prom-data
+  solarshare-grafana-data:
+    name: solarshare-grafana-data
+  solarshare-sonar-data:
+    name: solarshare-sonar-data
+  solarshare-sonar-extensions:
+    name: solarshare-sonar-extensions
+  solarshare-sonar-logs:
+    name: solarshare-sonar-logs
+  solarshare-jenkins-data:
+    name: solarshare-jenkins-data
+
+networks:
+  solarshare-network:
+    name: solarshare-network
+    driver: bridge
+
+
