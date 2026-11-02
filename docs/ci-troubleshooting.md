@@ -8,12 +8,14 @@ This guide details host and container optimizations required for running the Jen
 
 When running Jenkins, SonarQube (with embedded Elasticsearch), MySQL, and Laravel containers concurrently on Windows/WSL2, memory constraints can cause JVM processes to stall or crash (OOM 137).
 
-Create or update `C:\Users\<Your-Username>\.wslconfig`:
+Create or update `C:\Users\<Your-Username>\.wslconfig` (for example, on an 8GB RAM host):
 
 ```ini
 [wsl2]
-memory=8GB
-swap=4GB
+# On an 8GB total RAM host, reserve 5GB for WSL2 / Docker and leave 3GB for Windows
+memory=5GB
+# Swap provides virtual memory buffer to prevent SonarQube/Elasticsearch OOM crashes
+swap=6GB
 processors=4
 ```
 
@@ -80,3 +82,4 @@ If SonarQube or the scanner encounters timeouts, inspect the container state usi
      php artisan key:generate
      ```
    * CI test stages now automatically generate a secure, ephemeral throwaway key at runtime (`openssl rand -base64 32`) rather than storing static secrets in the pipeline script.
+
