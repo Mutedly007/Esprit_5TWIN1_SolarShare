@@ -32,8 +32,12 @@ class EmailVerificationController extends Controller
             event(new Verified($request->user()));
         }
 
-        return redirect()->intended(route('home') . '?verified=1')
-            ->with('success', 'Votre adresse email a été vérifiée avec succès !');
+        $target = empty($request->user()->solar_role)
+            ? route('onboarding.role')
+            : ($request->user()->isAdmin() ? route('admin.dashboard') : ($request->user()->isLender() ? route('lender.dashboard') : route('home')));
+
+        return redirect($target)
+            ->with('success', 'Votre adresse email a été vérifiée avec succès ! Bienvenue sur SolarShare.');
     }
 
     /**

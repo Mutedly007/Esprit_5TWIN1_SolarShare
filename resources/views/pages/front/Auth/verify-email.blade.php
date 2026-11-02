@@ -77,6 +77,27 @@
           <p class="ss-auth-subtitle">Didn't receive the email? We can easily send you another link.</p>
         </div>
 
+        @if (session('success'))
+          <div class="alert alert-success d-flex align-items-center rounded-3 shadow-sm mb-4" role="alert" style="background:#F0FDF4; border:1px solid #10B981; color:#065F46;">
+            <svg class="me-2 flex-shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <div>{{ session('success') }}</div>
+          </div>
+        @endif
+
+        @if (session('warning'))
+          <div class="alert alert-warning d-flex align-items-center rounded-3 shadow-sm mb-4" role="alert" style="background:#FFFBEB; border:1px solid #F59E0B; color:#92400E;">
+            <svg class="me-2 flex-shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div>{{ session('warning') }}</div>
+          </div>
+        @endif
+
         {{-- Verification link sent status --}}
         @if (session('status') == 'verification-link-sent')
           <div class="alert alert-success d-flex align-items-center rounded-3 shadow-sm mb-4" role="alert" style="background:#F0FDF4; border:1px solid #10B981; color:#065F46;">
