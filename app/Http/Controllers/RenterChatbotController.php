@@ -36,10 +36,12 @@ class RenterChatbotController extends Controller
 
         try {
             $reply = $this->chatService->reply($messages);
+            $navigation = $this->detectNavigation($validated['message'], $reply);
 
             return response()->json([
-                'status' => 'success',
-                'reply'  => $reply,
+                'status'     => 'success',
+                'reply'      => $reply,
+                'navigation' => $navigation,
             ]);
         } catch (\Throwable $e) {
             Log::error('Gemini Renter Chatbot error: ' . $e->getMessage());
@@ -50,4 +52,68 @@ class RenterChatbotController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Detect relevant page navigation from the conversation for the borrower session.
+     */
+    protected function detectNavigation(string $query, string $reply): ?array
+    {
+        $routes = [
+            '/rentals/create' => [
+                'label'    => 'Créer une réservation',
+                'keywords' => ['nouvelle location', 'creer une location', 'reserver', 'nouvelle reservation', 'louer un materiel', '/rentals/create'],
+            ],
+            '/rentals' => [
+                'label'    => 'Mes locations & réservations',
+                'keywords' => ['mes locations', 'mes reservations', 'suivi location', 'voir location', 'contrat', '/rentals'],
+            ],
+            '/marketplace' => [
+                'label'    => 'Marketplace des Équipements',
+                'keywords' => ['marketplace', 'catalogue', 'trouver un panneau', 'chercher equipement', 'batterie', 'materiel', '/marketplace'],
+            ],
+            '/energy-kits' => [
+                'label'    => 'Packs Solaires Clé-en-main',
+                'keywords' => ['pack solaire', 'packs solaires', 'kit solaire', 'kits solaires', 'pack', '/energy-kits'],
+            ],
+            '/hubs' => [
+                'label'    => 'Points Relais & Hubs',
+                'keywords' => ['point relais', 'points relais', 'hub', 'hubs', 'retrait', 'permanence', '/hubs'],
+            ],
+            '/profile' => [
+                'label'    => 'Mon Profil',
+                'keywords' => ['profil', 'mon compte', 'parametres compte', 'changer mot de passe', '/profile'],
+            ],
+            '/dashboard' => [
+                'label'    => 'Tableau de bord',
+                'keywords' => ['dashboard', 'tableau de bord', '/dashboard'],
+            ],
+        ];
+
+        $combined = mb_strtolower($query . ' ' . $reply);
+
+        // Check explicit URLs in reply first
+        foreach ($routes as $url => $info) {
+            if (str_contains($reply, $url)) {
+                return [
+                    'url'   => $url,
+                    'label' => $info['label'],
+                ];
+            }
+        }
+
+        // Check keywords
+        foreach ($routes as $url => $info) {
+            foreach ($info['keywords'] as $keyword) {
+                if (str_contains($combined, $keyword)) {
+                    return [
+                        'url'   => $url,
+                        'label' => $info['label'],
+                    ];
+                }
+            }
+        }
+
+        return null;
+    }
 }
+

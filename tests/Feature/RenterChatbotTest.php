@@ -61,4 +61,26 @@ class RenterChatbotTest extends TestCase
             'reply'  => 'Vous pouvez choisir un hub sur la carte ou la liste des points relais.',
         ]);
     }
+
+    public function test_renter_chatbot_detects_navigation_target(): void
+    {
+        $mock = $this->mock(GeminiRenterChatService::class);
+        $mock->shouldReceive('reply')
+            ->once()
+            ->andReturn('Voici le lien pour accéder directement à la marketplace : [Accéder à la Marketplace](/marketplace)');
+
+        $response = $this->postJson(route('renter.chat'), [
+            'message' => 'Emmène-moi à la marketplace',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'status'     => 'success',
+            'navigation' => [
+                'url'   => '/marketplace',
+                'label' => 'Marketplace des Équipements',
+            ],
+        ]);
+    }
 }
+

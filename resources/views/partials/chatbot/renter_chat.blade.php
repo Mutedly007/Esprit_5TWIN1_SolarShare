@@ -31,7 +31,7 @@
         </div>
         <div>
           <h3 id="solar-chat-title" class="solar-chat-title">SolarBot</h3>
-          <p class="solar-chat-subtitle">Assistant Emprunteur • Gemini IA</p>
+          <p class="solar-chat-subtitle">Assistant Emprunteur • Vocal &amp; Gemini IA</p>
         </div>
       </div>
       <div class="solar-chat-header-actions">
@@ -51,30 +51,29 @@
         <div class="solar-msg-avatar">☀️</div>
         <div class="solar-msg-content">
           <p>Bonjour ! Je suis <strong>SolarBot</strong>, votre assistant officiel dédié exclusivement à l'espace <strong>Emprunteur</strong> de SolarShare. ⚡</p>
-          <p>Je peux vous guider pour :</p>
+          <p>🎙️ <em>Vous pouvez me parler au micro pour vous rendre directement sur une page !</em> Dites par exemple :</p>
           <ul>
-            <li>🔍 Trouver du matériel sur la <strong>Marketplace</strong></li>
-            <li>📅 Créer et gérer vos <strong>réservations &amp; cautions</strong></li>
-            <li>📦 Réserver des <strong>Packs Solaires</strong> tout-en-un</li>
-            <li>📍 Trouver un <strong>Point Relais / Hub</strong> pour le retrait</li>
-            <li>📝 Réaliser vos <strong>états des lieux</strong> (check-in / check-out)</li>
+            <li>🗣️ <strong>« Emmène-moi sur la Marketplace »</strong></li>
+            <li>🗣️ <strong>« Je veux voir mes réservations »</strong></li>
+            <li>🗣️ <strong>« Ouvre les packs solaires »</strong></li>
+            <li>🗣️ <strong>« Où sont les points relais ? »</strong></li>
           </ul>
         </div>
       </div>
 
       <!-- Quick Suggestion Chips -->
       <div id="solar-chat-suggestions" class="solar-chat-suggestions">
-        <button type="button" class="solar-chip-btn" data-query="Comment réserver un équipement solaire ?">
-          ⚡ Comment réserver un équipement ?
+        <button type="button" class="solar-chip-btn" data-query="Emmène-moi sur la marketplace">
+          🔍 Aller à la Marketplace
         </button>
-        <button type="button" class="solar-chip-btn" data-query="Comment fonctionne l'état des lieux (check-in / check-out) ?">
-          📝 Comment fonctionne l'état des lieux ?
+        <button type="button" class="solar-chip-btn" data-query="Je veux voir mes locations">
+          📅 Voir mes réservations
         </button>
-        <button type="button" class="solar-chip-btn" data-query="Qu'est-ce qu'un pack solaire clé-en-main ?">
-          📦 Qu'est-ce qu'un pack solaire ?
+        <button type="button" class="solar-chip-btn" data-query="Ouvre les packs solaires clé-en-main">
+          📦 Découvrir les Packs Solaires
         </button>
-        <button type="button" class="solar-chip-btn" data-query="Comment choisir un hub de collecte pour le retrait ?">
-          📍 Choisir un point relais ?
+        <button type="button" class="solar-chip-btn" data-query="Où sont les points relais pour le retrait ?">
+          📍 Trouver un Point Relais
         </button>
       </div>
     </div>
@@ -91,15 +90,32 @@
 
     <!-- Footer Input Bar -->
     <div class="solar-chat-footer">
+      <!-- Voice Listening Status Bar -->
+      <div id="solar-voice-status" class="solar-voice-status d-none">
+        <span class="solar-voice-pulse"></span>
+        <span id="solar-voice-status-text">🎙️ Écoute en cours... Parlez maintenant</span>
+        <button type="button" id="solar-voice-cancel-btn" class="solar-voice-cancel" aria-label="Arrêter l'écoute">✕</button>
+      </div>
+
       <form id="solar-chat-form" class="solar-chat-form" autocomplete="off">
         <input 
           type="text" 
           id="solar-chat-input" 
           class="solar-chat-input" 
-          placeholder="Posez votre question sur vos locations..." 
+          placeholder="Écrivez ou cliquez sur le micro pour naviguer..." 
           maxlength="1000"
           required
         >
+        <!-- Voice Chat Mic Button -->
+        <button type="button" id="solar-chat-mic-btn" class="solar-chat-mic-btn" aria-label="Commande vocale" title="Parler au micro (Navigation vocale)">
+          <svg class="solar-mic-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+        </button>
+        <!-- Submit Button -->
         <button type="submit" id="solar-chat-send-btn" class="solar-chat-send-btn" aria-label="Envoyer le message">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -108,7 +124,7 @@
         </button>
       </form>
       <div class="solar-chat-disclaimer">
-        <span>Assistant IA réservé aux fonctionnalités Emprunteur • SolarShare</span>
+        <span>Assistant vocal &amp; IA réservé à la session Emprunteur • SolarShare</span>
       </div>
     </div>
   </div>
@@ -191,9 +207,9 @@
   position: fixed;
   bottom: 100px;
   right: 24px;
-  width: 400px;
+  width: 420px;
   max-width: calc(100vw - 32px);
-  height: 580px;
+  height: 600px;
   max-height: calc(100vh - 120px);
   background: #ffffff;
   border-radius: 20px;
@@ -360,6 +376,61 @@
   box-shadow: 0 4px 14px rgba(15, 92, 107, 0.25);
 }
 
+/* Inline links in bot messages */
+.solar-inline-link {
+  color: #0F5C6B;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.solar-inline-link:hover {
+  color: #FF6B3D;
+}
+
+/* Call-to-action Navigation Card Button */
+.solar-chat-nav-card {
+  margin-top: 10px;
+}
+
+.solar-chat-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: linear-gradient(135deg, #0F5C6B 0%, #0B424D 100%);
+  color: #ffffff !important;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 9px 14px;
+  border-radius: 12px;
+  text-decoration: none !important;
+  box-shadow: 0 4px 12px rgba(15, 92, 107, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(255, 176, 32, 0.4);
+}
+
+.solar-chat-nav-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(15, 92, 107, 0.45);
+  background: linear-gradient(135deg, #13697a 0%, #0F5C6B 100%);
+}
+
+.solar-chat-nav-icon {
+  font-size: 1.1rem;
+}
+
+.solar-chat-nav-arrow {
+  font-size: 1.1rem;
+  color: #FFB020;
+  transition: transform 0.2s ease;
+}
+
+.solar-chat-nav-btn:hover .solar-chat-nav-arrow {
+  transform: translateX(4px);
+}
+
 /* Quick Suggestion Chips */
 .solar-chat-suggestions {
   display: flex;
@@ -388,6 +459,51 @@
   border-color: #FFB020;
   transform: translateX(3px);
   color: #C2410C;
+}
+
+/* Voice Listening Status Bar */
+.solar-voice-status {
+  background: #FFF7ED;
+  border: 1px solid #FFEDD5;
+  color: #C2410C;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  animation: solar-voice-in 0.2s ease;
+}
+
+@keyframes solar-voice-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.solar-voice-pulse {
+  width: 8px;
+  height: 8px;
+  background: #EF4444;
+  border-radius: 50%;
+  animation: solar-voice-dot 1s infinite alternate;
+  flex-shrink: 0;
+}
+
+@keyframes solar-voice-dot {
+  from { transform: scale(0.8); opacity: 0.4; }
+  to { transform: scale(1.3); opacity: 1; }
+}
+
+.solar-voice-cancel {
+  border: none;
+  background: transparent;
+  color: #9A3412;
+  font-size: 0.95rem;
+  cursor: pointer;
+  line-height: 1;
 }
 
 /* Typing Indicator */
@@ -433,6 +549,7 @@
 
 .solar-chat-form {
   display: flex;
+  align-items: center;
   gap: 8px;
 }
 
@@ -451,6 +568,41 @@
   border-color: #FFB020;
   background: #ffffff;
   box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.2);
+}
+
+/* Voice Mic Button */
+.solar-chat-mic-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #F1F5F9;
+  color: #475569;
+  border: 1px solid rgba(16, 32, 43, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.solar-chat-mic-btn:hover {
+  background: #FFE8CC;
+  color: #C2410C;
+  border-color: #FFB020;
+  transform: scale(1.05);
+}
+
+.solar-chat-mic-btn.is-recording {
+  background: #EF4444 !important;
+  color: #ffffff !important;
+  border-color: #DC2626 !important;
+  animation: solar-mic-pulse 1.3s infinite alternate;
+}
+
+@keyframes solar-mic-pulse {
+  from { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+  to { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
 }
 
 .solar-chat-send-btn {
@@ -515,10 +667,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const messagesBox = document.getElementById('solar-chat-messages');
   const typingIndicator = document.getElementById('solar-chat-typing');
   const sendBtn = document.getElementById('solar-chat-send-btn');
+  const micBtn = document.getElementById('solar-chat-mic-btn');
+  const voiceStatus = document.getElementById('solar-voice-status');
+  const voiceCancelBtn = document.getElementById('solar-voice-cancel-btn');
   const iconOpen = toggleBtn.querySelector('.solar-chat-icon-open');
   const iconClose = toggleBtn.querySelector('.solar-chat-icon-close');
 
   let history = [];
+  let recognition = null;
+  let isListening = false;
 
   // Toggle open/close
   function toggleChat() {
@@ -532,6 +689,7 @@ document.addEventListener('DOMContentLoaded', () => {
       panel.classList.add('d-none');
       iconOpen.classList.remove('d-none');
       iconClose.classList.add('d-none');
+      stopVoiceRecognition();
     }
   }
 
@@ -550,13 +708,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Simple Markdown parser for bold, bullets, links
+  // Markdown Parser (supports bold, lists, and markdown links)
   function formatReply(text) {
     if (!text) return '';
     let escaped = text
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
+
+    // Markdown Links [Title](URL)
+    escaped = escaped.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="solar-inline-link">$1 ↗</a>');
 
     // Bold **text**
     escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -573,14 +734,30 @@ document.addEventListener('DOMContentLoaded', () => {
     return escaped;
   }
 
-  function appendMessage(role, text) {
+  function appendMessage(role, text, navigation = null) {
     const msgDiv = document.createElement('div');
     msgDiv.className = `solar-msg solar-msg-${role === 'user' ? 'user' : 'bot'}`;
 
     if (role === 'bot') {
+      let navButtonHtml = '';
+      if (navigation && navigation.url) {
+        navButtonHtml = `
+          <div class="solar-chat-nav-card">
+            <a href="${navigation.url}" class="solar-chat-nav-btn">
+              <span class="solar-chat-nav-icon">🚀</span>
+              <span>Accéder à : <strong>${navigation.label || 'la page'}</strong></span>
+              <span class="solar-chat-nav-arrow">&rarr;</span>
+            </a>
+          </div>
+        `;
+      }
+
       msgDiv.innerHTML = `
         <div class="solar-msg-avatar">☀️</div>
-        <div class="solar-msg-content">${formatReply(text)}</div>
+        <div class="solar-msg-content">
+          ${formatReply(text)}
+          ${navButtonHtml}
+        </div>
       `;
     } else {
       msgDiv.innerHTML = `
@@ -592,10 +769,91 @@ document.addEventListener('DOMContentLoaded', () => {
     messagesBox.scrollTop = messagesBox.scrollHeight;
   }
 
+  // Speech-to-Text (Voice Recognition)
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  function initSpeechRecognition() {
+    if (!SpeechRecognition) return null;
+
+    const sr = new SpeechRecognition();
+    sr.lang = 'fr-FR';
+    sr.continuous = false;
+    sr.interimResults = true;
+
+    sr.onstart = () => {
+      isListening = true;
+      micBtn.classList.add('is-recording');
+      voiceStatus.classList.remove('d-none');
+    };
+
+    sr.onresult = (event) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      input.value = transcript;
+    };
+
+    sr.onerror = (event) => {
+      console.warn('Speech recognition error:', event.error);
+      stopVoiceRecognition();
+    };
+
+    sr.onend = () => {
+      stopVoiceRecognition();
+      if (input.value.trim().length > 0) {
+        form.dispatchEvent(new Event('submit', { cancelable: true }));
+      }
+    };
+
+    return sr;
+  }
+
+  function startVoiceRecognition() {
+    if (!recognition) {
+      recognition = initSpeechRecognition();
+    }
+    if (!recognition) {
+      alert("La reconnaissance vocale n'est pas supportée par votre navigateur actuel (recommandé : Chrome ou Edge).");
+      return;
+    }
+    try {
+      input.value = '';
+      recognition.start();
+    } catch (e) {
+      recognition.stop();
+    }
+  }
+
+  function stopVoiceRecognition() {
+    isListening = false;
+    micBtn.classList.remove('is-recording');
+    voiceStatus.classList.add('d-none');
+    if (recognition) {
+      try { recognition.stop(); } catch(e) {}
+    }
+  }
+
+  micBtn.addEventListener('click', () => {
+    if (isListening) {
+      stopVoiceRecognition();
+    } else {
+      startVoiceRecognition();
+    }
+  });
+
+  voiceCancelBtn.addEventListener('click', stopVoiceRecognition);
+
+  // Form Submit (Voice or Text)
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const message = input.value.trim();
     if (!message) return;
+
+    // Stop voice if active
+    if (isListening) {
+      stopVoiceRecognition();
+    }
 
     // Append user message
     appendMessage('user', message);
@@ -626,7 +884,7 @@ document.addEventListener('DOMContentLoaded', () => {
       typingIndicator.classList.add('d-none');
 
       if (response.ok && data.status === 'success') {
-        appendMessage('bot', data.reply);
+        appendMessage('bot', data.reply, data.navigation);
         history.push({ role: 'user', text: message });
         history.push({ role: 'model', text: data.reply });
       } else {
