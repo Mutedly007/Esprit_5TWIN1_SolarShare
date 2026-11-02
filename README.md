@@ -85,5 +85,11 @@ php artisan migrate
 
 # 5. Démarrer le serveur
 php artisan serve
-test
 ```
+
+---
+
+## 🛠️ CI/CD & SonarQube Troubleshooting
+
+Pour la configuration de la mémoire sous WSL2, le réglage de `vm.max_map_count=524288` pour Elasticsearch, et le diagnostic des conteneurs SonarQube & Jenkins, consultez le guide dédié :
+👉 [Guide de Dépannage CI/CD & SonarQube](docs/ci-troubleshooting.md).
