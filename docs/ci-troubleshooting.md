@@ -17,6 +17,8 @@ memory=5GB
 # Swap provides virtual memory buffer to prevent SonarQube/Elasticsearch OOM crashes
 swap=6GB
 processors=4
+# Automatically sets vm.max_map_count for Elasticsearch permanently on every WSL2 boot
+kernelCommandLine = sysctl.vm.max_map_count=524288
 ```
 
 Apply changes by restarting WSL2 from PowerShell:
@@ -30,14 +32,15 @@ wsl --shutdown
 
 Elasticsearch requires adequate virtual memory mmap counts to index active rules without throwing `OutOfMemoryError` or failing socket requests.
 
-Inside WSL2 (or your Linux Docker host):
-```bash
-# Temporary (runtime)
-sudo sysctl -w vm.max_map_count=524288
-
-# Permanent: Add to /etc/sysctl.conf
-echo "vm.max_map_count=524288" | sudo tee -a /etc/sysctl.conf
-sudo sysctl -p
+* **Via PowerShell (already set for Docker Desktop):**
+  ```powershell
+  wsl -u root sysctl -w vm.max_map_count=524288
+  ```
+* **Via Linux / WSL2 bash:**
+  ```bash
+  sudo sysctl -w vm.max_map_count=524288
+  echo "vm.max_map_count=524288" | sudo tee -a /etc/sysctl.conf
+  ```
 ```
 
 ---
