@@ -21,6 +21,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'password_set_at',
         'solar_role',
         'role',
         'provider',
@@ -111,6 +112,38 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Check if user has explicitly set their own password.
+     */
+    public function hasSetPassword(): bool
+    {
+        return ! empty($this->password_set_at);
+    }
+
+    /**
+     * Check if user has an avatar.
+     */
+    public function hasAvatar(): bool
+    {
+        return ! empty($this->avatar);
+    }
+
+    /**
+     * Get avatar full URL (supports external OAuth URLs and local storage).
+     */
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (empty($this->avatar)) {
+            return null;
+        }
+
+        if (str_starts_with($this->avatar, 'http://') || str_starts_with($this->avatar, 'https://')) {
+            return $this->avatar;
+        }
+
+        return asset('storage/' . $this->avatar);
+    }
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>
@@ -129,6 +162,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
+            'password_set_at' => 'datetime',
             'password' => 'hashed',
         ];
     }

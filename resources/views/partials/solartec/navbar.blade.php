@@ -321,8 +321,12 @@
           <!-- Logged-in user menu -->
           <div class="ss-user-menu" style="position: relative;">
             <button type="button" id="ss-user-menu-btn" class="ss-btn ss-btn-ghost" style="display:inline-flex; align-items:center; gap:0.5rem;" aria-haspopup="true" aria-expanded="false">
-              <span class="ss-user-avatar" style="width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,#FFB020,#FF6B3D); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:700;">
-                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+              <span class="ss-user-avatar" style="width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,#FFB020,#FF6B3D); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:700; overflow:hidden;">
+                @if(auth()->user()->hasAvatar())
+                  <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" style="width:100%; height:100%; object-fit:cover;">
+                @else
+                  {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                @endif
               </span>
               <span class="ss-user-name">{{ auth()->user()->name }}</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -341,6 +345,9 @@
                 </div>
                 <span style="font-size:0.78rem; color:#64748B;">{{ auth()->user()->email }}</span>
               </div>
+              <a href="{{ route('profile.edit') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#0F5C6B; text-decoration:none; font-weight:700;">
+                👤 Mon Profil & Paramètres
+              </a>
               @if(auth()->user()->isRenter())
                 <a href="{{ route('rentals.index') }}" class="ss-user-dropdown-item" style="display:block; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#10202B; text-decoration:none; font-weight:600;">
                   ⚡ Mes Réservations
@@ -429,7 +436,13 @@
     </ul>
     <div style="display: flex; flex-direction: column; gap: 1rem;">
       @auth
-        <span style="text-align:center; font-size:0.85rem; color:#64748B;">Signed in as <strong>{{ auth()->user()->name }}</strong></span>
+        <div style="display:flex; align-items:center; justify-content:center; gap:0.6rem;">
+          @if(auth()->user()->hasAvatar())
+            <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+          @endif
+          <span style="text-align:center; font-size:0.85rem; color:#64748B;">Signed in as <strong>{{ auth()->user()->name }}</strong></span>
+        </div>
+        <a href="{{ route('profile.edit') }}" class="ss-btn ss-btn-secondary w-100 ss-mobile-nav-link" style="text-align:center; text-decoration:none; font-weight:700;">👤 Mon Profil</a>
         @if(auth()->user()->isRenter())
           <a href="{{ route('rentals.index') }}" class="ss-btn ss-btn-primary w-100 ss-mobile-nav-link" style="text-align:center; text-decoration:none;">⚡ Mes Réservations</a>
         @endif

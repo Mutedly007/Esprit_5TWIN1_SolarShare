@@ -45,6 +45,7 @@ class AuthController extends Controller
             'email'      => $validated['email'],
             'solar_role' => $validated['solar_role'] ?? null,
             'password'   => Hash::make($validated['password']),
+            'password_set_at' => now(),
         ]);
 
         event(new Registered($user));
@@ -147,6 +148,7 @@ class AuthController extends Controller
                 'name' => $socialUser->getName() ?: $socialUser->getNickname() ?: 'SolarShare Member',
                 'email' => $socialUser->getEmail(),
                 'password' => Hash::make(Str::random(32)),
+                'password_set_at' => null,
                 'provider' => $provider,
                 'provider_id' => $socialUser->getId(),
                 'avatar' => $socialUser->getAvatar(),
@@ -157,15 +159,21 @@ class AuthController extends Controller
         Auth::login($user, true);
         $request->session()->regenerate();
 
-        // Any account without a role goes to onboarding: brand-new social accounts,
-        // and accounts created before onboarding existed (provider linked, role still null).
+        // Any account without a role goes to onboarding: pick a role first
         if (empty($user->solar_role)) {
             return redirect()
                 ->route('onboarding.role')
-                ->with('success', 'Welcome to SolarShare, ' . $user->name . '! Just one more step.');
+                ->with('success', 'Bienvenue sur SolarShare, ' . $user->name . ' ! Encore une étape.');
         }
 
-        return redirect()->intended(route('home'))->with('success', 'Welcome, ' . $user->name . '!');
+        // If the social user hasn't set their password yet, prompt them to set it
+        if (! $user->hasSetPassword()) {
+            return redirect()
+                ->route('onboarding.password')
+                ->with('info', 'Bienvenue sur SolarShare, ' . $user->name . ' ! Définissez votre mot de passe.');
+        }
+
+        return redirect()->intended(route('home'))->with('success', 'Bienvenue, ' . $user->name . ' !');
     }
 
     /**
@@ -175,8 +183,15 @@ class AuthController extends Controller
     {
         $user = $request->user();
 
-        // Already has a role (or registered via the normal form)? Nothing to do here.
-        if (! $user || $user->solar_role) {
+        // Already has a role (or registered via the normal form)?
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        if ($user->solar_role) {
+            if (! $user->hasSetPassword()) {
+                return redirect()->route('onboarding.password');
+            }
             return redirect()->route('home');
         }
 
@@ -196,6 +211,61 @@ class AuthController extends Controller
 
         $user->forceFill(['solar_role' => $validated['solar_role']])->save();
 
-        return redirect()->route('home')->with('success', 'You are all set, ' . $user->name . '! Welcome to SolarShare.');
+        if (! $user->hasSetPassword()) {
+            return redirect()->route('onboarding.password')
+                ->with('success', 'Rôle enregistré ! Définissez maintenant votre mot de passe personnel.');
+        }
+
+        return redirect()->route('home')->with('success', 'Félicitations, ' . $user->name . ' ! Votre profil est prêt.');
+    }
+
+    /**
+     * Show the password creation step for OAuth/social users.
+     */
+    public function showPasswordSelection(Request $request)
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        if ($user->hasSetPassword()) {
+            return redirect()->route('home');
+        }
+
+        return view('pages.front.Auth.onboarding_password', ['user' => $user]);
+    }
+
+    /**
+     * Store the chosen password for OAuth/social users.
+     */
+    public function storePasswordSelection(Request $request)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
+        ], [
+            'password.required' => 'Veuillez saisir un mot de passe.',
+            'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
+        ]);
+
+        $user->forceFill([
+            'password' => Hash::make($validated['password']),
+            'password_set_at' => now(),
+        ])->save();
+
+        return redirect()->route('home')
+            ->with('success', 'Félicitations, ' . $user->name . ' ! Votre mot de passe a été configuré avec succès.');
+    }
+
+    /**
+     * Allow user to optionally skip setting password right away.
+     */
+    public function skipPasswordSelection(Request $request)
+    {
+        return redirect()->route('home')
+            ->with('info', 'Vous pourrez configurer votre mot de passe à tout moment depuis votre profil.');
     }
 }
