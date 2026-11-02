@@ -61,12 +61,13 @@ pipeline {
                         composer:2 composer install --prefer-dist --no-interaction --ignore-platform-reqs || true
 
                     # Provide mock Vite manifest so Laravel views render during testing
+                    # Each entry MUST include "src" (required by Laravel 12 Vite helper)
                     mkdir -p public/build
                     cat > public/build/manifest.json << 'MANIFEST_EOF'
 {
-  "resources/css/app.css": {"file": "assets/app.css", "isEntry": true},
-  "resources/js/app.js":   {"file": "assets/app.js",  "isEntry": true},
-  "resources/js/front/landing.js": {"file": "assets/landing.js", "isEntry": true}
+  "resources/css/app.css": {"file": "assets/app.css", "src": "resources/css/app.css", "isEntry": true},
+  "resources/js/app.js":   {"file": "assets/app.js",  "src": "resources/js/app.js",  "isEntry": true},
+  "resources/js/front/landing.js": {"file": "assets/landing.js", "src": "resources/js/front/landing.js", "isEntry": true}
 }
 MANIFEST_EOF
 
@@ -105,7 +106,7 @@ MANIFEST_EOF
                             -w /var/jenkins_home/workspace/SolarShare-Pipeline \
                             -e SCANNER_WORKDIR_PATH=/var/jenkins_home/workspace/SolarShare-Pipeline/.scannerwork \
                             -e 'SONAR_SCANNER_OPTS=-Xms128m -Xmx384m' \
-                            sonarsource/sonar-scanner-cli \
+                            sonarsource/sonar-scanner-cli:5 \
                             "-Dsonar.host.url=${SONAR_HOST_URL}" \
                             "-Dsonar.login=${SONAR_TOKEN}" \
                             "-Dsonar.scanner.socketTimeout=300"
