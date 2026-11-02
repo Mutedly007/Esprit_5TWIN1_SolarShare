@@ -30,3 +30,4 @@ class LanguageSwitchTest extends TestCase
         $response->assertSessionHas('locale', 'fr');
     }
 }
+

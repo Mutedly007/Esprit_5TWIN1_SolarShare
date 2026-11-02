@@ -1168,27 +1168,6 @@ import '../../css/front/landing.css';
       // Social buttons are real OAuth links now (see AuthController::redirectToProvider)
     }
 
-    /* ==========================================================================
-       16. USER MENU DROPDOWN (Navbar)
-       ========================================================================== */
-    const userMenuBtn = document.getElementById('ss-user-menu-btn');
-    const userDropdown = document.getElementById('ss-user-dropdown');
-    if (userMenuBtn && userDropdown) {
-      userMenuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isOpen = userDropdown.style.display === 'block';
-        userDropdown.style.display = isOpen ? 'none' : 'block';
-        userMenuBtn.setAttribute('aria-expanded', String(!isOpen));
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!userDropdown.contains(e.target) && e.target !== userMenuBtn) {
-          userDropdown.style.display = 'none';
-          userMenuBtn.setAttribute('aria-expanded', 'false');
-        }
-      });
-    }
-
     // Initial trigger
     updateNarratorSunAndSky();
     updateNavbarOnScroll();

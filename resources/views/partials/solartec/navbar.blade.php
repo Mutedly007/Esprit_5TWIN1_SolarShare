@@ -298,6 +298,81 @@
     color: #0F5C6B;
     font-weight: 700;
   }
+
+  /* User Menu Dropdown */
+  .ss-user-menu {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .ss-user-btn {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(16, 32, 43, 0.1);
+    background: #ffffff;
+    color: #10202B;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1;
+    transition: all 0.15s ease;
+  }
+
+  .ss-user-btn:hover {
+    background: #F8FAFC;
+    border-color: #0F5C6B;
+    color: #0F5C6B;
+  }
+
+  .ss-user-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    min-width: 220px;
+    background: #ffffff;
+    border: 1px solid rgba(16, 32, 43, 0.1);
+    border-radius: 14px;
+    box-shadow: 0 18px 40px -12px rgba(16, 32, 43, 0.25);
+    padding: 0.5rem;
+    z-index: 1100;
+  }
+
+  .ss-user-dropdown::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 0;
+    right: 0;
+    height: 10px;
+  }
+
+  .ss-user-menu:hover .ss-user-dropdown,
+  .ss-user-dropdown.is-open {
+    display: block !important;
+  }
+
+  [dir="rtl"] .ss-user-dropdown {
+    left: 0;
+    right: auto;
+  }
+  [dir="ltr"] .ss-user-dropdown,
+  html:not([dir="rtl"]) .ss-user-dropdown {
+    right: 0;
+    left: auto;
+  }
+
+  .ss-user-dropdown-item {
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .ss-user-dropdown-item:hover {
+    background: #F1F5F9 !important;
+  }
 </style>
 
 <header id="ss-navbar" class="ss-navbar">
@@ -441,8 +516,8 @@
 
         @auth
           <!-- Logged-in user menu -->
-          <div class="ss-user-menu" style="position: relative;">
-            <button type="button" id="ss-user-menu-btn" class="ss-btn ss-btn-ghost" style="display:inline-flex; align-items:center; gap:0.5rem;" aria-haspopup="true" aria-expanded="false">
+          <div class="ss-user-menu">
+            <button type="button" id="ss-user-menu-btn" class="ss-user-btn" aria-haspopup="true" aria-expanded="false">
               <span class="ss-user-avatar" style="width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,#FFB020,#FF6B3D); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:700; overflow:hidden;">
                 @if(auth()->user()->hasAvatar())
                   <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" style="width:100%; height:100%; object-fit:cover;">
@@ -457,7 +532,7 @@
             </button>
 
             <!-- Dropdown Menu -->
-            <div id="ss-user-dropdown" class="ss-user-dropdown" style="display:none; position:absolute; {{ app()->getLocale() === 'ar' ? 'left:0;' : 'right:0;' }} top:calc(100% + 10px); min-width:210px; background:#fff; border:1px solid rgba(16,32,43,0.08); border-radius:14px; box-shadow:0 18px 40px -12px rgba(16,32,43,0.25); padding:0.5rem; z-index:1000;">
+            <div id="ss-user-dropdown" class="ss-user-dropdown" role="menu">
               <div style="padding:0.6rem 0.8rem; border-bottom:1px solid rgba(16,32,43,0.06); margin-bottom:0.4rem;">
                 <div style="display:flex; align-items:center; justify-content:space-between;">
                   <strong style="display:block; font-size:0.9rem; color:#10202B;">{{ auth()->user()->name }}</strong>
@@ -600,12 +675,13 @@
     const exploreMenu = document.getElementById('ss-explore-dropdown-menu');
     if (exploreBtn && exploreMenu) {
       exploreBtn.addEventListener('click', function(e) {
+        e.preventDefault();
         e.stopPropagation();
         const isOpen = exploreMenu.classList.toggle('is-open');
         exploreBtn.setAttribute('aria-expanded', String(isOpen));
       });
       document.addEventListener('click', function(e) {
-        if (!exploreMenu.contains(e.target) && e.target !== exploreBtn) {
+        if (!exploreMenu.contains(e.target) && !exploreBtn.contains(e.target)) {
           exploreMenu.classList.remove('is-open');
           exploreBtn.setAttribute('aria-expanded', 'false');
         }
@@ -623,7 +699,7 @@
         langBtn.setAttribute('aria-expanded', String(isOpen));
       });
       document.addEventListener('click', function(e) {
-        if (!langMenu.contains(e.target) && e.target !== langBtn) {
+        if (!langMenu.contains(e.target) && !langBtn.contains(e.target)) {
           langMenu.classList.remove('is-open');
           langBtn.setAttribute('aria-expanded', 'false');
         }
@@ -635,12 +711,15 @@
     const userMenu = document.getElementById('ss-user-dropdown');
     if (userBtn && userMenu) {
       userBtn.addEventListener('click', function(e) {
+        e.preventDefault();
         e.stopPropagation();
-        userMenu.style.display = userMenu.style.display === 'block' ? 'none' : 'block';
+        const isOpen = userMenu.classList.toggle('is-open');
+        userBtn.setAttribute('aria-expanded', String(isOpen));
       });
       document.addEventListener('click', function(e) {
-        if (!userMenu.contains(e.target) && e.target !== userBtn) {
-          userMenu.style.display = 'none';
+        if (!userMenu.contains(e.target) && !userBtn.contains(e.target)) {
+          userMenu.classList.remove('is-open');
+          userBtn.setAttribute('aria-expanded', 'false');
         }
       });
     }
