@@ -111,6 +111,9 @@ MANIFEST_EOF
                             "-Dsonar.login=${SONAR_TOKEN}" \
                             "-Dsonar.working.directory=/var/jenkins_home/workspace/SolarShare-Pipeline/.scannerwork" \
                             "-Dsonar.scanner.socketTimeout=300"
+
+                        # Ensure Jenkins user has read access to scannerwork report
+                        chmod -R 777 /var/jenkins_home/workspace/SolarShare-Pipeline/.scannerwork 2>/dev/null || true
                     '''
                 }
 
