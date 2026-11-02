@@ -190,31 +190,55 @@
                     @enderror
                 </div>
 
-                <!-- Equipment Image Upload -->
+                <!-- Equipment Image Upload & AI Vision Analyzer -->
                 <div class="form-group" style="grid-column: span 12;">
-                    <label for="image" class="form-label">
-                        Photo de l'équipement
-                    </label>
-                    <div style="display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; background: #F8FAFC; border: 1.5px dashed var(--ss-border); border-radius: var(--ss-radius-md); padding: 1.25rem;">
-                        <div id="image-preview-box" style="width: 110px; height: 110px; border-radius: 12px; border: 1px solid var(--ss-border); display: flex; align-items: center; justify-content: center; overflow: hidden; background: #FFFFFF; flex-shrink: 0;">
-                            <span id="image-preview-placeholder" style="font-size: 2.2rem; color: #94A3B8;">📸</span>
-                            <img id="image-preview-img" src="" alt="Aperçu" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <label for="image" class="form-label" style="margin-bottom: 0;">
+                            Photo de l'équipement <span class="req">*</span>
+                        </label>
+                        <span style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: #4F46E5; background: #EEF2FF; padding: 0.25rem 0.65rem; border-radius: var(--ss-radius-pill); border: 1px solid #C7D2FE;">
+                            <span>✨</span> Remplissage intelligent par Gemini Vision
+                        </span>
+                    </div>
+
+                    <div style="background: #F8FAFC; border: 1.5px dashed var(--ss-border); border-radius: var(--ss-radius-md); padding: 1.25rem; transition: all 0.3s ease;">
+                        <div style="display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap;">
+                            <div id="image-preview-box" style="width: 120px; height: 120px; border-radius: 12px; border: 1px solid var(--ss-border); display: flex; align-items: center; justify-content: center; overflow: hidden; background: #FFFFFF; flex-shrink: 0; box-shadow: var(--ss-shadow-sm);">
+                                <span id="image-preview-placeholder" style="font-size: 2.4rem; color: #94A3B8;">📸</span>
+                                <img id="image-preview-img" src="" alt="Aperçu" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            
+                            <div style="flex: 1; min-width: 260px;">
+                                <input
+                                    type="file"
+                                    name="image"
+                                    id="image"
+                                    accept="image/png,image/jpeg,image/webp,image/jpg"
+                                    class="form-control @error('image') is-invalid @enderror"
+                                    onchange="handleEquipmentImageSelection(this)"
+                                >
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                                    <span class="form-hint" style="margin: 0;">
+                                        JPG, PNG, WebP (max 10 Mo). Dès sélection, Gemini Vision analyse le matériel, son état et pré-remplit les champs.
+                                    </span>
+                                    <button
+                                        type="button"
+                                        id="btn-trigger-ai"
+                                        onclick="triggerAiAnalysis()"
+                                        style="display: none; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 700; padding: 0.4rem 0.85rem; border-radius: var(--ss-radius-md); border: 1px solid #6366F1; background: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%); color: #FFFFFF; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);"
+                                    >
+                                        <span>✨</span> Ré-analyser avec l'IA
+                                    </button>
+                                </div>
+                                @error('image')
+                                    <span class="form-text-error">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
-                        <div style="flex: 1; min-width: 240px;">
-                            <input
-                                type="file"
-                                name="image"
-                                id="image"
-                                accept="image/png,image/jpeg,image/webp,image/jpg"
-                                class="form-control @error('image') is-invalid @enderror"
-                                onchange="previewEquipmentImage(this)"
-                            >
-                            <span class="form-hint" style="margin-top: 0.4rem; display: block;">
-                                Formats acceptés : JPG, PNG, WebP (max 5 Mo). Ajoutez une photo claire de votre matériel.
-                            </span>
-                            @error('image')
-                                <span class="form-text-error">{{ $message }}</span>
-                            @enderror
+
+                        <!-- AI Analysis Status Card -->
+                        <div id="ai-status-card" style="display: none; margin-top: 1rem; border-radius: 10px; padding: 1rem; font-size: 0.88rem; transition: all 0.3s ease;">
+                            <!-- Dynamically populated via JS -->
                         </div>
                     </div>
                 </div>
@@ -275,10 +299,28 @@
     </div>
 </div>
 
+<style>
+    @keyframes aiSpin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .field-ai-highlight {
+        animation: aiFieldGlow 2s ease-out;
+        border-color: #10B981 !important;
+        background-color: #F0FDF4 !important;
+        transition: all 0.4s ease;
+    }
+    @keyframes aiFieldGlow {
+        0% { box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.4); }
+        100% { box-shadow: none; }
+    }
+</style>
+
 <script>
-    function previewEquipmentImage(input) {
+    function handleEquipmentImageSelection(input) {
         const previewImg = document.getElementById('image-preview-img');
         const placeholder = document.getElementById('image-preview-placeholder');
+        const triggerBtn = document.getElementById('btn-trigger-ai');
 
         if (input.files && input.files[0]) {
             const reader = new FileReader();
@@ -288,9 +330,185 @@
                 placeholder.style.display = 'none';
             };
             reader.readAsDataURL(input.files[0]);
+
+            if (triggerBtn) {
+                triggerBtn.style.display = 'inline-flex';
+            }
+
+            // Automatically launch AI analysis upon photo selection
+            triggerAiAnalysis();
         } else {
             previewImg.style.display = 'none';
             placeholder.style.display = 'block';
+            if (triggerBtn) triggerBtn.style.display = 'none';
+            const statusCard = document.getElementById('ai-status-card');
+            if (statusCard) statusCard.style.display = 'none';
+        }
+    }
+
+    async function triggerAiAnalysis() {
+        const fileInput = document.getElementById('image');
+        const statusCard = document.getElementById('ai-status-card');
+
+        if (!fileInput.files || !fileInput.files[0]) {
+            alert('Veuillez d\'abord sélectionner une photo.');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        statusCard.style.display = 'block';
+        statusCard.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.85rem; color: #3730A3; background: #EEF2FF; border: 1.5px solid #C7D2FE; border-radius: 10px; padding: 1rem;">
+                <div style="width: 24px; height: 24px; border: 3px solid #C7D2FE; border-top-color: #4F46E5; border-radius: 50%; animation: aiSpin 0.7s linear infinite; flex-shrink: 0;"></div>
+                <div>
+                    <strong style="font-size: 0.95rem; color: #312E81;">Analyse visuelle Gemini Vision en cours...</strong>
+                    <div style="font-size: 0.82rem; color: #4338CA; margin-top: 0.2rem;">
+                        Inspection de l'image, reconnaissance de la marque, vérification de la netteté et détection des dommages éventuels...
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const token = document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}';
+            const response = await fetch("{{ route('equipment.analyze-photo') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Impossible d\'analyser la photo.');
+            }
+
+            const data = result.data;
+
+            // Scenario 1: Irrelevant photo (Not renewable energy equipment)
+            if (data.is_valid_equipment === false) {
+                statusCard.innerHTML = `
+                    <div style="background: #FEF2F2; border: 1.5px solid #FCA5A5; color: #991B1B; border-radius: 10px; padding: 1rem;">
+                        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                            <span style="font-size: 1.4rem;">⚠️</span>
+                            <div>
+                                <strong style="font-size: 0.95rem; color: #991B1B;">Photo non reconnue ou hors sujet</strong>
+                                <p style="margin: 0.35rem 0 0 0; font-size: 0.86rem; color: #B91C1C;">
+                                    ${data.relevance_explanation || "L'image ne semble pas être un équipement d'énergie renouvelable (panneau solaire, batterie, onduleur, etc.)."}
+                                </p>
+                                ${data.quality_warning ? `<div style="margin-top: 0.4rem; font-size: 0.82rem; color: #DC2626;"><strong>Conseil qualité :</strong> ${data.quality_warning}</div>` : ''}
+                                <div style="margin-top: 0.6rem; font-size: 0.82rem; color: #7F1D1D; font-weight: 600;">
+                                    👉 Veuillez téléverser une photo claire de votre matériel pour activer le pré-remplissage automatique.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Scenario 2: Valid equipment
+            // Pre-fill form fields
+            fillField('name', data.name);
+            fillField('brand', data.brand);
+            if (data.matched_category_id) {
+                fillField('category_id', data.matched_category_id);
+            }
+            if (data.power_watts) {
+                fillField('power_watts', data.power_watts);
+            }
+            if (data.capacity_wh) {
+                fillField('capacity_wh', data.capacity_wh);
+            }
+            if (data.daily_rate) {
+                fillField('daily_rate', Number(data.daily_rate).toFixed(2));
+            }
+            if (data.deposit_amount) {
+                fillField('deposit_amount', Number(data.deposit_amount).toFixed(2));
+            }
+            if (data.description) {
+                fillField('description', data.description);
+            }
+
+            // Render success report card
+            const damageBadge = data.damage_detected
+                ? `<span style="background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 9999px; font-size: 0.78rem;">⚠️ Dommages / usure détectés</span>`
+                : `<span style="background: #DCFCE7; color: #166534; border: 1px solid #86EFAC; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 9999px; font-size: 0.78rem;">🟢 Aucun dommage visible</span>`;
+
+            const qualityBadge = data.is_blurry_or_low_quality
+                ? `<span style="background: #FFFBEB; color: #B45309; border: 1px solid #FCD34D; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 9999px; font-size: 0.78rem;">⚠️ Photo floue / sombre</span>`
+                : `<span style="background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 9999px; font-size: 0.78rem;">✅ Photo nette</span>`;
+
+            statusCard.innerHTML = `
+                <div style="background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 10px; padding: 1.1rem; color: #166534;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.45rem; font-weight: 800; font-size: 0.96rem; color: #15803D;">
+                            <span>✨</span> Analyse Gemini Vision réussie
+                        </div>
+                        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                            ${qualityBadge}
+                            ${damageBadge}
+                        </div>
+                    </div>
+
+                    ${data.quality_warning ? `
+                        <div style="background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 6px; padding: 0.5rem 0.75rem; color: #92400E; font-size: 0.82rem; margin-bottom: 0.75rem;">
+                            <strong>Avis netteté :</strong> ${data.quality_warning}
+                        </div>
+                    ` : ''}
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.6rem; font-size: 0.85rem; margin-bottom: 0.85rem; background: #FFFFFF; border: 1px solid #BBF7D0; border-radius: 8px; padding: 0.85rem;">
+                        <div><span style="color: #64748B;">Équipement :</span> <strong>${data.identified_type || data.name}</strong></div>
+                        <div><span style="color: #64748B;">Marque :</span> <strong>${data.brand}</strong></div>
+                        <div><span style="color: #64748B;">Puissance estimée :</span> <strong>${data.power_watts ? data.power_watts + ' W' : 'Non spécifiée'}</strong></div>
+                        <div><span style="color: #64748B;">Capacité batterie :</span> <strong>${data.capacity_wh ? data.capacity_wh + ' Wh' : 'N/A'}</strong></div>
+                    </div>
+
+                    <!-- Inspection visuelle & calcul caution -->
+                    <div style="background: #FFFFFF; border: 1px solid ${data.damage_detected ? '#FCD34D' : '#BBF7D0'}; border-radius: 8px; padding: 0.85rem; margin-bottom: 0.75rem;">
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem;">
+                            <span style="font-size: 1.25rem;">${data.damage_detected ? '🔍' : '🛡️'}</span>
+                            <div style="font-size: 0.85rem;">
+                                <strong style="color: ${data.damage_detected ? '#B45309' : '#15803D'};">
+                                    ${data.damage_detected ? 'Détection de défauts / usure :' : 'État général constaté :'}
+                                </strong>
+                                <span style="color: #334155;"> ${data.damage_assessment}</span>
+                                <div style="margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px dashed #E2E8F0; color: #475569; font-size: 0.82rem;">
+                                    <strong>Caution suggérée (${data.deposit_amount} DT) :</strong> ${data.deposit_recommendation_reason}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; font-size: 0.82rem; color: #15803D; font-weight: 600;">
+                        <span>✓ Tous les champs du formulaire ont été pré-remplis automatiquement. Vous restez libre de les ajuster avant validation.</span>
+                    </div>
+                </div>
+            `;
+
+        } catch (err) {
+            statusCard.innerHTML = `
+                <div style="background: #FEF2F2; border: 1.5px solid #FCA5A5; color: #991B1B; border-radius: 10px; padding: 0.9rem; font-size: 0.88rem;">
+                    <strong>Erreur lors de l'analyse :</strong> ${err.message}
+                </div>
+            `;
+        }
+    }
+
+    function fillField(id, value) {
+        const el = document.getElementById(id);
+        if (el && value !== null && value !== undefined) {
+            el.value = value;
+            el.classList.add('field-ai-highlight');
+            setTimeout(() => {
+                el.classList.remove('field-ai-highlight');
+            }, 2500);
         }
     }
 </script>
