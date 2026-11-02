@@ -53,7 +53,8 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('home')->with('success', 'Welcome to SolarShare, ' . $user->name . '!');
+        return redirect()->route('verification.notice')
+            ->with('success', 'Votre compte a été créé avec succès ! Un lien de vérification a été envoyé à votre adresse email. Veuillez vérifier votre boîte email pour activer votre compte.');
     }
 
     /**
@@ -70,6 +71,11 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
+
+            if (! Auth::user()->hasVerifiedEmail()) {
+                return redirect()->route('verification.notice')
+                    ->with('warning', 'Veuillez vérifier votre adresse email pour accéder à votre compte.');
+            }
 
             return redirect()->intended(route('home'))->with('success', 'Welcome back, ' . Auth::user()->name . '!');
         }
