@@ -193,7 +193,7 @@ services:
       SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
       SONAR_WEB_JAVAOPTS: "-Xms256m -Xmx512m"
       SONAR_CE_JAVAOPTS: "-Xms128m -Xmx256m"
-      SONAR_SEARCH_JAVAOPTS: "-Xms256m -Xmx512m"
+      SONAR_SEARCH_JAVAOPTS: "-Xms512m -Xmx512m"
     volumes:
       - solarshare-sonar-data:/opt/sonarqube/data
       - solarshare-sonar-extensions:/opt/sonarqube/extensions
