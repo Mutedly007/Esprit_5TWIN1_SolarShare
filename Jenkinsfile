@@ -9,7 +9,7 @@ pipeline {
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         disableConcurrentBuilds()
-        timeout(time: 30, unit: 'MINUTES')
+        timeout(time: 45, unit: 'MINUTES')
     }
 
     environment {
@@ -99,7 +99,7 @@ MANIFEST_EOF
         // ---------------------------------------------------------------------
         stage('SonarQube Static Analysis & Quality Gate') {
             options {
-                timeout(time: 20, unit: 'MINUTES')
+                timeout(time: 35, unit: 'MINUTES')
                 retry(2)
             }
             steps {
@@ -137,7 +137,8 @@ MANIFEST_EOF
                             -v solarshare-scanner-cache:/opt/sonar-scanner/.sonar/cache \
                             -w /var/jenkins_home/workspace/SolarShare-Pipeline \
                             -e SCANNER_WORKDIR_PATH=/var/jenkins_home/workspace/SolarShare-Pipeline/.scannerwork \
-                            -e 'SONAR_SCANNER_OPTS=-Xms128m -Xmx384m' \
+                            -e 'SONAR_SCANNER_OPTS=-Xms128m -Xmx512m' \
+                            -e 'NODE_OPTIONS=--max-old-space-size=1024' \
                             -e SONAR_TOKEN \
                             sonarsource/sonar-scanner-cli:5 \
                             "-Dsonar.host.url=${SONAR_HOST_URL}" \
@@ -146,7 +147,8 @@ MANIFEST_EOF
                             "-Dsonar.working.directory=/var/jenkins_home/workspace/SolarShare-Pipeline/.scannerwork" \
                             "-Dsonar.scanner.socketTimeout=300" \
                             "-Dsonar.scanner.connectTimeout=60" \
-                            "-Dsonar.ws.timeout=300"
+                            "-Dsonar.ws.timeout=300" \
+                            "-Dsonar.javascript.node.maxspace=1024"
 
                         # Ensure Jenkins user has read access to scannerwork report
                         chmod -R 777 /var/jenkins_home/workspace/SolarShare-Pipeline/.scannerwork 2>/dev/null || true
