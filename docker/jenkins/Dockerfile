@@ -12,8 +12,8 @@ RUN apt-get update && \
     usermod -aG docker jenkins && \
     rm -rf /var/lib/apt/lists/*
 
-# Pre-install essential pipeline plugins
-RUN jenkins-plugin-cli --plugins "workflow-aggregator git pipeline-stage-view"
+# Pre-install essential pipeline plugins and SonarQube Scanner
+RUN jenkins-plugin-cli --plugins "workflow-aggregator git pipeline-stage-view sonar"
 
 # Copy automated Groovy initialization scripts
 COPY init.groovy.d/ /usr/share/jenkins/ref/init.groovy.d/
