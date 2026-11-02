@@ -433,9 +433,9 @@
               <div class="ss-dropdown-card-content">
                 <div class="ss-dropdown-card-title-row">
                   <strong class="ss-dropdown-card-title">{{ __('messages.nav.equipment') }}</strong>
-                  <span class="ss-dropdown-pill">Catalogue</span>
+                  <span class="ss-dropdown-pill">{{ __('messages.nav.explore_equip_pill') }}</span>
                 </div>
-                <span class="ss-dropdown-card-desc">Panneaux, batteries, micro-éoliennes à louer</span>
+                <span class="ss-dropdown-card-desc">{{ __('messages.nav.explore_equip_desc') }}</span>
               </div>
             </a>
 
@@ -451,9 +451,9 @@
               <div class="ss-dropdown-card-content">
                 <div class="ss-dropdown-card-title-row">
                   <strong class="ss-dropdown-card-title">{{ __('messages.nav.packs') }}</strong>
-                  <span class="ss-dropdown-pill pill-kits">Clé-en-main</span>
+                  <span class="ss-dropdown-pill pill-kits">{{ __('messages.nav.explore_kits_pill') }}</span>
                 </div>
-                <span class="ss-dropdown-card-desc">Kits combinés Vanlife, Camping & Chantiers</span>
+                <span class="ss-dropdown-card-desc">{{ __('messages.nav.explore_kits_desc') }}</span>
               </div>
             </a>
 
@@ -468,9 +468,9 @@
               <div class="ss-dropdown-card-content">
                 <div class="ss-dropdown-card-title-row">
                   <strong class="ss-dropdown-card-title">{{ __('messages.nav.hubs') }}</strong>
-                  <span class="ss-dropdown-pill pill-hubs">Local</span>
+                  <span class="ss-dropdown-pill pill-hubs">{{ __('messages.nav.explore_hubs_pill') }}</span>
                 </div>
-                <span class="ss-dropdown-card-desc">Hubs de collecte & créneaux de retrait</span>
+                <span class="ss-dropdown-card-desc">{{ __('messages.nav.explore_hubs_desc') }}</span>
               </div>
             </a>
           </div>
@@ -580,7 +580,7 @@
               @endif
               <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="ss-user-dropdown-item" style="display:block; width:100%; text-align:left; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#C2410C; background:none; border:none; cursor:pointer;">{{ __('messages.nav.logout') }}</button>
+                <button type="submit" class="ss-user-dropdown-item" style="display:block; width:100%; text-align:start; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.88rem; color:#C2410C; background:none; border:none; cursor:pointer;">{{ __('messages.nav.logout') }}</button>
               </form>
             </div>
           </div>

@@ -46,9 +46,12 @@
         <h5 class="ss-footer-title">{{ __('messages.footer.newsletter_title') }}</h5>
         <p style="font-size: 0.88rem; color: #94A3B8; margin-bottom: 0.85rem;">{{ __('messages.footer.newsletter_desc') }}</p>
 
-        <form id="ss-newsletter-form" class="ss-newsletter-form" novalidate>
+        <form id="ss-newsletter-form" class="ss-newsletter-form" novalidate
+              data-valid-msg="{{ __('messages.footer.newsletter_valid') }}"
+              data-success-msg="{{ __('messages.footer.newsletter_success') }}"
+              data-error-msg="{{ __('messages.footer.newsletter_error') }}">
           <div class="ss-newsletter-group">
-            <input type="email" id="ss-newsletter-email" class="ss-newsletter-input" placeholder="you@example.com" aria-label="Email address" required>
+            <input type="email" id="ss-newsletter-email" class="ss-newsletter-input" placeholder="{{ __('messages.footer.email_placeholder') }}" aria-label="{{ __('messages.auth.email') }}" required>
             <button type="submit" class="ss-btn ss-btn-primary ss-btn-sm" style="flex-shrink: 0;">{{ __('messages.footer.subscribe') }}</button>
           </div>
           <div id="ss-newsletter-msg" class="ss-newsletter-msg" aria-live="polite"></div>
@@ -66,9 +69,9 @@
     <!-- Footer Bottom Bar -->
     <div class="ss-footer-bottom">
       <div style="font-size: 0.85rem; color: #64748B;">
-        &copy; {{ date('Y') }} SolarShare Inc. All rights reserved. Peer-to-peer clean power network.
-        <span style="display:inline-block; margin-left:1rem; font-size:0.8rem; color:#94A3B8;">
-          Template : <a href="https://htmlcodex.com/renewable-energy-website-template" target="_blank" rel="noopener" style="color: #FFB020; text-decoration: underline;">Solartec</a> par HTML Codex / ThemeWagon
+        &copy; {{ date('Y') }} SolarShare Inc. {{ __('messages.footer.all_rights') }} {{ __('messages.footer.copyright_network') }}
+        <span style="display:inline-block; margin-inline-start:1rem; font-size:0.8rem; color:#94A3B8;">
+          Template : <a href="https://htmlcodex.com/renewable-energy-website-template" target="_blank" rel="noopener" style="color: #FFB020; text-decoration: underline;">Solartec</a> {{ __('messages.footer.template_by') }} HTML Codex / ThemeWagon
         </span>
       </div>
 

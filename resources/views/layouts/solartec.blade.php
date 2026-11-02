@@ -32,6 +32,19 @@
                 padding-left: 0.5rem !important;
                 padding-right: 0 !important;
             }
+            /* Logical RTL adaptations for Bootstrap 5 LTR utility classes */
+            [dir="rtl"] .me-1 { margin-right: 0 !important; margin-left: 0.25rem !important; }
+            [dir="rtl"] .me-2 { margin-right: 0 !important; margin-left: 0.5rem !important; }
+            [dir="rtl"] .me-3 { margin-right: 0 !important; margin-left: 1rem !important; }
+            [dir="rtl"] .me-4 { margin-right: 0 !important; margin-left: 1.5rem !important; }
+            [dir="rtl"] .ms-1 { margin-left: 0 !important; margin-right: 0.25rem !important; }
+            [dir="rtl"] .ms-2 { margin-left: 0 !important; margin-right: 0.5rem !important; }
+            [dir="rtl"] .ms-3 { margin-left: 0 !important; margin-right: 1rem !important; }
+            [dir="rtl"] .ps-3 { padding-left: 0 !important; padding-right: 1rem !important; }
+            [dir="rtl"] .end-0 { right: auto !important; left: 0 !important; }
+            [dir="rtl"] .start-0 { left: auto !important; right: 0 !important; }
+            [dir="rtl"] .back-to-top { right: auto !important; left: 30px !important; }
+            [dir="rtl"] .header-carousel .owl-dots { right: auto !important; left: 45px !important; }
         </style>
     @endif
 
@@ -166,13 +179,13 @@
     @if (isset($errors) && $errors->any())
     <div class="container mt-4">
         <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm" role="alert">
-            <div class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>Veuillez corriger les erreurs suivantes :</div>
+            <div class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ __('messages.common.fix_errors') }}</div>
             <ul class="mb-0 ps-3">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('messages.common.close') }}"></button>
         </div>
     </div>
     @endif
@@ -186,7 +199,7 @@
     @includeUnless(request()->routeIs('onboarding.*'), 'partials.solartec.footer')
 
     <!-- Back to Top -->
-    <a href="#" class="btn btn-lg btn-primary btn-lg-square rounded-circle back-to-top" aria-label="Retour en haut">
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square rounded-circle back-to-top" aria-label="{{ __('messages.common.back_to_top') }}">
         <i class="bi bi-arrow-up"></i>
     </a>
 
