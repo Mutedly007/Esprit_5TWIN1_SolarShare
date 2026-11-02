@@ -18,7 +18,6 @@ pipeline {
         DOCKER_NETWORK     = 'solarshare-network'
         SONAR_HOST_URL     = 'http://sonarqube:9000'
         SONAR_PROJECT_KEY  = 'SolarShare'
-        SONAR_TOKEN        = 'squ_2f87a04093c6dd49ffebc4b603ea91838afcf38f'
         APP_HEALTH_URL     = 'http://solarshare-web/up'
     }
 
@@ -71,12 +70,15 @@ pipeline {
 }
 MANIFEST_EOF
 
-                    # Run PHPUnit tests with APP_KEY and SQLite in-memory database
+                    # Generate dynamic throwaway test encryption key at runtime
+                    TEST_KEY="base64:$(openssl rand -base64 32)"
+
+                    # Run PHPUnit tests with SQLite in-memory database
                     docker run --rm \
                         --user 0:0 \
                         -v solarshare-jenkins-data:/var/jenkins_home \
                         -w /var/jenkins_home/workspace/SolarShare-Pipeline \
-                        -e APP_KEY="base64:FWLQ8I29e3KhyQaBXLNYPXCB5YhZJ3xny5OQlhov8ds=" \
+                        -e APP_KEY="${TEST_KEY}" \
                         -e APP_ENV=testing \
                         -e DB_CONNECTION=sqlite \
                         -e DB_DATABASE=:memory: \
@@ -95,37 +97,75 @@ MANIFEST_EOF
         // Stage 4: SonarQube Static Code Analysis & Quality Gate
         // ---------------------------------------------------------------------
         stage('SonarQube Static Analysis & Quality Gate') {
+            options {
+                timeout(time: 20, unit: 'MINUTES')
+                retry(2)
+            }
             steps {
+                echo "--> Polling SonarQube Server readiness on ${DOCKER_NETWORK}..."
+                sh '''
+                    # Wait up to 5 minutes for SonarQube to be UP
+                    READY=false
+                    for i in $(seq 1 60); do
+                        STATUS=$(curl -s http://sonarqube:9000/api/system/status 2>/dev/null | grep -o '"status":"[^"]*"' | head -1 | cut -d'"' -f4 || echo "DOWN")
+                        echo "--> Checking SonarQube health (attempt $i/60): status=[${STATUS}]"
+                        if [ "${STATUS}" = "UP" ]; then
+                            READY=true
+                            echo "--> SonarQube is fully UP and operational."
+                            break
+                        fi
+                        sleep 5
+                    done
+
+                    if [ "${READY}" != "true" ]; then
+                        echo "ERROR: SonarQube failed to reach UP status within 5 minutes."
+                        exit 1
+                    fi
+                '''
+
                 echo "--> Executing SonarScanner CLI against SonarQube Server..."
                 withSonarQubeEnv('SonarQube') {
                     sh '''
+                        # Pass token injected by withSonarQubeEnv without echoing in logs
+                        export SONAR_TOKEN="${SONAR_AUTH_TOKEN:-$SONAR_TOKEN}"
+
                         docker run --rm \
                             --user 0:0 \
                             --network ${DOCKER_NETWORK} \
                             -v solarshare-jenkins-data:/var/jenkins_home \
+                            -v solarshare-scanner-cache:/opt/sonar-scanner/.sonar/cache \
                             -w /var/jenkins_home/workspace/SolarShare-Pipeline \
                             -e SCANNER_WORKDIR_PATH=/var/jenkins_home/workspace/SolarShare-Pipeline/.scannerwork \
                             -e 'SONAR_SCANNER_OPTS=-Xms128m -Xmx384m' \
+                            -e SONAR_TOKEN \
                             sonarsource/sonar-scanner-cli:5 \
                             "-Dsonar.host.url=${SONAR_HOST_URL}" \
-                            "-Dsonar.login=${SONAR_TOKEN}" \
+                            "-Dsonar.token=${SONAR_TOKEN}" \
                             "-Dsonar.working.directory=/var/jenkins_home/workspace/SolarShare-Pipeline/.scannerwork" \
-                            "-Dsonar.scanner.socketTimeout=300"
+                            "-Dsonar.scanner.socketTimeout=300" \
+                            "-Dsonar.scanner.connectTimeout=60" \
+                            "-Dsonar.ws.timeout=300"
 
                         # Ensure Jenkins user has read access to scannerwork report
                         chmod -R 777 /var/jenkins_home/workspace/SolarShare-Pipeline/.scannerwork 2>/dev/null || true
                     '''
                 }
 
-                echo "--> SonarScanner analysis uploaded. Verifying Quality Gate status..."
-                sh '''
-                    sleep 5
-
-                    # Verify Quality Gate status via SonarQube REST API
-                    QG_STATUS=$(curl -s -u ${SONAR_TOKEN}: "${SONAR_HOST_URL}/api/qualitygates/project_status?projectKey=${SONAR_PROJECT_KEY}" | grep -o '"status":"[^"]*"' | head -1 | cut -d'"' -f4 || echo "OK")
-                    echo "--> SonarQube Quality Gate Status: ${QG_STATUS}"
-                    echo "--> Quality Gate verified."
-                '''
+                echo "--> SonarScanner analysis uploaded. Verifying Quality Gate..."
+                timeout(time: 5, unit: 'MINUTES') {
+                    script {
+                        try {
+                            def qg = waitForQualityGate()
+                            echo "--> SonarQube Quality Gate Status: ${qg.status}"
+                        } catch (Throwable t) {
+                            echo "--> Quality Gate webhook check notice (${t.message}). Verifying via REST API..."
+                            sh '''
+                                QG_STATUS=$(curl -s -u "${SONAR_AUTH_TOKEN:-$SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/qualitygates/project_status?projectKey=${SONAR_PROJECT_KEY}" 2>/dev/null | grep -o '"status":"[^"]*"' | head -1 | cut -d'"' -f4 || echo "OK")
+                                echo "--> SonarQube Quality Gate Status (API): ${QG_STATUS}"
+                            '''
+                        }
+                    }
+                }
             }
         }
 

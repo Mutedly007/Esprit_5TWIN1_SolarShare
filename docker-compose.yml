@@ -191,9 +191,20 @@ services:
       - "9000:9000"
     environment:
       SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
-      SONAR_WEB_JAVAOPTS: "-Xms256m -Xmx512m"
-      SONAR_CE_JAVAOPTS: "-Xms128m -Xmx256m"
-      SONAR_SEARCH_JAVAOPTS: "-Xms512m -Xmx512m"
+      SONAR_WEB_JAVAOPTS: "-Xms256m -Xmx768m"
+      SONAR_CE_JAVAOPTS: "-Xms256m -Xmx768m"
+      SONAR_SEARCH_JAVAOPTS: "-Xms1g -Xmx1g"
+    ulimits:
+      nofile:
+        soft: 131072
+        hard: 131072
+      nproc: 8192
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9000/api/system/status | grep -q '\"status\":\"UP\"' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 120s
     volumes:
       - solarshare-sonar-data:/opt/sonarqube/data
       - solarshare-sonar-extensions:/opt/sonarqube/extensions
@@ -216,6 +227,9 @@ services:
       - "50000:50000"
     environment:
       JAVA_OPTS: "-Djenkins.install.runSetupWizard=false -Xms256m -Xmx512m"
+    depends_on:
+      sonarqube:
+        condition: service_healthy
     volumes:
       - solarshare-jenkins-data:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
@@ -245,6 +259,8 @@ volumes:
     name: solarshare-sonar-extensions
   solarshare-sonar-logs:
     name: solarshare-sonar-logs
+  solarshare-scanner-cache:
+    name: solarshare-scanner-cache
   solarshare-jenkins-data:
     name: solarshare-jenkins-data
 
