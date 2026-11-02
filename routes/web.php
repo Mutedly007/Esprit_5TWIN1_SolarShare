@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -127,6 +129,21 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
 Route::post('/register', [AuthController::class, 'register'])->name('register.store');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Password Reset Routes
+Route::middleware('guest')->group(function () {
+    Route::get('/forgot-password', [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
+});
+
+// Email Verification Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->middleware('signed')->name('verification.verify');
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'send'])->middleware('throttle:6,1')->name('verification.send');
+});
+
 Route::get('/auth/{provider}/redirect', [AuthController::class, 'redirectToProvider'])
     ->whereIn('provider', ['google', 'github'])
     ->name('oauth.redirect');
@@ -135,10 +152,21 @@ Route::get('/auth/{provider}/callback', [AuthController::class, 'handleProviderC
     ->whereIn('provider', ['google', 'github'])
     ->name('oauth.callback');
 
-// Post-social-signup onboarding: pick a role (rent / lend / both)
+// Post-social-signup onboarding: pick a role (rent / lend / both) and set password
 Route::middleware('auth')->group(function () {
     Route::get('/onboarding/role', [AuthController::class, 'showRoleSelection'])->name('onboarding.role');
     Route::post('/onboarding/role', [AuthController::class, 'storeRoleSelection'])->name('onboarding.role.store');
+    Route::get('/onboarding/password', [AuthController::class, 'showPasswordSelection'])->name('onboarding.password');
+    Route::post('/onboarding/password', [AuthController::class, 'storePasswordSelection'])->name('onboarding.password.store');
+    Route::post('/onboarding/password/skip', [AuthController::class, 'skipPasswordSelection'])->name('onboarding.password.skip');
+
+    // User Profile Management (Modification informations, mot de passe, avatar, suppression compte)
+    Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/avatar', [\App\Http\Controllers\ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
+    Route::delete('/profile/avatar', [\App\Http\Controllers\ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
+    Route::put('/profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password.update');
+    Route::delete('/profile', [\App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Convenient /dashboard shortcut
     Route::get('/dashboard', function () {

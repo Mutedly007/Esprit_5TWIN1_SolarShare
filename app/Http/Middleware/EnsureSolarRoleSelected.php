@@ -23,6 +23,9 @@ class EnsureSolarRoleSelected
                 'onboarding.role',
                 'onboarding.role.store',
                 'logout',
+                'verification.notice',
+                'verification.verify',
+                'verification.send',
             ];
 
             if (! in_array($request->route()->getName(), $allowed, true)) {

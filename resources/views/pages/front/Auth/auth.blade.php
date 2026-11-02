@@ -259,9 +259,9 @@
               <div class="ss-form-label-row">
                 <label for="ss-login-password" class="ss-form-label">Password</label>
                 <!-- Line for Forgot Password -->
-                <button type="button" class="ss-forgot-pwd-link" id="ss-btn-forgot-password">
+                <a href="{{ route('password.request') }}" class="ss-forgot-pwd-link" id="ss-btn-forgot-password">
                   Forgot password?
-                </button>
+                </a>
               </div>
               <div class="ss-input-wrap">
                 <span class="ss-input-icon">
