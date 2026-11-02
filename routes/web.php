@@ -155,6 +155,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('lender')->group(function () {
         Route::get('/lender', [\App\Http\Controllers\LenderDashboardController::class, 'index'])->name('lender.dashboard');
         Route::resource('categories', \App\Http\Controllers\CategoryController::class);
+        Route::post('equipment/analyze-photo', [\App\Http\Controllers\EquipmentController::class, 'analyzePhoto'])->name('equipment.analyze-photo');
         Route::resource('equipment', \App\Http\Controllers\EquipmentController::class);
         Route::get('/lender/rentals', [\App\Http\Controllers\LenderRentalController::class, 'index'])->name('lender.rentals.index');
         Route::patch('/lender/pack-reservations/{reservation}/status', [\App\Http\Controllers\LenderRentalController::class, 'updateKitReservationStatus'])->name('lender.kit-reservations.status');

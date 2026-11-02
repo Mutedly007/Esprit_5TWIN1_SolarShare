@@ -6,6 +6,8 @@ use App\Http\Requests\StoreEquipmentRequest;
 use App\Http\Requests\UpdateEquipmentRequest;
 use App\Models\Category;
 use App\Models\Equipment;
+use App\Services\GeminiEquipmentVisionService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -64,6 +66,35 @@ class EquipmentController extends Controller
         $categories = Category::orderBy('name')->get();
 
         return view('lender.equipment.create', compact('categories'));
+    }
+
+    /**
+     * Analyze an uploaded equipment photo using Gemini Vision AI.
+     */
+    public function analyzePhoto(Request $request, GeminiEquipmentVisionService $visionService): JsonResponse
+    {
+        $request->validate([
+            'image' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:10240'],
+        ], [
+            'image.required' => 'Veuillez sélectionner une image à analyser.',
+            'image.image' => 'Le fichier doit être une image valide.',
+            'image.mimes' => 'Formats acceptés : JPG, JPEG, PNG, WEBP.',
+            'image.max' => 'L\'image ne doit pas dépasser 10 Mo.',
+        ]);
+
+        $result = $visionService->analyzePhoto($request->file('image'));
+
+        if (! $result['success']) {
+            return response()->json([
+                'success' => false,
+                'message' => $result['error'] ?? 'Une erreur est survenue lors de l\'analyse de la photo.',
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $result['data'],
+        ]);
     }
 
     /**
