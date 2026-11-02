@@ -62,7 +62,13 @@ pipeline {
 
                     # Provide mock Vite manifest so Laravel views render during testing
                     mkdir -p public/build
-                    echo '{"resources/css/app.css":{"file":"assets/app.css","isEntry":true},"resources/js/app.js":{"file":"assets/app.js","isEntry":true}}' > public/build/manifest.json
+                    cat > public/build/manifest.json << 'MANIFEST_EOF'
+{
+  "resources/css/app.css": {"file": "assets/app.css", "isEntry": true},
+  "resources/js/app.js":   {"file": "assets/app.js",  "isEntry": true},
+  "resources/js/front/landing.js": {"file": "assets/landing.js", "isEntry": true}
+}
+MANIFEST_EOF
 
                     # Run PHPUnit tests with APP_KEY and SQLite in-memory database
                     docker run --rm \
@@ -98,7 +104,7 @@ pipeline {
                             -v solarshare-jenkins-data:/var/jenkins_home \
                             -w /var/jenkins_home/workspace/SolarShare-Pipeline \
                             -e SCANNER_WORKDIR_PATH=/var/jenkins_home/workspace/SolarShare-Pipeline/.scannerwork \
-                            -e SONAR_SCANNER_OPTS="-Xms128m -Xmx384m" \
+                            -e 'SONAR_SCANNER_OPTS=-Xms128m -Xmx384m' \
                             sonarsource/sonar-scanner-cli \
                             "-Dsonar.host.url=${SONAR_HOST_URL}" \
                             "-Dsonar.login=${SONAR_TOKEN}" \
