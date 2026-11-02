@@ -111,9 +111,9 @@
       "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "targets": [
         {
-          "expr": "rate(container_cpu_usage_seconds_total{name=~\"solarshare.*\"}[1m]) * 100",
+          "expr": "label_replace((rate(container_cpu_usage_seconds_total{name=~\"solarshare.*\"}[1m]) * 100) or (rate(container_cpu_usage_seconds_total{id=~\"/docker/.*\"}[1m]) * 100), \"container\", \"$1\", \"id\", \"/docker/(.{12}).*\")",
           "refId": "A",
-          "legendFormat": "{{name}}"
+          "legendFormat": "{{name}}{{container}}"
         }
       ],
       "fieldConfig": {
@@ -136,9 +136,9 @@
       "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "targets": [
         {
-          "expr": "container_memory_working_set_bytes{name=~\"solarshare.*\"} / (1024 * 1024)",
+          "expr": "label_replace((container_memory_working_set_bytes{name=~\"solarshare.*\"} / (1024 * 1024)) or (container_memory_working_set_bytes{id=~\"/docker/.*\"} / (1024 * 1024)), \"container\", \"$1\", \"id\", \"/docker/(.{12}).*\")",
           "refId": "A",
-          "legendFormat": "{{name}}"
+          "legendFormat": "{{name}}{{container}}"
         }
       ],
       "fieldConfig": {
@@ -162,5 +162,5 @@
   "timezone": "browser",
   "title": "SolarShare DevOps Observability",
   "uid": "solarshare-overview",
-  "version": 1
+  "version": 2
 }
