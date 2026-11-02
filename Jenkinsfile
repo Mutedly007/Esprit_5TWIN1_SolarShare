@@ -55,14 +55,20 @@ pipeline {
                 sh '''
                     # Install dependencies for testing in workspace if not present
                     docker run --rm \
+                        --user 0:0 \
                         -v solarshare-jenkins-data:/var/jenkins_home \
                         -w /var/jenkins_home/workspace/SolarShare-Pipeline \
                         composer:2 composer install --prefer-dist --no-interaction --ignore-platform-reqs || true
 
-                    # Run PHPUnit tests
+                    # Run PHPUnit tests with APP_KEY and SQLite in-memory database
                     docker run --rm \
+                        --user 0:0 \
                         -v solarshare-jenkins-data:/var/jenkins_home \
                         -w /var/jenkins_home/workspace/SolarShare-Pipeline \
+                        -e APP_KEY="base64:FWLQ8I29e3KhyQaBXLNYPXCB5YhZJ3xny5OQlhov8ds=" \
+                        -e APP_ENV=testing \
+                        -e DB_CONNECTION=sqlite \
+                        -e DB_DATABASE=:memory: \
                         php:8.2-cli php -d memory_limit=512M vendor/bin/phpunit --no-coverage || true
 
                     # Ensure coverage.xml exists so SonarQube sensor imports cleanly
@@ -83,12 +89,14 @@ pipeline {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
                         docker run --rm \
+                            --user 0:0 \
                             --network ${DOCKER_NETWORK} \
                             -v solarshare-jenkins-data:/var/jenkins_home \
                             -w /var/jenkins_home/workspace/SolarShare-Pipeline \
                             sonarsource/sonar-scanner-cli \
                             "-Dsonar.host.url=${SONAR_HOST_URL}" \
-                            "-Dsonar.login=${SONAR_TOKEN}"
+                            "-Dsonar.login=${SONAR_TOKEN}" \
+                            "-Dsonar.ws.timeout=300"
                     '''
                 }
 
