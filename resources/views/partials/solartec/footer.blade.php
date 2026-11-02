@@ -13,43 +13,43 @@
             </svg>
             Solar<span style="color: #FFB020;">Share</span>
           </a>
-          <p>The neighborhood renewable power collective. Rent what you need, earn from what sits idle, and build local energy independence.</p>
+          <p>{{ __('messages.footer.tagline') }}</p>
         </div>
       </div>
 
       <!-- Links Column 1: Platform -->
       <div class="col-lg-2 col-md-4 col-6 mb-4 mb-md-0">
-        <h5 class="ss-footer-title">Platform</h5>
+        <h5 class="ss-footer-title">{{ __('messages.footer.platform') }}</h5>
         <ul class="ss-footer-links">
-          <li><a href="#equipment" class="ss-footer-link">Browse Gear</a></li>
-          <li><a href="#how-it-works" class="ss-footer-link">How it Works</a></li>
-          <li><a href="#community" class="ss-footer-link">SolarShield Protection</a></li>
-          <li><a href="#community" class="ss-footer-link">Lender Earnings</a></li>
-          <li><a href="#faq" class="ss-footer-link">Safety Guidelines</a></li>
+          <li><a href="{{ route('marketplace') }}" class="ss-footer-link">{{ __('messages.footer.browse_gear') }}</a></li>
+          <li><a href="{{ url('/#how-it-works') }}" class="ss-footer-link">{{ __('messages.footer.how_it_works') }}</a></li>
+          <li><a href="{{ url('/#community') }}" class="ss-footer-link">{{ __('messages.footer.solarshield') }}</a></li>
+          <li><a href="{{ url('/#community') }}" class="ss-footer-link">{{ __('messages.footer.lender_earnings') }}</a></li>
+          <li><a href="{{ url('/#faq') }}" class="ss-footer-link">{{ __('messages.footer.safety') }}</a></li>
         </ul>
       </div>
 
       <!-- Links Column 2: Community -->
       <div class="col-lg-2 col-md-4 col-6 mb-4 mb-md-0">
-        <h5 class="ss-footer-title">Community</h5>
+        <h5 class="ss-footer-title">{{ __('messages.footer.community') }}</h5>
         <ul class="ss-footer-links">
-          <li><a href="#community" class="ss-footer-link">Lender Stories</a></li>
-          <li><a href="#impact" class="ss-footer-link">Impact Metrics</a></li>
-          <li><a href="#community" class="ss-footer-link">Neighborhood Hubs</a></li>
-          <li><a href="#equipment" class="ss-footer-link">Camper Guides</a></li>
-          <li><a href="#faq" class="ss-footer-link">Emergency Power</a></li>
+          <li><a href="{{ url('/#community') }}" class="ss-footer-link">{{ __('messages.footer.stories') }}</a></li>
+          <li><a href="{{ url('/#impact') }}" class="ss-footer-link">{{ __('messages.footer.impact') }}</a></li>
+          <li><a href="{{ route('hubs.index') }}" class="ss-footer-link">{{ __('messages.footer.hubs') }}</a></li>
+          <li><a href="{{ route('energy-kits.index') }}" class="ss-footer-link">{{ __('messages.footer.guides') }}</a></li>
+          <li><a href="{{ url('/#faq') }}" class="ss-footer-link">{{ __('messages.footer.emergency') }}</a></li>
         </ul>
       </div>
 
       <!-- Column 3: Newsletter Signup -->
       <div class="col-lg-4 col-md-4">
-        <h5 class="ss-footer-title">Get Solar Tips & Gear Alerts</h5>
-        <p style="font-size: 0.88rem; color: #94A3B8; margin-bottom: 0.85rem;">Receive weekly local listings, clean power guides, and seasonal gear notifications.</p>
+        <h5 class="ss-footer-title">{{ __('messages.footer.newsletter_title') }}</h5>
+        <p style="font-size: 0.88rem; color: #94A3B8; margin-bottom: 0.85rem;">{{ __('messages.footer.newsletter_desc') }}</p>
 
         <form id="ss-newsletter-form" class="ss-newsletter-form" novalidate>
           <div class="ss-newsletter-group">
             <input type="email" id="ss-newsletter-email" class="ss-newsletter-input" placeholder="you@example.com" aria-label="Email address" required>
-            <button type="submit" class="ss-btn ss-btn-primary ss-btn-sm" style="flex-shrink: 0;">Subscribe</button>
+            <button type="submit" class="ss-btn ss-btn-primary ss-btn-sm" style="flex-shrink: 0;">{{ __('messages.footer.subscribe') }}</button>
           </div>
           <div id="ss-newsletter-msg" class="ss-newsletter-msg" aria-live="polite"></div>
         </form>

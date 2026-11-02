@@ -59,12 +59,22 @@
                 <!-- Language Dropdown -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-muted small px-2 d-flex align-items-center" href="javascript:void(0)" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="fw-bold">FR</span>
+                        <span class="fw-bold text-uppercase">{{ app()->getLocale() }}</span>
                         <i data-feather="chevron-down" class="feather-xs ms-1"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-animate-up py-2 shadow-sm border-0">
-                        <a class="dropdown-item small" href="javascript:void(0)">FR — Français</a>
-                        <a class="dropdown-item small" href="javascript:void(0)">EN — English</a>
+                        <a class="dropdown-item small d-flex align-items-center justify-content-between {{ app()->getLocale() === 'fr' ? 'fw-bold text-primary' : '' }}" href="{{ route('lang.switch', 'fr') }}">
+                            <span>🇫🇷 FR — Français</span>
+                            @if(app()->getLocale() === 'fr') <i class="fas fa-check font-12 ms-2"></i> @endif
+                        </a>
+                        <a class="dropdown-item small d-flex align-items-center justify-content-between {{ app()->getLocale() === 'en' ? 'fw-bold text-primary' : '' }}" href="{{ route('lang.switch', 'en') }}">
+                            <span>🇬🇧 EN — English</span>
+                            @if(app()->getLocale() === 'en') <i class="fas fa-check font-12 ms-2"></i> @endif
+                        </a>
+                        <a class="dropdown-item small d-flex align-items-center justify-content-between {{ app()->getLocale() === 'ar' ? 'fw-bold text-primary' : '' }}" href="{{ route('lang.switch', 'ar') }}">
+                            <span>🇹🇳 AR — العربية</span>
+                            @if(app()->getLocale() === 'ar') <i class="fas fa-check font-12 ms-2"></i> @endif
+                        </a>
                     </div>
                 </li>
             </ul>

@@ -103,11 +103,11 @@ class User extends Authenticatable
     {
         $role = strtolower((string) ($this->solar_role ?? $this->role ?? ''));
         return match ($role) {
-            'admin' => 'Administrateur',
-            'lend' => 'Prêteur (Lend)',
-            'rent' => 'Emprunteur (Rent)',
-            'both' => 'Mixte (Lend & Rent)',
-            default => 'Non défini',
+            'admin' => 'Admin',
+            'lend' => __('messages.profile.lender'),
+            'rent' => __('messages.profile.borrower'),
+            'both' => __('messages.profile.mixed'),
+            default => '-',
         };
     }
 

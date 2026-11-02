@@ -23,14 +23,14 @@
                     <div class="container">
                         <div class="row justify-content-start">
                             <div class="col-10 col-lg-8">
-                                <span class="badge badge-solar mb-3 text-uppercase px-3 py-2">Économie Circulaire & Énergie Propre</span>
-                                <h1 class="display-3 text-white animated slideInDown">Partagez l'Énergie Propre Entre Voisins</h1>
-                                <p class="fs-5 fw-medium text-white mb-4 pb-3">Louez des panneaux solaires portables, batteries de haute capacité et micro-éoliennes auprès de particuliers de confiance à proximité de chez vous.</p>
+                                <span class="badge badge-solar mb-3 text-uppercase px-3 py-2">{{ __('messages.home.hero_slide1_badge') }}</span>
+                                <h1 class="display-3 text-white animated slideInDown">{{ __('messages.home.hero_slide1_title') }}</h1>
+                                <p class="fs-5 fw-medium text-white mb-4 pb-3">{{ __('messages.home.hero_slide1_desc') }}</p>
                                 <a href="{{ route('marketplace') }}" class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft me-3">
-                                    <i class="fa fa-search me-2"></i>Louer du matériel
+                                    <i class="fa fa-search me-2"></i>{{ __('messages.home.hero_slide1_btn1') }}
                                 </a>
                                 <a href="{{ route('register') }}" class="btn btn-outline-light rounded-pill py-3 px-5 animated slideInRight">
-                                    <i class="fa fa-plus-circle me-2"></i>Déposer mon matériel
+                                    <i class="fa fa-plus-circle me-2"></i>{{ __('messages.home.hero_slide1_btn2') }}
                                 </a>
                             </div>
                         </div>
@@ -45,11 +45,11 @@
                     <div class="container">
                         <div class="row justify-content-start">
                             <div class="col-10 col-lg-8">
-                                <span class="badge badge-clean mb-3 text-uppercase px-3 py-2">Sans investissement lourd</span>
-                                <h1 class="display-3 text-white animated slideInDown">L'Autonomie Énergétique Pour Vos Aventures</h1>
-                                <p class="fs-5 fw-medium text-white mb-4 pb-3">Camping, vanlife, chantiers isolés ou secours d'urgence : bénéficiez d'une alimentation électrique 100% renouvelable pour quelques jours, sans acheter.</p>
-                                <a href="{{ route('marketplace') }}" class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft me-3">Voir les équipements</a>
-                                <a href="#how-it-works" class="btn btn-outline-light rounded-pill py-3 px-5 animated slideInRight">Comment ça marche</a>
+                                <span class="badge badge-clean mb-3 text-uppercase px-3 py-2">{{ __('messages.home.hero_slide2_badge') }}</span>
+                                <h1 class="display-3 text-white animated slideInDown">{{ __('messages.home.hero_slide2_title') }}</h1>
+                                <p class="fs-5 fw-medium text-white mb-4 pb-3">{{ __('messages.home.hero_slide2_desc') }}</p>
+                                <a href="{{ route('marketplace') }}" class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft me-3">{{ __('messages.home.hero_slide2_btn1') }}</a>
+                                <a href="#how-it-works" class="btn btn-outline-light rounded-pill py-3 px-5 animated slideInRight">{{ __('messages.home.hero_slide2_btn2') }}</a>
                             </div>
                         </div>
                     </div>
@@ -63,11 +63,11 @@
                     <div class="container">
                         <div class="row justify-content-start">
                             <div class="col-10 col-lg-8">
-                                <span class="badge badge-rent mb-3 text-uppercase px-3 py-2">Revenus complémentaires garantis</span>
-                                <h1 class="display-3 text-white animated slideInDown">Rentabilisez Votre Matériel Écologique</h1>
-                                <p class="fs-5 fw-medium text-white mb-4 pb-3">Votre station d'énergie ou kit solaire dort dans votre garage ? Mettez-le en location en toute sérénité grâce à notre caution sécurisée et notre contrat type.</p>
-                                <a href="{{ route('register') }}" class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft me-3">Devenir prêteur</a>
-                                <a href="#packs" class="btn btn-outline-light rounded-pill py-3 px-5 animated slideInRight">Découvrir les packs</a>
+                                <span class="badge badge-rent mb-3 text-uppercase px-3 py-2">{{ __('messages.home.hero_slide3_badge') }}</span>
+                                <h1 class="display-3 text-white animated slideInDown">{{ __('messages.home.hero_slide3_title') }}</h1>
+                                <p class="fs-5 fw-medium text-white mb-4 pb-3">{{ __('messages.home.hero_slide3_desc') }}</p>
+                                <a href="{{ route('register') }}" class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft me-3">{{ __('messages.home.hero_slide3_btn1') }}</a>
+                                <a href="#packs" class="btn btn-outline-light rounded-pill py-3 px-5 animated slideInRight">{{ __('messages.home.hero_slide3_btn2') }}</a>
                             </div>
                         </div>
                     </div>
@@ -88,8 +88,8 @@
                             <i class="fa fa-bolt text-white fs-4"></i>
                         </div>
                         <h2 class="display-6 fw-bold mb-1" data-toggle="counter-up">12480</h2>
-                        <span class="text-primary fw-bold">kWh Partagés</span>
-                        <p class="text-muted small mt-2 mb-0">D'énergie solaire et éolienne consommée localement.</p>
+                        <span class="text-primary fw-bold">{{ __('messages.home.stat_kwh') }}</span>
+                        <p class="text-muted small mt-2 mb-0">{{ __('messages.home.stat_kwh_desc') }}</p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.3s">
@@ -98,8 +98,8 @@
                             <i class="fa fa-leaf text-white fs-4"></i>
                         </div>
                         <h2 class="display-6 fw-bold mb-1"><span data-toggle="counter-up">8</span>.2 t</h2>
-                        <span class="text-primary fw-bold">CO₂ Évitées</span>
-                        <p class="text-muted small mt-2 mb-0">Grâce au partage de matériel plutôt qu'à l'achat neuf.</p>
+                        <span class="text-primary fw-bold">{{ __('messages.home.stat_co2') }}</span>
+                        <p class="text-muted small mt-2 mb-0">{{ __('messages.home.stat_co2_desc') }}</p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.5s">
@@ -108,8 +108,8 @@
                             <i class="fa fa-users text-white fs-4"></i>
                         </div>
                         <h2 class="display-6 fw-bold mb-1" data-toggle="counter-up">3150</h2>
-                        <span class="text-primary fw-bold">Membres Actifs</span>
-                        <p class="text-muted small mt-2 mb-0">Prêteurs et locataires engagés dans la communauté.</p>
+                        <span class="text-primary fw-bold">{{ __('messages.home.stat_members') }}</span>
+                        <p class="text-muted small mt-2 mb-0">{{ __('messages.home.stat_members_desc') }}</p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.7s">
@@ -118,8 +118,8 @@
                             <i class="fa fa-solar-panel text-white fs-4"></i>
                         </div>
                         <h2 class="display-6 fw-bold mb-1" data-toggle="counter-up">940</h2>
-                        <span class="text-primary fw-bold">Équipements</span>
-                        <p class="text-muted small mt-2 mb-0">Panneaux, batteries et éoliennes en circulation.</p>
+                        <span class="text-primary fw-bold">{{ __('messages.home.stat_equipment') }}</span>
+                        <p class="text-muted small mt-2 mb-0">{{ __('messages.home.stat_equipment_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -139,46 +139,46 @@
                 </div>
                 <div class="col-lg-6 about-text py-5 wow fadeIn" data-wow-delay="0.5s">
                     <div class="p-lg-5 pe-lg-0">
-                        <h6 class="text-primary text-uppercase fw-bold">Notre Mission</h6>
-                        <h2 class="mb-4">Démocratiser l'Accès aux Énergies Renouvelables Grâce au Partage</h2>
-                        <p class="text-muted">Un panneau solaire pliable ou une batterie nomade coûte cher et n'est souvent utilisé que 3 à 4 semaines par an. <strong>SolarShare</strong> résout cette absurdité écologique et économique en permettant le partage sécurisé entre particuliers.</p>
+                        <h6 class="text-primary text-uppercase fw-bold">{{ __('messages.home.mission_badge') }}</h6>
+                        <h2 class="mb-4">{{ __('messages.home.mission_title') }}</h2>
+                        <p class="text-muted">{{ __('messages.home.mission_desc') }}</p>
                         
                         <div class="row g-3 mt-2">
                             <div class="col-sm-6">
                                 <div class="d-flex align-items-center">
                                     <i class="fa fa-check-circle text-primary fs-5 me-3"></i>
-                                    <span>Caution numérique sécurisée</span>
+                                    <span>{{ __('messages.home.feature_deposit') }}</span>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="d-flex align-items-center">
                                     <i class="fa fa-check-circle text-primary fs-5 me-3"></i>
-                                    <span>État des lieux avec photo</span>
+                                    <span>{{ __('messages.home.feature_inspection') }}</span>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="d-flex align-items-center">
                                     <i class="fa fa-check-circle text-primary fs-5 me-3"></i>
-                                    <span>Matériel testé & certifié</span>
+                                    <span>{{ __('messages.home.feature_certified') }}</span>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="d-flex align-items-center">
                                     <i class="fa fa-check-circle text-primary fs-5 me-3"></i>
-                                    <span>Échange local ou points relais</span>
+                                    <span>{{ __('messages.home.feature_hubs') }}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="d-flex align-items-center mt-4 pt-2">
-                            <a href="#how-it-works" class="btn btn-primary rounded-pill py-3 px-5 me-4">Découvrir le fonctionnement</a>
+                            <a href="#how-it-works" class="btn btn-primary rounded-pill py-3 px-5 me-4">{{ __('messages.home.hero_slide2_btn2') }}</a>
                             <div class="d-flex align-items-center">
                                 <div class="btn-square bg-white rounded-circle shadow-sm me-3 text-center">
                                     <i class="fa fa-phone-alt text-primary"></i>
                                 </div>
                                 <div>
-                                    <small class="text-muted d-block">Une question ?</small>
-                                    <strong class="text-dark">Support 7j/7</strong>
+                                    <small class="text-muted d-block">{{ __('messages.home.support_question') }}</small>
+                                    <strong class="text-dark">{{ __('messages.home.support_7j') }}</strong>
                                 </div>
                             </div>
                         </div>
@@ -194,37 +194,37 @@
     <div class="container-xxl py-5" id="how-it-works">
         <div class="container">
             <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 650px;">
-                <h6 class="text-primary text-uppercase fw-bold">Simple, Rapide et Sûr</h6>
-                <h2 class="mb-4">Comment Fonctionne SolarShare ?</h2>
-                <p class="text-muted">Un cycle de location pensé pour protéger à la fois les propriétaires et les locataires de matériel nomade.</p>
+                <h6 class="text-primary text-uppercase fw-bold">{{ __('messages.home.how_badge') }}</h6>
+                <h2 class="mb-4">{{ __('messages.home.how_title') }}</h2>
+                <p class="text-muted">{{ __('messages.home.how_desc') }}</p>
             </div>
             <div class="row g-4">
                 <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.1s">
                     <div class="card border-0 shadow-sm p-4 text-center h-100">
                         <div class="btn-lg-square bg-primary text-white rounded-circle mx-auto mb-3 fs-4 fw-bold">1</div>
-                        <h5 class="mb-2">Trouvez le Matériel</h5>
-                        <p class="text-muted small">Parcourez les panneaux solaires, batteries et micro-éoliennes disponibles près de chez vous.</p>
+                        <h5 class="mb-2">{{ __('messages.home.step1_title') }}</h5>
+                        <p class="text-muted small">{{ __('messages.home.step1_desc') }}</p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.3s">
                     <div class="card border-0 shadow-sm p-4 text-center h-100">
                         <div class="btn-lg-square bg-primary text-white rounded-circle mx-auto mb-3 fs-4 fw-bold">2</div>
-                        <h5 class="mb-2">Réservez en Ligne</h5>
-                        <p class="text-muted small">Choisissez vos dates, validez le devis et bloquez la caution de façon transparente.</p>
+                        <h5 class="mb-2">{{ __('messages.home.step2_title') }}</h5>
+                        <p class="text-muted small">{{ __('messages.home.step2_desc') }}</p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.5s">
                     <div class="card border-0 shadow-sm p-4 text-center h-100">
                         <div class="btn-lg-square bg-primary text-white rounded-circle mx-auto mb-3 fs-4 fw-bold">3</div>
-                        <h5 class="mb-2">État des Lieux & Retrait</h5>
-                        <p class="text-muted small">Vérifiez l'équipement (charge, câbles, état physique) via l'inspection numérique SolarShare.</p>
+                        <h5 class="mb-2">{{ __('messages.home.step3_title') }}</h5>
+                        <p class="text-muted small">{{ __('messages.home.step3_desc') }}</p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.7s">
                     <div class="card border-0 shadow-sm p-4 text-center h-100">
                         <div class="btn-lg-square bg-primary text-white rounded-circle mx-auto mb-3 fs-4 fw-bold">4</div>
-                        <h5 class="mb-2">Restituez & Partagez</h5>
-                        <p class="text-muted small">Rapport de retour, déblocage immédiat de la caution et évaluation de l'expérience.</p>
+                        <h5 class="mb-2">{{ __('messages.home.step4_title') }}</h5>
+                        <p class="text-muted small">{{ __('messages.home.step4_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -237,9 +237,9 @@
     <div class="container-xxl py-5" id="categories">
         <div class="container">
             <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 650px;">
-                <h6 class="text-primary text-uppercase fw-bold">Nos Équipements</h6>
-                <h2 class="mb-4">Catégories de Matériel Énergétique</h2>
-                <p class="text-muted">Tout le nécessaire pour produire, stocker et utiliser de l'électricité verte n'importe où.</p>
+                <h6 class="text-primary text-uppercase fw-bold">{{ __('messages.home.cat_badge') }}</h6>
+                <h2 class="mb-4">{{ __('messages.home.cat_title') }}</h2>
+                <p class="text-muted">{{ __('messages.home.cat_desc') }}</p>
             </div>
             <div class="row g-4">
                 <!-- Catégorie 1: Panneaux solaires portables -->
@@ -250,9 +250,9 @@
                             <div class="service-icon">
                                 <i class="fa fa-solar-panel fa-3x"></i>
                             </div>
-                            <h4 class="mb-3">Panneaux Solaires Pliables</h4>
-                            <p class="text-muted">Modules monocristallins légers de 50W à 400W, faciles à déployer pour le van, le bivouac ou le jardin.</p>
-                            <a class="small fw-bold text-primary" href="{{ route('marketplace', ['category' => 'panneaux-solaires-portables']) }}">Voir les annonces <i class="fa fa-arrow-right ms-2"></i></a>
+                            <h4 class="mb-3">{{ __('messages.home.cat_solar_panels') }}</h4>
+                            <p class="text-muted">{{ __('messages.home.cat_solar_panels_desc') }}</p>
+                            <a class="small fw-bold text-primary" href="{{ route('marketplace', ['category' => 'panneaux-solaires-portables']) }}">{{ __('messages.home.cat_view_ads') }} <i class="fa fa-arrow-right ms-2"></i></a>
                         </div>
                     </div>
                 </div>
@@ -265,9 +265,9 @@
                             <div class="service-icon">
                                 <i class="fa fa-wind fa-3x"></i>
                             </div>
-                            <h4 class="mb-3">Micro-Éoliennes Portables</h4>
-                            <p class="text-muted">Turbines éoliennes compactes à monter sur mât télescopique pour produire même la nuit et par temps couvert.</p>
-                            <a class="small fw-bold text-primary" href="{{ route('marketplace', ['category' => 'micro-eoliennes']) }}">Voir les annonces <i class="fa fa-arrow-right ms-2"></i></a>
+                            <h4 class="mb-3">{{ __('messages.home.cat_wind') }}</h4>
+                            <p class="text-muted">{{ __('messages.home.cat_wind_desc') }}</p>
+                            <a class="small fw-bold text-primary" href="{{ route('marketplace', ['category' => 'micro-eoliennes']) }}">{{ __('messages.home.cat_view_ads') }} <i class="fa fa-arrow-right ms-2"></i></a>
                         </div>
                     </div>
                 </div>
@@ -280,9 +280,9 @@
                             <div class="service-icon">
                                 <i class="fa fa-car-battery fa-3x"></i>
                             </div>
-                            <h4 class="mb-3">Stations d'Énergie & Batteries</h4>
-                            <p class="text-muted">Générateurs LiFePO4 de 500Wh à 3000Wh avec prises 220V pures, USB-C Power Delivery et recharge solaire rapide.</p>
-                            <a class="small fw-bold text-primary" href="{{ route('marketplace', ['category' => 'stations-energie-batteries']) }}">Voir les annonces <i class="fa fa-arrow-right ms-2"></i></a>
+                            <h4 class="mb-3">{{ __('messages.home.cat_batteries') }}</h4>
+                            <p class="text-muted">{{ __('messages.home.cat_batteries_desc') }}</p>
+                            <a class="small fw-bold text-primary" href="{{ route('marketplace', ['category' => 'stations-energie-batteries']) }}">{{ __('messages.home.cat_view_ads') }} <i class="fa fa-arrow-right ms-2"></i></a>
                         </div>
                     </div>
                 </div>
@@ -617,16 +617,16 @@
     <!-- ==================== CALL TO ACTION / BANNER ==================== -->
     <div class="container-fluid bg-primary text-white py-5 my-5 wow fadeIn" data-wow-delay="0.1s" id="contact">
         <div class="container text-center py-4">
-            <h2 class="display-6 text-white mb-3">Vous Possédez du Matériel Solaire ou Éolien Inutilisé ?</h2>
+            <h2 class="display-6 text-white mb-3">{{ __('messages.home.cta_title') }}</h2>
             <p class="lead text-white-50 mx-auto mb-4" style="max-width: 700px;">
-                Rejoignez le réseau SolarShare dès aujourd'hui. Vos équipements sont assurés, vous fixez vos disponibilités et vos tarifs journaliers en toute liberté.
+                {{ __('messages.home.cta_desc') }}
             </p>
             <div class="d-flex justify-content-center gap-3 flex-wrap">
                 <a href="{{ route('register') }}" class="btn btn-warning rounded-pill py-3 px-5 fw-bold text-dark shadow">
-                    <i class="fa fa-plus-circle me-2"></i>Déposer une annonce gratuitement
+                    <i class="fa fa-plus-circle me-2"></i>{{ __('messages.home.cta_btn') }}
                 </a>
                 <a href="{{ route('login') }}" class="btn btn-outline-light rounded-pill py-3 px-5 fw-bold">
-                    Se connecter à mon compte
+                    {{ __('messages.nav.login') }}
                 </a>
             </div>
         </div>

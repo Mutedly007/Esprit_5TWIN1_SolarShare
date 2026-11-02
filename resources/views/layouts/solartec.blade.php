@@ -6,7 +6,7 @@
   Distributed By: ThemeWagon (https://themewagon.com)
 --}}
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 
 <head>
     <meta charset="utf-8">
@@ -17,6 +17,23 @@
 
     <!-- Favicon -->
     <link href="{{ asset('solartec/img/favicon.ico') }}" rel="icon">
+
+    @if(app()->getLocale() === 'ar')
+        <!-- Google Font for Arabic -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+        <style>
+            body, h1, h2, h3, h4, h5, h6, .ss-btn, .nav-link, button, input, select, textarea {
+                font-family: 'Cairo', 'DM Sans', sans-serif !important;
+            }
+            .breadcrumb-item + .breadcrumb-item::before {
+                float: right !important;
+                padding-left: 0.5rem !important;
+                padding-right: 0 !important;
+            }
+        </style>
+    @endif
 
     <!-- Core Design System & Assets (Same unified navbar, footer, buttons, and animations) -->
     @vite(['resources/js/front/landing.js'])

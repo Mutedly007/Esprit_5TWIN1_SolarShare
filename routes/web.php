@@ -1,7 +1,13 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\LocalizationController;
 use Illuminate\Support\Facades\Route;
+
+// Multilingual language switcher (FR, EN, AR)
+Route::get('/lang/{locale}', [LocalizationController::class, 'switch'])
+    ->whereIn('locale', ['fr', 'en', 'ar'])
+    ->name('lang.switch');
 
 Route::get('/', function () {
     $featuredEquipment = [
