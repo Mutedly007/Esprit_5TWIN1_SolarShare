@@ -84,8 +84,12 @@
                     <a class="nav-link dropdown-toggle d-flex align-items-center text-decoration-none" href="javascript:void(0)" data-bs-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">
                         <!-- Rounded Avatar with initial / gradient -->
-                        <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center me-2 shadow-sm" style="width: 36px; height: 36px; background: linear-gradient(135deg, #5f76e8, #7b8ff5); font-weight: 700; font-size: 0.85rem;">
-                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center me-2 shadow-sm overflow-hidden" style="width: 36px; height: 36px; background: linear-gradient(135deg, #5f76e8, #7b8ff5); font-weight: 700; font-size: 0.85rem;">
+                            @if(auth()->user()->hasAvatar())
+                                <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            @else
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            @endif
                         </span>
                         <span class="d-none d-lg-inline-block text-dark font-14">
                             Hello, <strong class="text-dark">{{ auth()->user()->name }}</strong>
@@ -100,6 +104,9 @@
                             </div>
                             <small class="text-muted d-block">{{ auth()->user()->email }}</small>
                         </div>
+                        <a class="dropdown-item py-2 font-14 text-dark fw-semibold" href="{{ route('profile.edit') }}">
+                            <i data-feather="user" class="svg-icon me-2 ms-1"></i> Mon Profil
+                        </a>
                         <a class="dropdown-item py-2 font-14 text-primary" href="{{ route('home') }}">
                             <i data-feather="external-link" class="svg-icon me-2 ms-1"></i> Voir le site public
                         </a>
