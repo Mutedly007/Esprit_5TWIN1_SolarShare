@@ -135,10 +135,21 @@ Route::get('/auth/{provider}/callback', [AuthController::class, 'handleProviderC
     ->whereIn('provider', ['google', 'github'])
     ->name('oauth.callback');
 
-// Post-social-signup onboarding: pick a role (rent / lend / both)
+// Post-social-signup onboarding: pick a role (rent / lend / both) and set password
 Route::middleware('auth')->group(function () {
     Route::get('/onboarding/role', [AuthController::class, 'showRoleSelection'])->name('onboarding.role');
     Route::post('/onboarding/role', [AuthController::class, 'storeRoleSelection'])->name('onboarding.role.store');
+    Route::get('/onboarding/password', [AuthController::class, 'showPasswordSelection'])->name('onboarding.password');
+    Route::post('/onboarding/password', [AuthController::class, 'storePasswordSelection'])->name('onboarding.password.store');
+    Route::post('/onboarding/password/skip', [AuthController::class, 'skipPasswordSelection'])->name('onboarding.password.skip');
+
+    // User Profile Management (Modification informations, mot de passe, avatar, suppression compte)
+    Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/avatar', [\App\Http\Controllers\ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
+    Route::delete('/profile/avatar', [\App\Http\Controllers\ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
+    Route::put('/profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password.update');
+    Route::delete('/profile', [\App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Convenient /dashboard shortcut
     Route::get('/dashboard', function () {
