@@ -106,3 +106,4 @@ wsl -d docker-desktop -u root sysctl -w vm.max_map_count=524288
 
 ### If Jenkins pipeline is triggered:
 Go to **[http://localhost:8082/job/SolarShare-Pipeline/](http://localhost:8082/job/SolarShare-Pipeline/)** and click **Build Now**.
+
