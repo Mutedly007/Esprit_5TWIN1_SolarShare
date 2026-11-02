@@ -18,6 +18,7 @@ pipeline {
         DOCKER_NETWORK     = 'solarshare-network'
         SONAR_HOST_URL     = 'http://sonarqube:9000'
         SONAR_PROJECT_KEY  = 'SolarShare'
+        SONAR_TOKEN        = credentials('sonar-token')
         APP_HEALTH_URL     = 'http://solarshare-web/up'
     }
 
@@ -141,6 +142,7 @@ MANIFEST_EOF
                             sonarsource/sonar-scanner-cli:5 \
                             "-Dsonar.host.url=${SONAR_HOST_URL}" \
                             "-Dsonar.token=${SONAR_TOKEN}" \
+                            "-Dsonar.login=${SONAR_TOKEN}" \
                             "-Dsonar.working.directory=/var/jenkins_home/workspace/SolarShare-Pipeline/.scannerwork" \
                             "-Dsonar.scanner.socketTimeout=300" \
                             "-Dsonar.scanner.connectTimeout=60" \
