@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\RenterChatbotController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -121,6 +122,9 @@ Route::get('/', function () {
 // Public Marketplace (Catalogue & Equipment details)
 Route::get('/marketplace', [\App\Http\Controllers\MarketplaceController::class, 'index'])->name('marketplace');
 Route::get('/marketplace/{equipment}', [\App\Http\Controllers\MarketplaceController::class, 'show'])->name('marketplace.show');
+
+// AI Assistant for Borrowers (Gemini Chatbot)
+Route::post('/renter/chat', [RenterChatbotController::class, 'ask'])->name('renter.chat');
 
 Route::get('/login', [AuthController::class, 'show'])->defaults('tab', 'login')->name('login');
 Route::get('/register', [AuthController::class, 'show'])->defaults('tab', 'register')->name('register');
