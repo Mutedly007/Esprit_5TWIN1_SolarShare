@@ -40,6 +40,11 @@
   "Confirm New Password": "Confirmer le nouveau mot de passe",
   "Update Password": "Mettre à jour le mot de passe",
   "Delete My Account": "Supprimer mon compte",
-  "Danger Zone": "Zone de danger"
+  "Danger Zone": "Zone de danger",
+  "Showing": "Affichage de",
+  "to": "à",
+  "of": "sur",
+  "results": "résultats",
+  "Pagination Navigation": "Navigation des pages"
 }
 

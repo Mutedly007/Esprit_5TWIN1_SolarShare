@@ -40,6 +40,11 @@
   "Confirm New Password": "تأكيد كلمة المرور الجديدة",
   "Update Password": "تحديث كلمة المرور",
   "Delete My Account": "حذف حسابي",
-  "Danger Zone": "منطقة الخطر"
+  "Danger Zone": "منطقة الخطر",
+  "Showing": "عرض من",
+  "to": "إلى",
+  "of": "أصل",
+  "results": "نتائج",
+  "Pagination Navigation": "التنقل بين الصفحات"
 }
 
