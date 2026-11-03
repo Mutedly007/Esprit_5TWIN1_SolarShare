@@ -166,3 +166,4 @@ flowchart TD
 | **cAdvisor** | Surveillance conteneurs | Extraction des métriques matérielles (CPU/RAM) au niveau du démon Docker |
 | **Prometheus** | Base de données métriques | Collecte (scraping) et indexation chronologique des métriques |
 | **Grafana 11.3** | Visualisation | Tableaux de bord opérationnels et alertes visuelles en temps réel |
+

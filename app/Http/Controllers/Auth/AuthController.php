@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -47,10 +48,13 @@ class AuthController extends Controller
             'password_set_at' => now(),
         ]);
 
+        event(new Registered($user));
+
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('home')->with('success', 'Welcome to SolarShare, ' . $user->name . '!');
+        return redirect()->route('verification.notice')
+            ->with('success', 'Votre compte a été créé avec succès ! Un lien de vérification a été envoyé à votre adresse email. Veuillez vérifier votre boîte email pour activer votre compte.');
     }
 
     /**
@@ -67,6 +71,11 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
+
+            if (! Auth::user()->hasVerifiedEmail()) {
+                return redirect()->route('verification.notice')
+                    ->with('warning', 'Veuillez vérifier votre adresse email pour accéder à votre compte.');
+            }
 
             return redirect()->intended(route('home'))->with('success', 'Welcome back, ' . Auth::user()->name . '!');
         }
@@ -149,6 +158,7 @@ class AuthController extends Controller
                 'provider' => $provider,
                 'provider_id' => $socialUser->getId(),
                 'avatar' => $socialUser->getAvatar(),
+                'email_verified_at' => now(),
             ]);
         }
 

@@ -1001,17 +1001,7 @@ import '../../css/front/landing.css';
         });
       });
 
-      // "Forgot Password" line click interaction
-      const forgotBtn = document.getElementById('ss-btn-forgot-password');
-      if (forgotBtn) {
-        forgotBtn.addEventListener('click', () => {
-          showToast(
-            'Password Reset Requested',
-            'Demo mode: In a live system, a secure reset link would be sent to your email.',
-            '🔑'
-          );
-        });
-      }
+      // "Forgot Password" link allows natural navigation to password.request
 
       // Real form submissions: validate first (styled ✗ errors, no native tooltips), then loading state + POST
       const ERROR_SVG =
