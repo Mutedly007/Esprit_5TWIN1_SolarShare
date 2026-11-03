@@ -1137,10 +1137,29 @@ import '../../css/front/landing.css';
             invalid.push(termsInput);
           }
 
+          // Google reCAPTCHA v2 validation
+          const recaptchaWrap = registerForm.querySelector('.ss-recaptcha-wrap');
+          const recaptchaErr = document.getElementById('ss-recaptcha-error');
+          if (typeof grecaptcha !== 'undefined') {
+            const recaptchaVal = grecaptcha.getResponse();
+            if (!recaptchaVal || recaptchaVal.trim().length === 0) {
+              if (recaptchaErr) recaptchaErr.classList.remove('d-none');
+              if (recaptchaWrap) shakeWrap(recaptchaWrap);
+              invalid.push(recaptchaErr || registerForm);
+            } else {
+              if (recaptchaErr) recaptchaErr.classList.add('d-none');
+            }
+          }
+
           if (invalid.length) {
             e.preventDefault();
-            invalid[0].focus();
-            invalid[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const first = invalid[0];
+            if (first && typeof first.focus === 'function') {
+              first.focus();
+            }
+            if (first && typeof first.scrollIntoView === 'function') {
+              first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
             return;
           }
 

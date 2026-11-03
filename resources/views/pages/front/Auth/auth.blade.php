@@ -570,6 +570,19 @@
               </div>
             </div>
 
+            <!-- Google reCAPTCHA v2 (Je ne suis pas un robot) -->
+            <div class="ss-form-group ss-recaptcha-wrap" style="margin-top: 1.25rem; margin-bottom: 1.25rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+              <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}" data-callback="onRecaptchaSuccess" data-expired-callback="onRecaptchaExpired"></div>
+              <div id="ss-recaptcha-error" class="ss-field-error d-none" style="color: #dc3545; font-size: 0.85rem; margin-top: 0.5rem; text-align: center; font-weight: 500;">
+                Veuillez cocher la case "Je ne suis pas un robot".
+              </div>
+              @error('g-recaptcha-response')
+                <div class="ss-field-error" style="color: #dc3545; font-size: 0.85rem; margin-top: 0.5rem; text-align: center; font-weight: 500;">
+                  {{ $message }}
+                </div>
+              @enderror
+            </div>
+
             <!-- Terms & Community Guidelines Checkbox -->
             <div class="ss-form-options">
               <label class="ss-checkbox-label">
@@ -633,3 +646,22 @@
   </div>
 </section>
 @endsection
+
+@push('scripts')
+<script src="https://www.google.com/recaptcha/api.js?hl=fr" async defer></script>
+<script>
+  window.onRecaptchaSuccess = function() {
+    const err = document.getElementById('ss-recaptcha-error');
+    if (err) err.classList.add('d-none');
+    const viewport = document.getElementById('ss-auth-panel-viewport');
+    const registerPanel = document.getElementById('ss-auth-panel-register');
+    if (viewport && registerPanel && registerPanel.classList.contains('is-active')) {
+      viewport.style.height = registerPanel.offsetHeight + 'px';
+    }
+  };
+  window.onRecaptchaExpired = function() {
+    const err = document.getElementById('ss-recaptcha-error');
+    if (err) err.classList.remove('d-none');
+  };
+</script>
+@endpush
