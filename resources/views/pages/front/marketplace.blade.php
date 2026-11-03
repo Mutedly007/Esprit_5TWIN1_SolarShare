@@ -1,27 +1,27 @@
 {{-- resources/views/pages/front/marketplace.blade.php --}}
 @extends('layouts.solartec')
 
-@section('title', 'Marketplace d\'Équipements — SolarShare')
-@section('meta_description', 'Découvrez et louez des panneaux solaires, batteries de stockage et micro-éoliennes partagés par la communauté SolarShare.')
+@section('title', __('messages.marketplace.page_title'))
+@section('meta_description', __('messages.marketplace.meta_description'))
 
 @section('content')
 
 <!-- ==================== MARKETPLACE HERO & SEARCH ==================== -->
 <section style="background: linear-gradient(135deg, #083E49 0%, #0F5C6B 60%, #10202B 100%); color: #FFFFFF; padding: 4rem 0 3.5rem 0; position: relative; overflow: hidden;">
     <!-- Decorative Sun Ray Glow -->
-    <div style="position: absolute; right: -50px; top: -50px; width: 350px; height: 350px; background: radial-gradient(circle, rgba(255, 176, 32, 0.25) 0%, rgba(255, 107, 61, 0) 70%); border-radius: 50%; pointer-events: none;"></div>
+    <div style="position: absolute; inset-inline-end: -50px; top: -50px; width: 350px; height: 350px; background: radial-gradient(circle, rgba(255, 176, 32, 0.25) 0%, rgba(255, 107, 61, 0) 70%); border-radius: 50%; pointer-events: none;"></div>
 
     <div class="container" style="position: relative; z-index: 2;">
         <div class="row justify-content-center text-center">
             <div class="col-lg-9">
                 <span class="badge badge-solar mb-3 text-uppercase px-3 py-2" style="background: #FFB020; color: #10202B; font-weight: 700; border-radius: 9999px;">
-                    ☀️ Marketplace Énergies Renouvelables
+                    ☀️ {{ __('messages.marketplace.hero_badge') }}
                 </span>
                 <h1 class="display-5 text-white fw-bold mb-3" style="font-family: 'Sora', sans-serif; letter-spacing: -0.02em;">
-                    Louez du Matériel Solaire & Écologique
+                    {{ __('messages.marketplace.hero_title') }}
                 </h1>
                 <p class="fs-5 text-white-50 mb-4" style="max-width: 680px; margin: 0 auto;">
-                    Parcourez les équipements d'énergie renouvelable mis à disposition par la communauté SolarShare pour vos voyages, travaux ou urgences.
+                    {{ __('messages.marketplace.hero_subtitle') }}
                 </p>
 
                 <!-- Search Form -->
@@ -30,8 +30,8 @@
                         <input type="hidden" name="category" value="{{ request('category') }}">
                     @endif
                     <div style="display: flex; gap: 0.5rem; background: #FFFFFF; padding: 0.45rem; border-radius: 9999px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);">
-                        <div style="display: flex; align-items: center; flex: 1; padding-left: 1rem;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <div style="display: flex; align-items: center; flex: 1; padding-inline-start: 1rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
@@ -39,12 +39,12 @@
                                 type="text"
                                 name="search"
                                 value="{{ request('search') }}"
-                                placeholder="Rechercher par nom, marque (EcoFlow, Bluetti, Renogy...)..."
+                                placeholder="{{ __('messages.marketplace.hero_search_placeholder') }}"
                                 style="width: 100%; border: none; outline: none; padding: 0.6rem 0.8rem; font-size: 0.95rem; color: #10202B; background: transparent;"
                             >
                         </div>
                         <button type="submit" class="btn btn-primary rounded-pill px-4 py-2" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; font-weight: 700; color: #071520;">
-                            Rechercher
+                            {{ __('messages.marketplace.search_btn') }}
                         </button>
                     </div>
                 </form>
@@ -61,7 +61,7 @@
             <!-- All Categories -->
             <a href="{{ route('marketplace', array_merge(request()->except(['category', 'page']))) }}"
                class="badge-category-filter {{ !request('category') ? 'is-active' : '' }}">
-                <span>Tous les matériels</span>
+                <span>{{ __('messages.marketplace.all_equipment') }}</span>
                 <span class="count-pill">{{ $totalCount }}</span>
             </a>
 
@@ -69,7 +69,7 @@
             @foreach($categories as $cat)
                 <a href="{{ route('marketplace', array_merge(request()->except(['page']), ['category' => $cat->slug])) }}"
                    class="badge-category-filter {{ request('category') == $cat->slug ? 'is-active' : '' }}">
-                    <span>{{ $cat->name }}</span>
+                    <span>{{ $cat->localized_name }}</span>
                     <span class="count-pill">{{ $cat->equipment_count }}</span>
                 </a>
             @endforeach
@@ -87,15 +87,15 @@
             <div>
                 <h2 style="font-size: 1.35rem; font-weight: 800; color: #10202B; margin-bottom: 0.2rem;">
                     @if($selectedCategory)
-                        {{ $selectedCategory->name }}
+                        {{ $selectedCategory->localized_name }}
                     @elseif(request('search'))
-                        Résultats pour &laquo; {{ request('search') }} &raquo;
+                        {{ __('messages.marketplace.search_results_for', ['query' => request('search')]) }}
                     @else
-                        Catalogue d'Équipements Disponibles
+                        {{ __('messages.marketplace.available_catalog_heading') }}
                     @endif
                 </h2>
                 <span style="font-size: 0.88rem; color: #64748B;">
-                    {{ $equipment->total() }} équipement(s) répertorié(s)
+                    {{ __('messages.marketplace.listed_count', ['count' => $equipment->total()]) }}
                 </span>
             </div>
 
@@ -108,15 +108,15 @@
                     <input type="hidden" name="search" value="{{ request('search') }}">
                 @endif
 
-                <select name="sort" class="form-select form-select-sm" style="width: auto; border-radius: 10px; font-size: 0.88rem; font-weight: 600; padding: 0.45rem 2rem 0.45rem 0.85rem;" onchange="this.form.submit()">
-                    <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Plus récents</option>
-                    <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Prix : Moins cher</option>
-                    <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Prix : Plus cher</option>
+                <select name="sort" class="form-select form-select-sm" style="width: auto; border-radius: 10px; font-size: 0.88rem; font-weight: 600; padding-block: 0.45rem; padding-inline-start: 0.85rem; padding-inline-end: 2rem;" onchange="this.form.submit()">
+                    <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>{{ __('messages.marketplace.sort_latest') }}</option>
+                    <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>{{ __('messages.marketplace.sort_price_asc') }}</option>
+                    <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>{{ __('messages.marketplace.sort_price_desc') }}</option>
                 </select>
 
                 @if(request('search') || request('category') || request('sort'))
                     <a href="{{ route('marketplace') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size: 0.82rem;">
-                        Réinitialiser
+                        {{ __('messages.marketplace.reset_btn') }}
                     </a>
                 @endif
             </form>
@@ -141,17 +141,17 @@
             <!-- Empty State -->
             <div class="card border-0 shadow-sm rounded-4 p-5 text-center my-4" style="background: #FFFFFF;">
                 <div style="font-size: 3.5rem; margin-bottom: 1rem;">☀️</div>
-                <h3 class="fw-bold mb-2">Aucun équipement ne correspond à votre recherche</h3>
+                <h3 class="fw-bold mb-2">{{ __('messages.marketplace.empty_title') }}</h3>
                 <p class="text-muted" style="max-width: 480px; margin: 0 auto 1.5rem auto;">
-                    Essayez de réinitialiser vos critères de recherche ou explorez une autre catégorie d'énergie propre.
+                    {{ __('messages.marketplace.empty_subtitle') }}
                 </p>
-                <div class="d-flex justify-content-center gap-3">
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
                     <a href="{{ route('marketplace') }}" class="btn btn-outline-primary rounded-pill px-4">
-                        Voir tout le catalogue
+                        {{ __('messages.marketplace.view_full_catalog') }}
                     </a>
                     @auth
                         <a href="{{ route('equipment.create') }}" class="btn btn-primary rounded-pill px-4">
-                            + Déposer un équipement
+                            + {{ __('messages.marketplace.list_equipment_btn') }}
                         </a>
                     @endauth
                 </div>

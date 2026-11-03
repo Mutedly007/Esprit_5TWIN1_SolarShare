@@ -92,15 +92,14 @@ class Equipment extends Model
     }
 
     /**
-     * Friendly status label in French as requested:
-     * pending -> Non traité
+     * Friendly localized status label (FR / EN / AR).
      */
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
-            'approved' => 'Validé',
-            'rejected' => 'Refusé',
-            default => 'Non traité',
+            'approved' => __('messages.marketplace.status_approved'),
+            'rejected' => __('messages.marketplace.status_rejected'),
+            default => __('messages.marketplace.status_pending'),
         };
     }
 

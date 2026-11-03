@@ -12,14 +12,14 @@
         @endif
 
         <!-- Category Badge -->
-        <span style="position: absolute; top: 12px; left: 12px; background: rgba(16, 32, 43, 0.85); backdrop-filter: blur(8px); color: #FFFFFF; font-size: 0.74rem; font-weight: 700; padding: 0.3rem 0.75rem; border-radius: 9999px;">
-            {{ $equipment->category?->name ?? 'Énergie' }}
+        <span style="position: absolute; top: 12px; inset-inline-start: 12px; background: rgba(16, 32, 43, 0.85); backdrop-filter: blur(8px); color: #FFFFFF; font-size: 0.74rem; font-weight: 700; padding: 0.3rem 0.75rem; border-radius: 9999px;">
+            {{ $equipment->category?->localized_name ?? __('messages.marketplace.default_category') }}
         </span>
 
         <!-- Availability Badge -->
-        <span style="position: absolute; top: 12px; right: 12px; background: {{ $equipment->is_available ? '#DCFCE7' : '#FEE2E2' }}; color: {{ $equipment->is_available ? '#166534' : '#991B1B' }}; font-size: 0.74rem; font-weight: 700; padding: 0.3rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.3rem;">
+        <span style="position: absolute; top: 12px; inset-inline-end: 12px; background: {{ $equipment->is_available ? '#DCFCE7' : '#FEE2E2' }}; color: {{ $equipment->is_available ? '#166534' : '#991B1B' }}; font-size: 0.74rem; font-weight: 700; padding: 0.3rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.3rem;">
             <span style="width: 6px; height: 6px; border-radius: 50%; background: {{ $equipment->is_available ? '#16A34A' : '#EF4444' }};"></span>
-            {{ $equipment->is_available ? 'Disponible' : 'Réservé' }}
+            {{ $equipment->is_available ? __('messages.marketplace.badge_available') : __('messages.marketplace.badge_reserved') }}
         </span>
     </div>
 
@@ -28,7 +28,7 @@
         <div>
             <!-- Brand -->
             <div style="font-size: 0.78rem; font-weight: 700; color: #0F5C6B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;">
-                {{ $equipment->brand ?? 'Matériel certifié' }}
+                {{ $equipment->brand ?: __('messages.marketplace.certified_gear') }}
             </div>
 
             <!-- Name -->
@@ -38,7 +38,7 @@
 
             <!-- Description snippet -->
             <p class="text-muted small mb-3" style="line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                {{ $equipment->description ?: 'Aucune description spécifique fournie pour cet équipement.' }}
+                {{ $equipment->description ?: __('messages.marketplace.no_description') }}
             </p>
 
             <!-- Specs Pills -->
@@ -63,15 +63,15 @@
                     <span style="font-size: 1.35rem; font-weight: 800; color: #10202B;">
                         {{ number_format($equipment->daily_rate, 2) }}
                     </span>
-                    <span style="font-size: 0.8rem; color: #64748B; font-weight: 600;">TND / jour</span>
+                    <span style="font-size: 0.8rem; color: #64748B; font-weight: 600;">{{ __('messages.marketplace.tnd_per_day') }}</span>
                 </div>
                 <span style="display: block; font-size: 0.75rem; color: #94A3B8;">
-                    Caution : {{ number_format($equipment->deposit_amount, 2) }} TND
+                    {{ __('messages.marketplace.deposit_card', ['amount' => number_format($equipment->deposit_amount, 2)]) }}
                 </span>
             </div>
 
             <a href="{{ route('marketplace.show', $equipment) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-2" style="font-weight: 700; font-size: 0.85rem; border-color: #0F5C6B; color: #0F5C6B;">
-                Détails &rarr;
+                {{ __('messages.marketplace.details_btn') }} {!! app()->getLocale() === 'ar' ? '&larr;' : '&rarr;' !!}
             </a>
         </div>
     </div>
@@ -80,12 +80,12 @@
     <div style="background: #FAFCFE; border-top: 1px solid #F1F5F9; padding: 0.65rem 1.25rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: #64748B;">
         <div style="display: flex; align-items: center; gap: 0.45rem;">
             <span style="width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #FFB020, #FF6B3D); color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700;">
-                {{ strtoupper(substr($equipment->user?->name ?? 'P', 0, 1)) }}
+                {{ mb_strtoupper(mb_substr($equipment->user?->name ?? 'P', 0, 1)) }}
             </span>
-            <span>{{ $equipment->user?->name ?? 'Prêteur partenaire' }}</span>
+            <span>{{ $equipment->user?->name ?? __('messages.marketplace.partner_lender') }}</span>
         </div>
         <span style="font-size: 0.72rem; color: #94A3B8;">
-            {{ $equipment->created_at?->diffForHumans() }}
+            {{ $equipment->created_at?->locale(app()->getLocale())->diffForHumans() }}
         </span>
     </div>
 </div>

@@ -39,4 +39,36 @@ class Category extends Model
     {
         return $this->hasMany(Equipment::class);
     }
+
+    /**
+     * Localized category name for default seeded slugs, falling back to stored name.
+     */
+    public function getLocalizedNameAttribute(): string
+    {
+        if (! empty($this->slug)) {
+            $key = 'messages.marketplace.categories.' . $this->slug;
+            $translated = __($key);
+            if ($translated !== $key) {
+                return $translated;
+            }
+        }
+
+        return (string) $this->name;
+    }
+
+    /**
+     * Localized category description for default seeded slugs, falling back to stored description.
+     */
+    public function getLocalizedDescriptionAttribute(): ?string
+    {
+        if (! empty($this->slug)) {
+            $key = 'messages.marketplace.category_descriptions.' . $this->slug;
+            $translated = __($key);
+            if ($translated !== $key) {
+                return $translated;
+            }
+        }
+
+        return $this->description;
+    }
 }
