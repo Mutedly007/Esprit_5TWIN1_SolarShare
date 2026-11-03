@@ -230,7 +230,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/packs/{energyKit}/toggle', [\App\Http\Controllers\EnergyKitController::class, 'toggle'])->middleware('lender')->name('energy-kits.toggle');
 });
 
-// Public Packs Solaires (Energy Kits)
+// Public Packs Solaires (Energy Kits) & Dedicated Gemini AI Assistant
+Route::post('/energy-kits/chat', [\App\Http\Controllers\EnergyKitChatbotController::class, 'ask'])->name('energy-kits.chat');
 Route::get('/energy-kits', [\App\Http\Controllers\EnergyKitController::class, 'index'])->name('energy-kits.index');
 Route::get('/energy-kits/{energyKit}', [\App\Http\Controllers\EnergyKitController::class, 'show'])->name('energy-kits.show');
 

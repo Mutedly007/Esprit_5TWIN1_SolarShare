@@ -208,8 +208,12 @@
         <i class="bi bi-arrow-up"></i>
     </a>
 
-    <!-- SolarShare Renter Assistant Chatbot (Gemini AI) -->
-    @include('partials.chatbot.renter_chat')
+    <!-- SolarShare AI Assistants: PackBot exclusively on Solar Packs module, SolarBot elsewhere -->
+    @if(request()->routeIs('energy-kits.*') || request()->is('energy-kits*', 'packs*'))
+        @include('partials.chatbot.energy_kit_chat')
+    @else
+        @include('partials.chatbot.renter_chat')
+    @endif
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>

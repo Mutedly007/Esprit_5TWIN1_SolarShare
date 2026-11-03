@@ -473,6 +473,10 @@
                         @endif
                     @endauth
 
+                    <button type="button" onclick="window.openPackBot && window.openPackBot()" class="btn w-100 rounded-pill py-2 mb-2 fw-bold text-center" style="background: rgba(15, 92, 107, 0.08); border: 1.5px solid #0F5C6B; color: #0F5C6B; font-size: 0.86rem;">
+                        🤖 {{ __('messages.pack_ai.open_btn_show') }}
+                    </button>
+
                     <a href="{{ route('energy-kits.index') }}" class="btn btn-outline-secondary w-100 rounded-pill py-2 text-center" style="font-size: 0.9rem;">
                         {!! $isRtl ? '&rarr;' : '&larr;' !!} {{ __('messages.kits.back_to_packs') }}
                     </a>
