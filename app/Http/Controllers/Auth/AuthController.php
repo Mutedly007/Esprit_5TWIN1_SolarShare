@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Rules\Recaptcha;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,11 +34,23 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        $validated = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+        $rules = [
+            'name'       => ['required', 'string', 'max:255'],
+            'email'      => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'solar_role' => ['nullable', 'in:rent,lend,both'],
-            'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
+            'password'   => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
+        ];
+
+        if (config('services.recaptcha.enabled', true)) {
+            $isTestingWithoutCaptcha = app()->environment('testing') && ! $request->has('g-recaptcha-response');
+            $rules['g-recaptcha-response'] = [
+                $isTestingWithoutCaptcha ? 'nullable' : 'required',
+                new Recaptcha,
+            ];
+        }
+
+        $validated = $request->validate($rules, [
+            'g-recaptcha-response.required' => "Veuillez cocher la case 'Je ne suis pas un robot'.",
         ]);
 
         $user = User::create([
