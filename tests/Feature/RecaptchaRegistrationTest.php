@@ -104,3 +104,4 @@ class RecaptchaRegistrationTest extends TestCase
         $this->assertDatabaseMissing(User::class, ['email' => 'failed-mock@example.com']);
     }
 }
+

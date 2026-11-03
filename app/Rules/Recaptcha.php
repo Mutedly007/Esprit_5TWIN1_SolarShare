@@ -66,3 +66,4 @@ class Recaptcha implements ValidationRule
         }
     }
 }
+
