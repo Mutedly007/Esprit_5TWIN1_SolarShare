@@ -47,8 +47,11 @@
     });
 
 
+    var isRtl = document.documentElement.getAttribute('dir') === 'rtl';
+
     // Header carousel
     $(".header-carousel").owlCarousel({
+        rtl: isRtl,
         autoplay: true,
         smartSpeed: 1500,
         loop: true,
@@ -61,13 +64,17 @@
 
     // Testimonials carousel
     $(".testimonial-carousel").owlCarousel({
+        rtl: isRtl,
         autoplay: true,
         smartSpeed: 1000,
         center: true,
         dots: false,
         loop: true,
         nav : true,
-        navText : [
+        navText : isRtl ? [
+            '<i class="bi bi-arrow-right"></i>',
+            '<i class="bi bi-arrow-left"></i>'
+        ] : [
             '<i class="bi bi-arrow-left"></i>',
             '<i class="bi bi-arrow-right"></i>'
         ],

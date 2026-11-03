@@ -165,17 +165,17 @@ class EnergyKit extends Model
     }
 
     /**
-     * Friendly label in French for target use.
+     * Localized label for target use.
      */
     public function getTargetUseLabelAttribute(): string
     {
         return match ($this->target_use) {
-            'camping' => 'Camping & Plein Air',
-            'chantier' => 'Chantier & Travaux',
-            'urgence' => 'Secours & Urgence',
-            'vanlife' => 'Vanlife & Voyage',
-            'evenement' => 'Événementiel & Fêtes',
-            default => ucfirst($this->target_use),
+            'camping' => __('messages.kits.use_camping'),
+            'chantier' => __('messages.kits.use_chantier'),
+            'urgence' => __('messages.kits.use_urgence'),
+            'vanlife' => __('messages.kits.use_vanlife'),
+            'evenement' => __('messages.kits.use_evenement'),
+            default => ucfirst((string) $this->target_use),
         };
     }
 

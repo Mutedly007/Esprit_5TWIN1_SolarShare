@@ -1,28 +1,29 @@
 {{-- resources/views/partials/pagination.blade.php --}}
 @if ($paginator->hasPages())
+    @php $isRtl = app()->getLocale() === 'ar'; @endphp
     <nav role="navigation" aria-label="Pagination" class="ss-pagination-container">
         <div class="ss-pagination-info">
-            Affichage de <span>{{ $paginator->firstItem() }}</span> à <span>{{ $paginator->lastItem() }}</span> sur <span>{{ $paginator->total() }}</span> matériels
+            {{ __('messages.common.showing') }} <span>{{ $paginator->firstItem() }}</span> {{ __('messages.common.to') }} <span>{{ $paginator->lastItem() }}</span> {{ __('messages.common.of') }} <span>{{ $paginator->total() }}</span> {{ __('messages.common.items') }}
         </div>
 
         <ul class="ss-pagination-list">
             {{-- Bouton Précédent --}}
             @if ($paginator->onFirstPage())
                 <li class="ss-page-item is-disabled" aria-disabled="true">
-                    <span class="ss-page-btn" aria-label="Précédent">
+                    <span class="ss-page-btn" aria-label="{{ __('messages.common.previous') }}">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="15 18 9 12 15 6"></polyline>
+                            <polyline points="{{ $isRtl ? '9 18 15 12 9 6' : '15 18 9 12 15 6' }}"></polyline>
                         </svg>
-                        <span class="d-none d-sm-inline">Précédent</span>
+                        <span class="d-none d-sm-inline">{{ __('messages.common.previous') }}</span>
                     </span>
                 </li>
             @else
                 <li class="ss-page-item">
-                    <a href="{{ $paginator->previousPageUrl() }}" rel="prev" class="ss-page-btn" aria-label="Précédent">
+                    <a href="{{ $paginator->previousPageUrl() }}" rel="prev" class="ss-page-btn" aria-label="{{ __('messages.common.previous') }}">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="15 18 9 12 15 6"></polyline>
+                            <polyline points="{{ $isRtl ? '9 18 15 12 9 6' : '15 18 9 12 15 6' }}"></polyline>
                         </svg>
-                        <span class="d-none d-sm-inline">Précédent</span>
+                        <span class="d-none d-sm-inline">{{ __('messages.common.previous') }}</span>
                     </a>
                 </li>
             @endif
@@ -53,19 +54,19 @@
             {{-- Bouton Suivant --}}
             @if ($paginator->hasMorePages())
                 <li class="ss-page-item">
-                    <a href="{{ $paginator->nextPageUrl() }}" rel="next" class="ss-page-btn" aria-label="Suivant">
-                        <span class="d-none d-sm-inline">Suivant</span>
+                    <a href="{{ $paginator->nextPageUrl() }}" rel="next" class="ss-page-btn" aria-label="{{ __('messages.common.next') }}">
+                        <span class="d-none d-sm-inline">{{ __('messages.common.next') }}</span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="9 18 15 12 9 6"></polyline>
+                            <polyline points="{{ $isRtl ? '15 18 9 12 15 6' : '9 18 15 12 9 6' }}"></polyline>
                         </svg>
                     </a>
                 </li>
             @else
                 <li class="ss-page-item is-disabled" aria-disabled="true">
-                    <span class="ss-page-btn" aria-label="Suivant">
-                        <span class="d-none d-sm-inline">Suivant</span>
+                    <span class="ss-page-btn" aria-label="{{ __('messages.common.next') }}">
+                        <span class="d-none d-sm-inline">{{ __('messages.common.next') }}</span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="9 18 15 12 9 6"></polyline>
+                            <polyline points="{{ $isRtl ? '15 18 9 12 15 6' : '9 18 15 12 9 6' }}"></polyline>
                         </svg>
                     </span>
                 </li>

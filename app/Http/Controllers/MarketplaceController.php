@@ -125,7 +125,7 @@ class MarketplaceController extends Controller
         if ($equipment->status !== 'approved') {
             $canPreview = auth()->check() && (auth()->user()->isAdmin() || auth()->id() === $equipment->user_id);
             if (! $canPreview) {
-                abort(404, 'Cet équipement est en cours de validation par un administrateur.');
+                abort(404, __('messages.marketplace.pending_404'));
             }
         }
 
