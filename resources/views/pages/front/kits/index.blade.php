@@ -30,6 +30,9 @@
                 </p>
             </div>
             <div class="d-flex flex-wrap gap-2">
+                <button type="button" onclick="window.openPackBot && window.openPackBot()" class="btn rounded-pill px-4 py-2 fw-bold" style="background: rgba(15, 92, 107, 0.1); border: 1.5px solid #0F5C6B; color: #0F5C6B; font-size: 0.9rem;">
+                    🤖 {{ __('messages.pack_ai.open_btn_banner') }}
+                </button>
                 @auth
                     @if(auth()->user()->isLender())
                         <a href="{{ route('energy-kits.create') }}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 0.92rem; box-shadow: 0 4px 14px rgba(255, 107, 61, 0.3);">
