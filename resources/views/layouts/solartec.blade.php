@@ -6,7 +6,7 @@
   Distributed By: ThemeWagon (https://themewagon.com)
 --}}
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 
 <head>
     <meta charset="utf-8">
@@ -17,6 +17,36 @@
 
     <!-- Favicon -->
     <link href="{{ asset('solartec/img/favicon.ico') }}" rel="icon">
+
+    @if(app()->getLocale() === 'ar')
+        <!-- Google Font for Arabic -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+        <style>
+            body, h1, h2, h3, h4, h5, h6, .ss-btn, .nav-link, button, input, select, textarea {
+                font-family: 'Cairo', 'DM Sans', sans-serif !important;
+            }
+            .breadcrumb-item + .breadcrumb-item::before {
+                float: right !important;
+                padding-left: 0.5rem !important;
+                padding-right: 0 !important;
+            }
+            /* Logical RTL adaptations for Bootstrap 5 LTR utility classes */
+            [dir="rtl"] .me-1 { margin-right: 0 !important; margin-left: 0.25rem !important; }
+            [dir="rtl"] .me-2 { margin-right: 0 !important; margin-left: 0.5rem !important; }
+            [dir="rtl"] .me-3 { margin-right: 0 !important; margin-left: 1rem !important; }
+            [dir="rtl"] .me-4 { margin-right: 0 !important; margin-left: 1.5rem !important; }
+            [dir="rtl"] .ms-1 { margin-left: 0 !important; margin-right: 0.25rem !important; }
+            [dir="rtl"] .ms-2 { margin-left: 0 !important; margin-right: 0.5rem !important; }
+            [dir="rtl"] .ms-3 { margin-left: 0 !important; margin-right: 1rem !important; }
+            [dir="rtl"] .ps-3 { padding-left: 0 !important; padding-right: 1rem !important; }
+            [dir="rtl"] .end-0 { right: auto !important; left: 0 !important; }
+            [dir="rtl"] .start-0 { left: auto !important; right: 0 !important; }
+            [dir="rtl"] .back-to-top { right: auto !important; left: 30px !important; }
+            [dir="rtl"] .header-carousel .owl-dots { right: auto !important; left: 45px !important; }
+        </style>
+    @endif
 
     <!-- Core Design System & Assets (Same unified navbar, footer, buttons, and animations) -->
     @vite(['resources/js/front/landing.js'])
@@ -149,13 +179,13 @@
     @if (isset($errors) && $errors->any())
     <div class="container mt-4">
         <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm" role="alert">
-            <div class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>Veuillez corriger les erreurs suivantes :</div>
+            <div class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ __('messages.common.fix_errors') }}</div>
             <ul class="mb-0 ps-3">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('messages.common.close') }}"></button>
         </div>
     </div>
     @endif
@@ -169,7 +199,7 @@
     @includeUnless(request()->routeIs('onboarding.*'), 'partials.solartec.footer')
 
     <!-- Back to Top -->
-    <a href="#" class="btn btn-lg btn-primary btn-lg-square rounded-circle back-to-top" aria-label="Retour en haut">
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square rounded-circle back-to-top" aria-label="{{ __('messages.common.back_to_top') }}">
         <i class="bi bi-arrow-up"></i>
     </a>
 

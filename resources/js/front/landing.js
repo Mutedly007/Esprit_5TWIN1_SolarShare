@@ -522,6 +522,10 @@ import '../../css/front/landing.css';
     if (newsletterForm && newsletterInput && newsletterMsg) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+      const validMsg = newsletterForm.dataset.validMsg || '✓ Ready to receive clean energy alerts';
+      const successMsg = newsletterForm.dataset.successMsg || '★ Thank you! You are subscribed to SolarShare alerts.';
+      const errorMsg = newsletterForm.dataset.errorMsg || 'Please enter a valid email address.';
+
       newsletterInput.addEventListener('input', () => {
         const val = newsletterInput.value.trim();
         if (val === '') {
@@ -531,12 +535,12 @@ import '../../css/front/landing.css';
           newsletterInput.classList.add('is-valid');
           newsletterInput.classList.remove('is-invalid');
           newsletterMsg.style.color = 'var(--ss-success)';
-          newsletterMsg.textContent = '✓ Ready to receive clean energy alerts';
+          newsletterMsg.textContent = validMsg;
         } else {
           newsletterInput.classList.add('is-invalid');
           newsletterInput.classList.remove('is-valid');
           newsletterMsg.style.color = 'var(--ss-ember-coral)';
-          newsletterMsg.textContent = 'Please enter a valid email address';
+          newsletterMsg.textContent = errorMsg;
         }
       });
 
@@ -547,11 +551,11 @@ import '../../css/front/landing.css';
           newsletterInput.value = '';
           newsletterInput.classList.remove('is-valid');
           newsletterMsg.style.color = 'var(--ss-sun-amber)';
-          newsletterMsg.textContent = '★ Thank you! You are subscribed to SolarShare alerts.';
+          newsletterMsg.textContent = successMsg;
         } else {
           newsletterInput.classList.add('is-invalid');
           newsletterMsg.style.color = 'var(--ss-ember-coral)';
-          newsletterMsg.textContent = 'Please provide a valid email before subscribing.';
+          newsletterMsg.textContent = errorMsg;
           newsletterInput.focus();
         }
       });
@@ -1156,27 +1160,6 @@ import '../../css/front/landing.css';
       }
 
       // Social buttons are real OAuth links now (see AuthController::redirectToProvider)
-    }
-
-    /* ==========================================================================
-       16. USER MENU DROPDOWN (Navbar)
-       ========================================================================== */
-    const userMenuBtn = document.getElementById('ss-user-menu-btn');
-    const userDropdown = document.getElementById('ss-user-dropdown');
-    if (userMenuBtn && userDropdown) {
-      userMenuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isOpen = userDropdown.style.display === 'block';
-        userDropdown.style.display = isOpen ? 'none' : 'block';
-        userMenuBtn.setAttribute('aria-expanded', String(!isOpen));
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!userDropdown.contains(e.target) && e.target !== userMenuBtn) {
-          userDropdown.style.display = 'none';
-          userMenuBtn.setAttribute('aria-expanded', 'false');
-        }
-      });
     }
 
     // Initial trigger

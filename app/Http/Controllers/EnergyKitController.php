@@ -104,8 +104,8 @@ class EnergyKitController extends Controller
             'items.*.quantity' => ['required', 'integer', 'min:1', 'max:20'],
             'items.*.options' => ['nullable', 'string', 'max:255'],
         ], [
-            'items.required' => 'Vous devez sélectionner au moins un équipement pour composer ce pack.',
-            'items.min' => 'Un pack doit contenir au moins 1 équipement.',
+            'items.required' => __('messages.kits.err_min_one_eq'),
+            'items.min' => __('messages.kits.err_min_one_eq'),
         ]);
 
         // Restriction : un prêteur ne peut composer un pack qu'avec ses propres équipements approuvés
@@ -118,7 +118,7 @@ class EnergyKitController extends Controller
             foreach ($validated['items'] as $item) {
                 if (!in_array($item['equipment_id'], $ownedEquipmentIds)) {
                     return back()->withInput()->withErrors([
-                        'items' => 'Vous ne pouvez composer un pack solaire qu\'avec vos propres équipements approuvés.'
+                        'items' => __('messages.kits.err_own_approved_only')
                     ]);
                 }
             }
@@ -150,7 +150,7 @@ class EnergyKitController extends Controller
         $kit->equipment()->sync($syncData);
 
         return redirect()->route('energy-kits.show', $kit)
-            ->with('success', 'Le pack solaire "' . $kit->title . '" a été créé avec succès !');
+            ->with('success', __('messages.kits.flash_created', ['title' => $kit->title]));
     }
 
     /**
@@ -211,7 +211,7 @@ class EnergyKitController extends Controller
             foreach ($validated['items'] as $item) {
                 if (!in_array($item['equipment_id'], $ownedEquipmentIds)) {
                     return back()->withInput()->withErrors([
-                        'items' => 'Vous ne pouvez associer que vos propres équipements approuvés à ce pack.'
+                        'items' => __('messages.kits.err_own_approved_only')
                     ]);
                 }
             }
@@ -245,7 +245,7 @@ class EnergyKitController extends Controller
         $energyKit->equipment()->sync($syncData);
 
         return redirect()->route('energy-kits.show', $energyKit)
-            ->with('success', 'Le pack solaire a été mis à jour avec succès.');
+            ->with('success', __('messages.kits.flash_updated'));
     }
 
     /**
@@ -274,7 +274,7 @@ class EnergyKitController extends Controller
                 ->exists();
 
             if (!$isOwned) {
-                return back()->withErrors(['items' => 'Vous ne pouvez ajouter que vos propres équipements approuvés.']);
+                return back()->withErrors(['items' => __('messages.kits.err_own_approved_only')]);
             }
         }
 
@@ -285,7 +285,7 @@ class EnergyKitController extends Controller
             ]
         ]);
 
-        return back()->with('success', 'Équipement ajouté au pack avec succès.');
+        return back()->with('success', __('messages.kits.flash_attached'));
     }
 
     /**
@@ -303,7 +303,7 @@ class EnergyKitController extends Controller
 
         $energyKit->equipment()->detach($equipment->id);
 
-        return back()->with('success', 'L\'équipement a été retiré du pack.');
+        return back()->with('success', __('messages.kits.flash_detached'));
     }
 
     /**
@@ -326,7 +326,7 @@ class EnergyKitController extends Controller
         $energyKit->delete();
 
         return redirect()->route('energy-kits.index')
-            ->with('success', 'Le pack a été supprimé.');
+            ->with('success', __('messages.kits.flash_deleted'));
     }
 
     /**
@@ -336,7 +336,7 @@ class EnergyKitController extends Controller
     {
         if (!auth()->check()) {
             return redirect()->route('login')
-                ->with('error', 'Veuillez vous connecter pour réserver ce pack solaire.');
+                ->with('error', __('messages.kits.err_login_to_reserve'));
         }
 
         if (!auth()->user()->isRenter()) {
@@ -347,11 +347,6 @@ class EnergyKitController extends Controller
             'start_date' => ['required', 'date', 'after_or_equal:today'],
             'end_date'   => ['required', 'date', 'after_or_equal:start_date'],
             'notes'      => ['nullable', 'string', 'max:1000'],
-        ], [
-            'start_date.required' => 'La date de début est obligatoire.',
-            'start_date.after_or_equal' => 'La date de début doit être aujourd\'hui ou ultérieure.',
-            'end_date.required' => 'La date de fin est obligatoire.',
-            'end_date.after_or_equal' => 'La date de fin doit être égale ou postérieure à la date de début.',
         ]);
 
         $startDate = \Carbon\Carbon::parse($validated['start_date']);
@@ -376,7 +371,13 @@ class EnergyKitController extends Controller
         ]);
 
         return redirect()->route('energy-kits.show', $energyKit)
-            ->with('success', "🎉 Félicitations ! Votre réservation pour le pack '{$energyKit->title}' a bien été enregistrée pour {$daysCount} jour(s) (du {$startDate->format('d/m/Y')} au {$endDate->format('d/m/Y')}). Montant total : " . number_format($totalPrice, 2) . " TND.");
+            ->with('success', __('messages.kits.flash_reserved', [
+                'title' => $energyKit->title,
+                'days' => $daysCount,
+                'start' => $startDate->format('d/m/Y'),
+                'end' => $endDate->format('d/m/Y'),
+                'total' => number_format($totalPrice, 2),
+            ]));
     }
 
     /**
@@ -390,6 +391,8 @@ class EnergyKitController extends Controller
 
         $energyKit->update(['is_active' => !$energyKit->is_active]);
 
-        return back()->with('success', 'Statut du pack mis à jour avec succès : ' . ($energyKit->is_active ? 'Actif (Publié)' : 'Inactif (Masqué)'));
+        return back()->with('success', __('messages.kits.flash_toggled', [
+            'status' => $energyKit->is_active ? __('messages.kits.active_online') : __('messages.kits.inactive_hidden'),
+        ]));
     }
 }

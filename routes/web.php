@@ -1,10 +1,16 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\LocalizationController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\RenterChatbotController;
 use Illuminate\Support\Facades\Route;
+
+// Multilingual language switcher (FR, EN, AR)
+Route::get('/lang/{locale}', [LocalizationController::class, 'switch'])
+    ->whereIn('locale', ['fr', 'en', 'ar'])
+    ->name('lang.switch');
 
 Route::get('/', function () {
     $featuredEquipment = [

@@ -5,7 +5,7 @@
   Author: AdminMart (https://adminmart.com)
 --}}
 <!DOCTYPE html>
-<html dir="ltr" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8">
@@ -16,6 +16,18 @@
 
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('admin-assets/assets/images/favicon.png') }}">
+
+    @if(app()->getLocale() === 'ar')
+        <!-- Google Font for Arabic in Admin -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+        <style>
+            body, h1, h2, h3, h4, h5, h6, .navbar, .sidebar-nav, button, input, select, textarea {
+                font-family: 'Cairo', sans-serif !important;
+            }
+        </style>
+    @endif
 
     <!-- Vendor CSS -->
     <link href="{{ asset('admin-assets/assets/extra-libs/c3/c3.min.css') }}" rel="stylesheet">

@@ -44,11 +44,11 @@ class EnergyKitReservation extends Model
     public function getStatusBadgeAttribute(): string
     {
         return match ($this->status) {
-            'confirmed' => '<span class="badge bg-success">Confirmée</span>',
-            'active' => '<span class="badge bg-info text-dark">En cours</span>',
-            'completed' => '<span class="badge bg-secondary">Terminée</span>',
-            'cancelled' => '<span class="badge bg-danger">Annulée</span>',
-            default => '<span class="badge bg-warning text-dark">En attente</span>',
+            'confirmed' => '<span class="badge bg-success">' . e(__('messages.kits.status_confirmed')) . '</span>',
+            'active' => '<span class="badge bg-info text-dark">' . e(__('messages.kits.status_active')) . '</span>',
+            'completed' => '<span class="badge bg-secondary">' . e(__('messages.kits.status_completed')) . '</span>',
+            'cancelled' => '<span class="badge bg-danger">' . e(__('messages.kits.status_cancelled')) . '</span>',
+            default => '<span class="badge bg-warning text-dark">' . e(__('messages.kits.status_pending')) . '</span>',
         };
     }
 }

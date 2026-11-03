@@ -1,18 +1,19 @@
 {{-- resources/views/pages/front/kits/show.blade.php --}}
 @extends('layouts.solartec')
 
-@section('title', $energyKit->title . ' — Packs Solaires Clé-en-main')
+@section('title', $energyKit->title . ' — ' . __('messages.kits.show_title_suffix'))
 @section('meta_description', Str::limit(strip_tags($energyKit->description), 150))
 
 @section('content')
+@php $isRtl = app()->getLocale() === 'ar'; @endphp
 <section style="background: #F8FAFC; padding: 2.5rem 0 5rem 0;">
     <div class="container">
 
         <!-- Breadcrumb Navigation -->
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb" style="font-size: 0.88rem;">
-                <li class="breadcrumb-item"><a href="{{ url('/') }}" style="color: #0F5C6B; text-decoration: none;">Accueil</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('energy-kits.index') }}" style="color: #0F5C6B; text-decoration: none;">Packs Solaires</a></li>
+                <li class="breadcrumb-item"><a href="{{ url('/') }}" style="color: #0F5C6B; text-decoration: none;">{{ __('messages.nav.home') }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('energy-kits.index') }}" style="color: #0F5C6B; text-decoration: none;">{{ __('messages.nav.packs') }}</a></li>
                 <li class="breadcrumb-item active" aria-current="page" style="color: #64748B;">{{ $energyKit->title }}</li>
             </ol>
         </nav>
@@ -29,13 +30,13 @@
                             <div style="font-size: 5rem; color: #FFB020;">📦</div>
                         @endif
 
-                        <span style="position: absolute; top: 16px; left: 16px; {{ $energyKit->target_use_badge_style }}; font-size: 0.82rem; font-weight: 700; padding: 0.35rem 0.85rem; border-radius: 9999px;">
+                        <span style="position: absolute; top: 16px; inset-inline-start: 16px; {{ $energyKit->target_use_badge_style }}; font-size: 0.82rem; font-weight: 700; padding: 0.35rem 0.85rem; border-radius: 9999px;">
                             {{ $energyKit->target_use_label }}
                         </span>
 
                         @if($energyKit->discount_percentage > 0)
-                            <span style="position: absolute; top: 16px; right: 16px; background: linear-gradient(135deg, #FFB020, #FF6B3D); color: #071520; font-size: 0.85rem; font-weight: 800; padding: 0.4rem 0.9rem; border-radius: 9999px; box-shadow: 0 4px 12px rgba(255, 107, 61, 0.4);">
-                                -{{ rtrim(rtrim(number_format($energyKit->discount_percentage, 1), '0'), '.') }}% Remise Pack
+                            <span style="position: absolute; top: 16px; inset-inline-end: 16px; background: linear-gradient(135deg, #FFB020, #FF6B3D); color: #071520; font-size: 0.85rem; font-weight: 800; padding: 0.4rem 0.9rem; border-radius: 9999px; box-shadow: 0 4px 12px rgba(255, 107, 61, 0.4);">
+                                -{{ rtrim(rtrim(number_format($energyKit->discount_percentage, 1), '0'), '.') }}% {{ __('messages.kits.discount_badge') }}
                             </span>
                         @endif
                     </div>
@@ -44,7 +45,7 @@
                 <div class="col-lg-7">
                     <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
                         <span class="badge rounded-pill text-uppercase fw-bold px-3 py-1" style="background: rgba(15, 92, 107, 0.12); color: #0F5C6B; font-size: 0.75rem;">
-                            Pack Combiné ({{ $energyKit->equipment->count() }} Équipements)
+                            {{ __('messages.kits.combined_pack_badge', ['count' => $energyKit->equipment->count()]) }}
                         </span>
                         
                         @auth
@@ -52,18 +53,18 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <form action="{{ route('energy-kits.toggle', $energyKit) }}" method="POST" class="d-inline">
                                         @csrf
-                                        <button type="submit" class="btn btn-sm rounded-pill px-3 fw-bold {{ $energyKit->is_active ? 'btn-success text-white' : 'btn-secondary text-white' }}" title="Cliquer pour basculer Actif / Inactif">
-                                            {{ $energyKit->is_active ? '✓ Actif (En ligne)' : '✕ Inactif (Masqué)' }}
+                                        <button type="submit" class="btn btn-sm rounded-pill px-3 fw-bold {{ $energyKit->is_active ? 'btn-success text-white' : 'btn-secondary text-white' }}" title="{{ __('messages.kits.toggle_title') }}">
+                                            {{ $energyKit->is_active ? __('messages.kits.active_online') : __('messages.kits.inactive_hidden') }}
                                         </button>
                                     </form>
                                     <a href="{{ route('energy-kits.edit', $energyKit) }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-                                        ✏️ Modifier
+                                        ✏️ {{ __('messages.common.edit') }}
                                     </a>
-                                    <form action="{{ route('energy-kits.destroy', $energyKit) }}" method="POST" class="d-inline" onsubmit="return confirm('Supprimer ce pack ?');">
+                                    <form action="{{ route('energy-kits.destroy', $energyKit) }}" method="POST" class="d-inline" onsubmit="return confirm(@js(__('messages.kits.confirm_delete_pack')));">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                                            🗑️ Supprimer
+                                            🗑️ {{ __('messages.common.delete') }}
                                         </button>
                                     </form>
                                 </div>
@@ -74,27 +75,27 @@
                     <h1 class="h2 fw-bold text-dark mb-3">{{ $energyKit->title }}</h1>
                     
                     <p class="text-muted" style="line-height: 1.7; font-size: 0.96rem;">
-                        {{ $energyKit->description ?: 'Ce pack solaire combiné rassemble tous les éléments nécessaires pour une autonomie énergétique immédiate.' }}
+                        {{ $energyKit->description ?: __('messages.kits.show_default_desc') }}
                     </p>
 
                     <!-- Combined Specs Grid -->
                     <div class="row g-2 pt-2 border-top">
                         <div class="col-sm-4 col-6">
                             <div class="p-2 rounded-3 text-center" style="background: #F8FAFC; border: 1px solid #E2E8F0;">
-                                <span class="d-block text-muted small fw-bold">⚡ Puissance Totale</span>
+                                <span class="d-block text-muted small fw-bold">⚡ {{ __('messages.kits.total_power') }}</span>
                                 <strong class="fs-5 text-dark">{{ $energyKit->total_power_watts }} W</strong>
                             </div>
                         </div>
                         <div class="col-sm-4 col-6">
                             <div class="p-2 rounded-3 text-center" style="background: #F8FAFC; border: 1px solid #E2E8F0;">
-                                <span class="d-block text-muted small fw-bold">🔋 Capacité Cumulée</span>
+                                <span class="d-block text-muted small fw-bold">🔋 {{ __('messages.kits.total_capacity') }}</span>
                                 <strong class="fs-5 text-dark">{{ $energyKit->total_capacity_wh }} Wh</strong>
                             </div>
                         </div>
                         <div class="col-sm-4 col-12">
                             <div class="p-2 rounded-3 text-center" style="background: #F8FAFC; border: 1px solid #E2E8F0;">
-                                <span class="d-block text-muted small fw-bold">🛡️ Caution Totale</span>
-                                <strong class="fs-5 text-dark">{{ number_format($energyKit->total_deposit, 2) }} TND</strong>
+                                <span class="d-block text-muted small fw-bold">🛡️ {{ __('messages.kits.total_deposit') }}</span>
+                                <strong class="fs-5 text-dark">{{ number_format($energyKit->total_deposit, 2) }} {{ __('messages.kits.currency') }}</strong>
                             </div>
                         </div>
                     </div>
@@ -113,41 +114,41 @@
                     <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
                         <div>
                             <span class="badge rounded-pill text-uppercase fw-bold px-3 py-1 mb-1" style="background: rgba(255, 176, 32, 0.15); color: #C2410C; font-size: 0.72rem;">
-                                🧩 Composition du Pack (Relation N-N)
+                                🧩 {{ __('messages.kits.composition_badge') }}
                             </span>
-                            <h4 class="h5 fw-bold text-dark mb-0">Équipements Inclus dans ce Pack</h4>
+                            <h4 class="h5 fw-bold text-dark mb-0">{{ __('messages.kits.included_title') }}</h4>
                         </div>
                         
                         @auth
                             @if(auth()->user()->isAdmin() || auth()->id() === $energyKit->user_id)
                                 <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#attachEquipmentModal">
-                                    + Ajouter un équipement
+                                    + {{ __('messages.kits.add_equipment_btn') }}
                                 </button>
                             @endif
                         @endauth
                     </div>
 
                     <p class="text-muted small mb-4">
-                        Ce kit combiné regroupe <strong>{{ $energyKit->equipment->count() }} équipement(s)</strong> avec options et câblages spécifiques inclus.
+                        {!! __('messages.kits.composition_intro', ['count' => $energyKit->equipment->count()]) !!}
                     </p>
 
                     @if($energyKit->equipment->isEmpty())
                         <div class="text-center py-5 text-muted">
                             <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⚠️</div>
-                            <p>Aucun équipement n'est encore associé à ce pack.</p>
+                            <p>{{ __('messages.kits.no_equipment_in_pack') }}</p>
                         </div>
                     @else
                         <div class="table-responsive">
                             <table class="table align-middle">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Équipement</th>
-                                        <th>Qté</th>
-                                        <th>Options & Spécifications</th>
-                                        <th>Tarif Journalier</th>
+                                        <th>{{ __('messages.kits.col_equipment') }}</th>
+                                        <th>{{ __('messages.kits.col_qty') }}</th>
+                                        <th>{{ __('messages.kits.col_options') }}</th>
+                                        <th>{{ __('messages.kits.col_daily_rate') }}</th>
                                         @auth
                                             @if(auth()->user()->isAdmin() || auth()->id() === $energyKit->user_id)
-                                                <th class="text-end">Retirer</th>
+                                                <th style="text-align: end;">{{ __('messages.kits.col_remove') }}</th>
                                             @endif
                                         @endauth
                                     </tr>
@@ -192,17 +193,17 @@
                                             </td>
 
                                             <td>
-                                                <strong style="color: #0F5C6B;">{{ number_format($item->daily_rate * $item->pivot->quantity, 2) }} TND/j</strong>
-                                                <span class="d-block text-muted" style="font-size: 0.72rem;">({{ number_format($item->daily_rate, 2) }} TND/u)</span>
+                                                <strong style="color: #0F5C6B;">{{ number_format($item->daily_rate * $item->pivot->quantity, 2) }} {{ __('messages.kits.tnd_per_day_short') }}</strong>
+                                                <span class="d-block text-muted" style="font-size: 0.72rem;">({{ number_format($item->daily_rate, 2) }} {{ __('messages.kits.tnd_per_unit') }})</span>
                                             </td>
 
                                             @auth
                                                 @if(auth()->user()->isAdmin() || auth()->id() === $energyKit->user_id)
-                                                    <td class="text-end">
-                                                        <form action="{{ route('energy-kits.detach', ['energyKit' => $energyKit->slug, 'equipment' => $item->id]) }}" method="POST" onsubmit="return confirm('Retirer cet équipement du pack ?');">
+                                                    <td style="text-align: end;">
+                                                        <form action="{{ route('energy-kits.detach', ['energyKit' => $energyKit->slug, 'equipment' => $item->id]) }}" method="POST" onsubmit="return confirm(@js(__('messages.kits.confirm_detach_eq')));">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0 p-1" title="Détacher cet équipement">
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0 p-1" title="{{ __('messages.kits.detach_title') }}">
                                                                 &times;
                                                             </button>
                                                         </form>
@@ -222,29 +223,29 @@
                             @php
                                 $receivedKitReservations = $energyKit->reservations()->with('user')->latest()->get();
                             @endphp
-                            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mt-4" style="border-left: 4px solid #FF6B3D !important;">
+                            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mt-4" style="border-inline-start: 4px solid #FF6B3D !important;">
                                 <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                                     <div>
                                         <div class="d-flex align-items-center gap-2">
                                             <span style="font-size: 1.2rem;">📥</span>
-                                            <h5 class="fw-bold mb-0 text-dark">Réservations Reçues sur ce Pack Solaire</h5>
+                                            <h5 class="fw-bold mb-0 text-dark">{{ __('messages.kits.received_res_title') }}</h5>
                                             <span class="badge rounded-pill bg-light text-dark border">
-                                                {{ $receivedKitReservations->count() }} au total
+                                                {{ __('messages.kits.total_count', ['count' => $receivedKitReservations->count()]) }}
                                             </span>
                                         </div>
                                         <p class="text-muted small mb-0 mt-1">
-                                            En tant que propriétaire du pack, retrouvez les réservations enregistrées avec la remise pack appliquée (-{{ rtrim(rtrim(number_format($energyKit->discount_percentage, 1), '0'), '.') }}%).
+                                            {{ __('messages.kits.received_res_desc', ['discount' => rtrim(rtrim(number_format($energyKit->discount_percentage, 1), '0'), '.')]) }}
                                         </p>
                                     </div>
                                     <a href="{{ route('lender.rentals.index', ['tab' => 'packs']) }}" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-1 fw-bold text-decoration-none">
-                                        Espace Prêteur &rarr;
+                                        {{ __('messages.nav.lender_space') }} {!! $isRtl ? '&larr;' : '&rarr;' !!}
                                     </a>
                                 </div>
 
                                 @if($receivedKitReservations->isEmpty())
                                     <div class="p-4 text-center rounded-3" style="background: #F8FAFC; border: 1px dashed #CBD5E1;">
                                         <p class="text-muted small mb-0">
-                                            Aucun emprunteur n'a encore réservé ce pack solaire. Dès qu'une réservation est validée, elle apparaîtra ici avec son détail financier.
+                                            {{ __('messages.kits.received_res_empty') }}
                                         </p>
                                     </div>
                                 @else
@@ -252,12 +253,12 @@
                                         <table class="table table-hover align-middle mb-0" style="font-size: 0.88rem;">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th>Réf.</th>
-                                                    <th>Locataire</th>
-                                                    <th>Période & Durée</th>
-                                                    <th>Tarif Remisé</th>
-                                                    <th>Statut</th>
-                                                    <th style="text-align: right;">Action</th>
+                                                    <th>{{ __('messages.kits.col_ref') }}</th>
+                                                    <th>{{ __('messages.kits.col_renter') }}</th>
+                                                    <th>{{ __('messages.kits.col_period') }}</th>
+                                                    <th>{{ __('messages.kits.col_discounted_rate') }}</th>
+                                                    <th>{{ __('messages.common.status') }}</th>
+                                                    <th style="text-align: end;">{{ __('messages.kits.col_action') }}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -281,28 +282,28 @@
                                                             @endif
                                                         </td>
                                                         <td>
-                                                            <div>{{ $rRes->start_date->format('d/m/Y') }} &rarr; {{ $rRes->end_date->format('d/m/Y') }}</div>
-                                                            <span class="badge bg-light text-dark border">{{ $rRes->days_count }} jour(s)</span>
+                                                            <div>{{ $rRes->start_date->format('d/m/Y') }} {!! $isRtl ? '&larr;' : '&rarr;' !!} {{ $rRes->end_date->format('d/m/Y') }}</div>
+                                                            <span class="badge bg-light text-dark border">{{ $rRes->days_count }} {{ __('messages.kits.days_unit') }}</span>
                                                         </td>
                                                         <td>
                                                             <div class="fw-bold" style="color: #C2410C; font-size: 1rem;">
-                                                                {{ number_format($rRes->total_price, 2) }} TND
+                                                                {{ number_format($rRes->total_price, 2) }} {{ __('messages.kits.currency') }}
                                                             </div>
                                                             <span class="d-block text-muted" style="font-size: 0.75rem;">
-                                                                {{ number_format($rRes->daily_rate, 2) }} TND/j · Caution: {{ number_format($rRes->deposit_amount, 2) }} TND
+                                                                {{ number_format($rRes->daily_rate, 2) }} {{ __('messages.kits.tnd_per_day_short') }} · {{ __('messages.kits.deposit_short') }} {{ number_format($rRes->deposit_amount, 2) }} {{ __('messages.kits.currency') }}
                                                             </span>
                                                         </td>
                                                         <td>
                                                             {!! $rRes->status_badge !!}
                                                         </td>
-                                                        <td style="text-align: right;">
+                                                        <td style="text-align: end;">
                                                             @if($rRes->status === 'pending')
                                                                 <form method="POST" action="{{ route('lender.kit-reservations.status', $rRes) }}" class="d-inline">
                                                                     @csrf
                                                                     @method('PATCH')
                                                                     <input type="hidden" name="status" value="confirmed">
                                                                     <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 py-1 fw-bold">
-                                                                        ✓ Confirmer
+                                                                        {{ __('messages.kits.btn_confirm') }}
                                                                     </button>
                                                                 </form>
                                                             @elseif($rRes->status === 'confirmed')
@@ -311,7 +312,7 @@
                                                                     @method('PATCH')
                                                                     <input type="hidden" name="status" value="active">
                                                                     <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 py-1 fw-bold" style="background:#0284C7; border-color:#0284C7;">
-                                                                        ▶ En cours
+                                                                        {{ __('messages.kits.btn_active') }}
                                                                     </button>
                                                                 </form>
                                                             @elseif($rRes->status === 'active')
@@ -320,7 +321,7 @@
                                                                     @method('PATCH')
                                                                     <input type="hidden" name="status" value="completed">
                                                                     <button type="submit" class="btn btn-sm btn-secondary rounded-pill px-3 py-1 fw-bold">
-                                                                        ✓ Restitué
+                                                                        {{ __('messages.kits.btn_returned') }}
                                                                     </button>
                                                                 </form>
                                                             @else
@@ -344,40 +345,40 @@
             <div class="col-lg-4">
                 
                 <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4" style="position: sticky; top: 96px;">
-                    <h5 class="fw-bold mb-3" style="color: #10202B;">Tarif & Avantage Pack</h5>
+                    <h5 class="fw-bold mb-3" style="color: #10202B;">{{ __('messages.kits.pricing_title') }}</h5>
 
                     <div class="p-3 rounded-3 mb-3" style="background: linear-gradient(135deg, rgba(255, 176, 32, 0.12), rgba(255, 107, 61, 0.06)); border: 1px solid rgba(255, 176, 32, 0.3);">
                         <div class="d-flex justify-content-between text-muted small mb-1">
-                            <span>Prix unitaire cumulé :</span>
-                            <span class="text-decoration-line-through">{{ number_format($energyKit->raw_daily_rate, 2) }} TND / j</span>
+                            <span>{{ __('messages.kits.raw_unit_price') }}</span>
+                            <span class="text-decoration-line-through">{{ number_format($energyKit->raw_daily_rate, 2) }} {{ __('messages.kits.tnd_per_day_short') }}</span>
                         </div>
                         
                         @if($energyKit->discount_percentage > 0)
                             <div class="d-flex justify-content-between small text-success fw-bold mb-2">
-                                <span>Remise Pack ({{ rtrim(rtrim(number_format($energyKit->discount_percentage, 1), '0'), '.') }}%) :</span>
-                                <span>-{{ number_format($energyKit->daily_savings, 2) }} TND / j</span>
+                                <span>{{ __('messages.kits.pack_discount_label', ['discount' => rtrim(rtrim(number_format($energyKit->discount_percentage, 1), '0'), '.')]) }}</span>
+                                <span>-{{ number_format($energyKit->daily_savings, 2) }} {{ __('messages.kits.tnd_per_day_short') }}</span>
                             </div>
                         @endif
 
                         <div class="d-flex justify-content-between align-items-baseline pt-2 border-top">
-                            <span class="fw-bold text-dark">Tarif Pack :</span>
+                            <span class="fw-bold text-dark">{{ __('messages.kits.pack_rate_label') }}</span>
                             <span style="font-size: 2.2rem; font-weight: 800; color: #C2410C; line-height: 1;">
                                 {{ number_format($energyKit->discounted_daily_rate, 2) }}
                             </span>
-                            <span style="font-size: 0.95rem; font-weight: 700; color: #7C2D12;">TND / jour</span>
+                            <span style="font-size: 0.95rem; font-weight: 700; color: #7C2D12;">{{ __('messages.kits.tnd_per_day') }}</span>
                         </div>
                     </div>
 
                     <!-- Availability indicator -->
                     <div class="p-3 rounded-3 mb-4" style="background: #F8FAFC; border: 1px solid #E2E8F0; font-size: 0.85rem;">
                         <div class="d-flex align-items-center justify-content-between mb-1">
-                            <span>Disponibilité du pack :</span>
+                            <span>{{ __('messages.kits.availability_label') }}</span>
                             <span class="badge rounded-pill {{ $energyKit->is_all_available ? 'bg-success text-white' : 'bg-warning text-dark' }}">
-                                {{ $energyKit->is_all_available ? '✓ Disponible immédiatement' : '⏳ Partiellement réservé' }}
+                                {{ $energyKit->is_all_available ? __('messages.kits.avail_now') : __('messages.kits.avail_partial') }}
                             </span>
                         </div>
                         <span class="text-muted small d-block">
-                            Caution totale de garantie : <strong>{{ number_format($energyKit->total_deposit, 2) }} TND</strong> (restituée après restitution et état des lieux).
+                            {!! __('messages.kits.deposit_notice', ['amount' => number_format($energyKit->total_deposit, 2)]) !!}
                         </span>
                     </div>
 
@@ -388,31 +389,31 @@
                                 <button type="button" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" 
                                         data-bs-toggle="modal" data-bs-target="#reserveKitModal"
                                         style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 1.05rem; box-shadow: 0 6px 20px rgba(255, 107, 61, 0.35); cursor: pointer;">
-                                    ⚡ Réserver ce Pack Solaire
+                                    ⚡ {{ __('messages.kits.reserve_this_pack') }}
                                 </button>
                             @else
-                                <div class="alert alert-warning border-0 rounded-4 p-3 mb-3 text-start shadow-sm" style="background: #FFFBEB; border-left: 4px solid #F59E0B !important; color: #92400E; font-size: 0.88rem;">
+                                <div class="alert alert-warning border-0 rounded-4 p-3 mb-3 text-start shadow-sm" style="background: #FFFBEB; border-inline-start: 4px solid #F59E0B !important; color: #92400E; font-size: 0.88rem;">
                                     <div class="d-flex align-items-center gap-2 fw-bold mb-1" style="font-size: 0.92rem;">
                                         <span>🔒</span>
-                                        <span>Réservation non autorisée</span>
+                                        <span>{{ __('messages.kits.booking_not_allowed_title') }}</span>
                                     </div>
                                     <p class="mb-0" style="line-height: 1.45;">
-                                        Votre compte a le rôle <strong>Prêteur (Lend)</strong>. Seuls les utilisateurs avec le rôle <strong>Emprunteur (Rent)</strong> ou <strong>Les deux (Both)</strong> peuvent réserver ce pack solaire.
+                                        {!! __('messages.kits.booking_not_allowed_desc') !!}
                                     </p>
                                 </div>
                                 <button type="button" class="btn btn-secondary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" disabled style="opacity: 0.7; cursor: not-allowed; background: #94A3B8; border: none;">
-                                    ⚡ Réservation réservée aux emprunteurs
+                                    ⚡ {{ __('messages.kits.booking_renters_only') }}
                                 </button>
                             @endif
                         @else
                             <a href="{{ route('login') }}" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" 
                                style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 1.05rem; box-shadow: 0 6px 20px rgba(255, 107, 61, 0.35); text-decoration: none;">
-                                ⚡ Connectez-vous pour Réserver
+                                ⚡ {{ __('messages.kits.login_to_reserve') }}
                             </a>
                         @endauth
                     @else
                         <button type="button" class="btn btn-secondary w-100 rounded-pill py-3 fw-bold mb-3" disabled>
-                            Pack en cours de configuration
+                            {{ __('messages.kits.pack_configuring') }}
                         </button>
                     @endif
 
@@ -425,10 +426,10 @@
                             <div class="mb-3 p-3 rounded-3" style="background: #FFFBEB; border: 1.5px solid #FCD34D;">
                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                     <div class="fw-bold text-dark" style="font-size: 0.85rem;">
-                                        📥 Réservations reçues ({{ $sidebarReceivedReservations->count() }}) :
+                                        📥 {{ __('messages.kits.sidebar_received', ['count' => $sidebarReceivedReservations->count()]) }}
                                     </div>
                                     @if($sidebarReceivedReservations->where('status', 'pending')->count() > 0)
-                                        <span class="badge bg-warning text-dark">{{ $sidebarReceivedReservations->where('status', 'pending')->count() }} en attente</span>
+                                        <span class="badge bg-warning text-dark">{{ __('messages.kits.pending_count', ['count' => $sidebarReceivedReservations->where('status', 'pending')->count()]) }}</span>
                                     @endif
                                 </div>
                                 @if($sidebarReceivedReservations->isNotEmpty())
@@ -436,19 +437,19 @@
                                         <div class="py-2 border-bottom border-warning-subtle" style="font-size: 0.8rem;">
                                             <div class="d-flex justify-content-between fw-bold text-dark">
                                                 <span>{{ $rRes->user->name }}</span>
-                                                <span style="color: #C2410C;">{{ number_format($rRes->total_price, 2) }} TND</span>
+                                                <span style="color: #C2410C;">{{ number_format($rRes->total_price, 2) }} {{ __('messages.kits.currency') }}</span>
                                             </div>
                                             <div class="text-muted d-flex justify-content-between align-items-center mt-1">
-                                                <span>{{ $rRes->start_date->format('d/m/y') }} &rarr; {{ $rRes->end_date->format('d/m/y') }} ({{ $rRes->days_count }}j)</span>
+                                                <span>{{ $rRes->start_date->format('d/m/y') }} {!! $isRtl ? '&larr;' : '&rarr;' !!} {{ $rRes->end_date->format('d/m/y') }} ({{ $rRes->days_count }}{{ __('messages.kits.days_short') }})</span>
                                                 {!! $rRes->status_badge !!}
                                             </div>
                                         </div>
                                     @endforeach
                                     <a href="{{ route('lender.rentals.index', ['tab' => 'packs']) }}" class="btn btn-sm btn-dark w-100 mt-2 rounded-pill fw-bold" style="font-size: 0.78rem;">
-                                        Gérer dans l'Espace Prêteur &rarr;
+                                        {{ __('messages.kits.manage_in_lender') }} {!! $isRtl ? '&larr;' : '&rarr;' !!}
                                     </a>
                                 @else
-                                    <span class="text-muted small">Aucune réservation pour le moment.</span>
+                                    <span class="text-muted small">{{ __('messages.kits.no_res_yet') }}</span>
                                 @endif
                             </div>
                         @endif
@@ -460,12 +461,12 @@
                         @if($userReservations->isNotEmpty())
                             <div class="mb-3 p-3 rounded-3" style="background: #F0FDF4; border: 1px solid #BBF7D0;">
                                 <div class="fw-bold mb-2 text-success" style="font-size: 0.85rem;">
-                                    ✓ Vos réservations pour ce pack ({{ $userReservations->count() }}) :
+                                    {{ __('messages.kits.your_reservations', ['count' => $userReservations->count()]) }}
                                 </div>
                                 @foreach($userReservations as $res)
                                     <div class="d-flex align-items-center justify-content-between py-1 border-bottom border-success-subtle" style="font-size: 0.8rem;">
-                                        <span>Du {{ $res->start_date->format('d/m/Y') }} au {{ $res->end_date->format('d/m/Y') }} ({{ $res->days_count }}j)</span>
-                                        <span class="badge bg-success">{{ number_format($res->total_price, 2) }} TND</span>
+                                        <span>{{ __('messages.kits.from_to_days', ['start' => $res->start_date->format('d/m/Y'), 'end' => $res->end_date->format('d/m/Y'), 'days' => $res->days_count]) }}</span>
+                                        <span class="badge bg-success">{{ number_format($res->total_price, 2) }} {{ __('messages.kits.currency') }}</span>
                                     </div>
                                 @endforeach
                             </div>
@@ -473,22 +474,22 @@
                     @endauth
 
                     <a href="{{ route('energy-kits.index') }}" class="btn btn-outline-secondary w-100 rounded-pill py-2 text-center" style="font-size: 0.9rem;">
-                        &larr; Retour à la liste des packs
+                        {!! $isRtl ? '&rarr;' : '&larr;' !!} {{ __('messages.kits.back_to_packs') }}
                     </a>
 
                     <!-- Reassurance Items -->
                     <div class="mt-4 pt-3 border-top" style="font-size: 0.82rem; color: #64748B;">
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <span>📦</span>
-                            <span>Ensemble complet prêt à brancher immédiatement</span>
+                            <span>{{ __('messages.kits.reassurance_1') }}</span>
                         </div>
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <span>🔍</span>
-                            <span>État des lieux numérique complet (Check-in & Check-out)</span>
+                            <span>{{ __('messages.kits.reassurance_2') }}</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <span>🛡️</span>
-                            <span>Contrat de prêt sécurisé et caution garantie</span>
+                            <span>{{ __('messages.kits.reassurance_3') }}</span>
                         </div>
                     </div>
 
@@ -510,34 +511,34 @@
             <form action="{{ route('energy-kits.attach', $energyKit->slug) }}" method="POST">
                 @csrf
                 <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold text-dark" id="attachModalLabel">Ajouter un équipement au pack</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    <h5 class="modal-title fw-bold text-dark" id="attachModalLabel">{{ __('messages.kits.modal_attach_title') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('messages.common.close') }}"></button>
                 </div>
                 <div class="modal-body py-3">
                     <div class="mb-3">
-                        <label for="modal_equipment_id" class="form-label fw-bold small text-dark">Choisir l'équipement</label>
+                        <label for="modal_equipment_id" class="form-label fw-bold small text-dark">{{ __('messages.kits.modal_choose_eq') }}</label>
                         <select name="equipment_id" id="modal_equipment_id" class="form-select rounded-3" required>
-                            <option value="" disabled selected>-- Sélectionnez un équipement --</option>
+                            <option value="" disabled selected>{{ __('messages.kits.modal_select_placeholder') }}</option>
                             @foreach(\App\Models\Equipment::where('status', 'approved')->orderBy('name')->get() as $eq)
-                                <option value="{{ $eq->id }}">{{ $eq->name }} ({{ $eq->category?->name }}) — {{ number_format($eq->daily_rate, 2) }} TND/j</option>
+                                <option value="{{ $eq->id }}">{{ $eq->name }} ({{ $eq->category?->name }}) — {{ number_format($eq->daily_rate, 2) }} {{ __('messages.kits.tnd_per_day_short') }}</option>
                             @endforeach
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <label for="modal_quantity" class="form-label fw-bold small text-dark">Quantité</label>
+                        <label for="modal_quantity" class="form-label fw-bold small text-dark">{{ __('messages.kits.modal_qty_label') }}</label>
                         <input type="number" name="quantity" id="modal_quantity" class="form-control rounded-3" min="1" max="20" value="1" required>
                     </div>
 
                     <div class="mb-3">
-                        <label for="modal_options" class="form-label fw-bold small text-dark">Option / Câblage inclus (facultatif)</label>
-                        <input type="text" name="options" id="modal_options" class="form-control rounded-3" placeholder="Ex: Câble MC4 5m inclus, Trépied fourni">
+                        <label for="modal_options" class="form-label fw-bold small text-dark">{{ __('messages.kits.modal_options_label') }}</label>
+                        <input type="text" name="options" id="modal_options" class="form-control rounded-3" placeholder="{{ __('messages.kits.modal_options_placeholder') }}">
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">{{ __('messages.common.cancel') }}</button>
                     <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520;">
-                        + Ajouter au pack
+                        {{ __('messages.kits.modal_add_to_pack') }}
                     </button>
                 </div>
             </form>
@@ -556,54 +557,54 @@
                 @csrf
                 <div class="modal-header text-white" style="background: linear-gradient(135deg, #071520, #0F5C6B); border-radius: 16px 16px 0 0; padding: 1.25rem 1.5rem;">
                     <h5 class="modal-title fw-bold" id="reserveKitModalLabel" style="font-size: 1.15rem;">
-                        ⚡ Réserver : {{ $energyKit->title }}
+                        ⚡ {{ __('messages.kits.modal_reserve_title', ['title' => $energyKit->title]) }}
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ __('messages.common.close') }}"></button>
                 </div>
                 <div class="modal-body p-4">
                     <div class="alert alert-info py-2 px-3 mb-3 d-flex align-items-center justify-content-between" style="border-radius: 10px; font-size: 0.88rem;">
-                        <span>Tarif négocié ({{ $energyKit->discount_percentage }}% de remise) :</span>
-                        <strong class="text-primary">{{ number_format($energyKit->discounted_daily_rate, 2) }} TND / jour</strong>
+                        <span>{{ __('messages.kits.modal_negotiated_rate', ['discount' => $energyKit->discount_percentage]) }}</span>
+                        <strong class="text-primary">{{ number_format($energyKit->discounted_daily_rate, 2) }} {{ __('messages.kits.tnd_per_day') }}</strong>
                     </div>
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label for="reserve_start_date" class="form-label fw-semibold" style="font-size: 0.88rem;">Date de début *</label>
+                            <label for="reserve_start_date" class="form-label fw-semibold" style="font-size: 0.88rem;">{{ __('messages.kits.start_date') }}</label>
                             <input type="date" name="start_date" id="reserve_start_date" class="form-control rounded-3" 
                                    min="{{ date('Y-m-d') }}" value="{{ old('start_date', date('Y-m-d')) }}" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="reserve_end_date" class="form-label fw-semibold" style="font-size: 0.88rem;">Date de fin *</label>
+                            <label for="reserve_end_date" class="form-label fw-semibold" style="font-size: 0.88rem;">{{ __('messages.kits.end_date') }}</label>
                             <input type="date" name="end_date" id="reserve_end_date" class="form-control rounded-3" 
                                    min="{{ date('Y-m-d') }}" value="{{ old('end_date', date('Y-m-d', strtotime('+3 days'))) }}" required>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="reserve_notes" class="form-label fw-semibold" style="font-size: 0.88rem;">Remarques ou besoins spécifiques (Optionnel)</label>
-                        <textarea name="notes" id="reserve_notes" rows="2" class="form-control rounded-3" placeholder="Ex: Livraison sur chantier, câblage additionnel souhaité..."></textarea>
+                        <label for="reserve_notes" class="form-label fw-semibold" style="font-size: 0.88rem;">{{ __('messages.kits.reserve_notes_label') }}</label>
+                        <textarea name="notes" id="reserve_notes" rows="2" class="form-control rounded-3" placeholder="{{ __('messages.kits.reserve_notes_placeholder') }}"></textarea>
                     </div>
 
                     <!-- Live Cost Preview -->
                     <div class="p-3 rounded-3" style="background: #F8FAFC; border: 1px solid #E2E8F0;">
                         <div class="d-flex justify-content-between mb-1" style="font-size: 0.88rem;">
-                            <span class="text-muted">Durée de la location :</span>
-                            <strong id="calc_days">4 jour(s)</strong>
+                            <span class="text-muted">{{ __('messages.kits.rental_duration') }}</span>
+                            <strong id="calc_days">4 {{ __('messages.kits.days_unit') }}</strong>
                         </div>
                         <div class="d-flex justify-content-between mb-1" style="font-size: 0.88rem;">
-                            <span class="text-muted">Total location pack :</span>
-                            <strong class="text-success" id="calc_total">0.00 TND</strong>
+                            <span class="text-muted">{{ __('messages.kits.total_pack_rental') }}</span>
+                            <strong class="text-success" id="calc_total">0.00 {{ __('messages.kits.currency') }}</strong>
                         </div>
                         <div class="d-flex justify-content-between pt-2 border-top" style="font-size: 0.82rem;">
-                            <span class="text-muted">Caution de garantie (restituée) :</span>
-                            <strong>{{ number_format($energyKit->total_deposit, 2) }} TND</strong>
+                            <span class="text-muted">{{ __('messages.kits.guarantee_deposit') }}</span>
+                            <strong>{{ number_format($energyKit->total_deposit, 2) }} {{ __('messages.kits.currency') }}</strong>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-3 pt-0">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">{{ __('messages.common.cancel') }}</button>
                     <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520;">
-                        ✓ Confirmer la réservation
+                        {{ __('messages.kits.confirm_booking') }}
                     </button>
                 </div>
             </form>
@@ -618,21 +619,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const calcDays = document.getElementById('calc_days');
     const calcTotal = document.getElementById('calc_total');
     const dailyRate = {{ (float) $energyKit->discounted_daily_rate }};
+    const invalidDatesLabel = @json(__('messages.kits.invalid_dates'));
+    const daysUnitLabel = @json(__('messages.kits.days_unit'));
+    const currencyLabel = @json(__('messages.kits.currency'));
 
     function updateTotals() {
         if (!startInput || !endInput || !calcDays || !calcTotal) return;
         const start = new Date(startInput.value);
         const end = new Date(endInput.value);
         if (isNaN(start) || isNaN(end) || end < start) {
-            calcDays.textContent = 'Dates invalides';
-            calcTotal.textContent = '0.00 TND';
+            calcDays.textContent = invalidDatesLabel;
+            calcTotal.textContent = '0.00 ' + currencyLabel;
             return;
         }
         const diffTime = Math.abs(end - start);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
         const total = (diffDays * dailyRate).toFixed(2);
-        calcDays.textContent = diffDays + ' jour(s)';
-        calcTotal.textContent = total + ' TND';
+        calcDays.textContent = diffDays + ' ' + daysUnitLabel;
+        calcTotal.textContent = total + ' ' + currencyLabel;
     }
 
     if (startInput && endInput) {
