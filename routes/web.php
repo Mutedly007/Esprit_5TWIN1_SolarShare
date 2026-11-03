@@ -268,6 +268,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::put('/slots/{slot}', [\App\Http\Controllers\AdminCollectionHubController::class, 'updateSlot'])->name('admin.hubs.slots.update');
     Route::delete('/slots/{slot}', [\App\Http\Controllers\AdminCollectionHubController::class, 'destroySlot'])->name('admin.hubs.slots.destroy');
     Route::post('/slots/{slot}/toggle', [\App\Http\Controllers\AdminCollectionHubController::class, 'toggleSlot'])->name('admin.hubs.slots.toggle');
+    Route::post('/hubs/{hub}/ai-generate-slots', [\App\Http\Controllers\AdminCollectionHubController::class, 'aiGenerateSlots'])->name('admin.hubs.ai-generate-slots');
+    Route::post('/hubs/{hub}/ai-apply-slots', [\App\Http\Controllers\AdminCollectionHubController::class, 'aiApplySlots'])->name('admin.hubs.ai-apply-slots');
 
     // Administration des Utilisateurs
     Route::get('/users', [\App\Http\Controllers\AdminUserController::class, 'index'])->name('admin.users.index');

@@ -8,7 +8,9 @@ use App\Http\Requests\UpdateCollectionHubRequest;
 use App\Http\Requests\UpdateOperatingSlotRequest;
 use App\Models\CollectionHub;
 use App\Models\OperatingSlot;
+use App\Services\GeminiHubScheduleService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminCollectionHubController extends Controller
 {
@@ -178,5 +180,156 @@ class AdminCollectionHubController extends Controller
         $slot->save();
 
         return back()->with('success', 'Le statut du créneau horaire a été modifié.');
+    }
+
+    /**
+     * AI Schedule Assistant: Generate proposed operating slots from natural language description.
+     */
+    public function aiGenerateSlots(Request $request, CollectionHub $hub, GeminiHubScheduleService $geminiService)
+    {
+        $validated = $request->validate([
+            'description' => ['required', 'string', 'min:5', 'max:1000'],
+        ], [
+            'description.required' => 'Veuillez saisir une description des horaires (ex: "Ouvert du lundi au vendredi de 9h à 18h...").',
+            'description.min' => 'La description doit comporter au moins 5 caractères.',
+        ]);
+
+        try {
+            $proposedSlots = $geminiService->generateSlots($validated['description']);
+
+            if (empty($proposedSlots)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "L'assistant IA n'a pas pu identifier de créneaux horaires dans votre description. Veuillez préciser les jours et heures.",
+                ], 422);
+            }
+
+            // Fetch existing active slots for this hub to check for overlaps
+            $existingSlots = $hub->operatingSlots()->where('is_active', true)->get();
+
+            $evaluatedSlots = [];
+            $hasWarnings = false;
+            $validDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+
+            foreach ($proposedSlots as $index => $slot) {
+                $day = strtolower($slot['day_of_week'] ?? '');
+                $open = $slot['open_time'] ?? '';
+                $close = $slot['close_time'] ?? '';
+                $notes = $slot['notes'] ?? 'Généré par IA';
+
+                $isValid = true;
+                $warning = null;
+
+                // 1. Check valid day
+                if (!in_array($day, $validDays, true)) {
+                    $isValid = false;
+                    $warning = "Jour de la semaine invalide : {$day}.";
+                }
+
+                // 2. Check time format (HH:MM)
+                elseif (!preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $open) || !preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $close)) {
+                    $isValid = false;
+                    $warning = "Format d'heure invalide (attendu HH:MM).";
+                }
+
+                // 3. Check closing time is strictly after opening time
+                elseif (strcmp($close, $open) <= 0) {
+                    $isValid = false;
+                    $warning = "L'heure de fermeture ({$close}) doit être postérieure à l'ouverture ({$open}).";
+                }
+
+                // 4. Overlap check with existing hub slots
+                if ($isValid) {
+                    $overlapWithExisting = $existingSlots->first(function ($existing) use ($day, $open, $close) {
+                        if ($existing->day_of_week !== $day) {
+                            return false;
+                        }
+                        return !(strcmp($close, $existing->open_time) <= 0 || strcmp($open, $existing->close_time) >= 0);
+                    });
+
+                    if ($overlapWithExisting) {
+                        $isValid = false;
+                        $warning = "Chevauchement détecté avec le créneau existant du {$overlapWithExisting->formatted_day} ({$overlapWithExisting->formatted_hours}).";
+                        $hasWarnings = true;
+                    }
+                }
+
+                // 5. Overlap check with previously accepted proposed slots on the same day
+                if ($isValid) {
+                    foreach ($evaluatedSlots as $prevSlot) {
+                        if ($prevSlot['is_valid'] && $prevSlot['day_of_week'] === $day) {
+                            $overlapsPrev = !(strcmp($close, $prevSlot['open_time']) <= 0 || strcmp($open, $prevSlot['close_time']) >= 0);
+                            if ($overlapsPrev) {
+                                $isValid = false;
+                                $warning = "Chevauchement interne avec le créneau proposé {$prevSlot['open_time']} - {$prevSlot['close_time']}.";
+                                $hasWarnings = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                $evaluatedSlots[] = [
+                    'id' => 'prop_' . $index,
+                    'day_of_week' => $day,
+                    'open_time' => $open,
+                    'close_time' => $close,
+                    'notes' => $notes,
+                    'is_valid' => $isValid,
+                    'warning' => $warning,
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'total_proposed' => count($evaluatedSlots),
+                'valid_count' => count(array_filter($evaluatedSlots, fn($s) => $s['is_valid'])),
+                'has_warnings' => $hasWarnings,
+                'slots' => $evaluatedSlots,
+                'hub_id' => $hub->id,
+                'hub_name' => $hub->name,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * AI Schedule Assistant: Confirm and persist validated slots in bulk.
+     */
+    public function aiApplySlots(Request $request, CollectionHub $hub)
+    {
+        $validated = $request->validate([
+            'slots' => ['required', 'array', 'min:1'],
+            'slots.*.day_of_week' => ['required', 'string', 'in:lundi,mardi,mercredi,jeudi,vendredi,samedi,dimanche'],
+            'slots.*.open_time' => ['required', 'date_format:H:i'],
+            'slots.*.close_time' => ['required', 'date_format:H:i', 'after:slots.*.open_time'],
+            'slots.*.notes' => ['nullable', 'string', 'max:255'],
+        ], [
+            'slots.required' => 'Aucune plage horaire sélectionnée pour l\'enregistrement.',
+            'slots.min' => 'Vous devez valider au moins une plage horaire.',
+            'slots.*.close_time.after' => 'L\'heure de fermeture doit être après l\'heure d\'ouverture.',
+        ]);
+
+        $createdCount = 0;
+
+        DB::transaction(function () use ($hub, $validated, &$createdCount) {
+            foreach ($validated['slots'] as $slotData) {
+                $hub->operatingSlots()->create([
+                    'day_of_week' => strtolower($slotData['day_of_week']),
+                    'open_time' => $slotData['open_time'],
+                    'close_time' => $slotData['close_time'],
+                    'notes' => $slotData['notes'] ?: 'Généré par Assistant IA',
+                    'is_active' => true,
+                ]);
+                $createdCount++;
+            }
+        });
+
+        return redirect()->route('admin.hubs.show', $hub)
+            ->with('success', "✨ {$createdCount} plage(s) horaire(s) générée(s) par l'Assistant IA ont été enregistrées avec succès pour « {$hub->name} » !");
     }
 }
