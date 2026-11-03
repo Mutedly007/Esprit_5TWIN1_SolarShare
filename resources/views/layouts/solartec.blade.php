@@ -45,6 +45,11 @@
             [dir="rtl"] .start-0 { left: auto !important; right: 0 !important; }
             [dir="rtl"] .back-to-top { right: auto !important; left: 30px !important; }
             [dir="rtl"] .header-carousel .owl-dots { right: auto !important; left: 45px !important; }
+            [dir="rtl"] .form-select {
+                background-position: left 0.75rem center !important;
+                padding-left: 2.25rem !important;
+                padding-right: 0.85rem !important;
+            }
         </style>
     @endif
 

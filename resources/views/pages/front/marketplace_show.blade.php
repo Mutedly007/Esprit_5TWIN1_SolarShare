@@ -11,20 +11,20 @@
         <!-- Breadcrumb Navigation -->
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb" style="font-size: 0.88rem;">
-                <li class="breadcrumb-item"><a href="{{ url('/') }}" style="color: #0F5C6B; text-decoration: none;">Accueil</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('marketplace') }}" style="color: #0F5C6B; text-decoration: none;">Marketplace</a></li>
+                <li class="breadcrumb-item"><a href="{{ url('/') }}" style="color: #0F5C6B; text-decoration: none;">{{ __('messages.nav.home') }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('marketplace') }}" style="color: #0F5C6B; text-decoration: none;">{{ __('messages.marketplace.breadcrumb') }}</a></li>
                 @if($equipment->category)
-                    <li class="breadcrumb-item"><a href="{{ route('marketplace', ['category' => $equipment->category->slug]) }}" style="color: #0F5C6B; text-decoration: none;">{{ $equipment->category->name }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('marketplace', ['category' => $equipment->category->slug]) }}" style="color: #0F5C6B; text-decoration: none;">{{ $equipment->category->localized_name }}</a></li>
                 @endif
                 <li class="breadcrumb-item active" aria-current="page" style="color: #64748B;">{{ $equipment->name }}</li>
             </ol>
         </nav>
 
         @if($equipment->status !== 'approved')
-            <div class="alert alert-warning rounded-4 p-3 mb-4 shadow-sm border-0 d-flex align-items-center gap-3" style="background: #FFFBEB; color: #92400E; border-left: 5px solid #F59E0B !important;">
+            <div class="alert alert-warning rounded-4 p-3 mb-4 shadow-sm border-0 d-flex align-items-center gap-3" style="background: #FFFBEB; color: #92400E; border-inline-start: 5px solid #F59E0B !important;">
                 <span style="font-size: 1.6rem; line-height: 1;">⏳</span>
                 <div>
-                    <strong>Aperçu privé pour le propriétaire ou l'administrateur :</strong> Cet équipement a le statut <strong>« Non traité »</strong>. Il n'est pas publié sur la Marketplace publique tant qu'il n'a pas été validé par un administrateur.
+                    <strong>{{ __('messages.marketplace.private_preview_title') }}</strong> {!! __('messages.marketplace.private_preview_desc', ['status' => e($equipment->status_label)]) !!}
                 </div>
             </div>
         @endif
@@ -41,50 +41,50 @@
                             <div style="font-size: 5rem; color: #FFB020;">☀️</div>
                         @endif
 
-                        <span style="position: absolute; top: 18px; left: 18px; background: rgba(16, 32, 43, 0.85); backdrop-filter: blur(8px); color: #FFFFFF; font-size: 0.82rem; font-weight: 700; padding: 0.4rem 0.9rem; border-radius: 9999px;">
-                            {{ $equipment->category?->name ?? 'Énergie' }}
+                        <span style="position: absolute; top: 18px; inset-inline-start: 18px; background: rgba(16, 32, 43, 0.85); backdrop-filter: blur(8px); color: #FFFFFF; font-size: 0.82rem; font-weight: 700; padding: 0.4rem 0.9rem; border-radius: 9999px;">
+                            {{ $equipment->category?->localized_name ?? __('messages.marketplace.default_category') }}
                         </span>
 
-                        <span style="position: absolute; top: 18px; right: 18px; background: {{ $equipment->is_available ? '#DCFCE7' : '#FEE2E2' }}; color: {{ $equipment->is_available ? '#166534' : '#991B1B' }}; font-size: 0.82rem; font-weight: 700; padding: 0.4rem 0.9rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem;">
+                        <span style="position: absolute; top: 18px; inset-inline-end: 18px; background: {{ $equipment->is_available ? '#DCFCE7' : '#FEE2E2' }}; color: {{ $equipment->is_available ? '#166534' : '#991B1B' }}; font-size: 0.82rem; font-weight: 700; padding: 0.4rem 0.9rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem;">
                             <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ $equipment->is_available ? '#16A34A' : '#EF4444' }};"></span>
-                            {{ $equipment->is_available ? 'Disponible immédiatement' : 'Actuellement réservé' }}
+                            {{ $equipment->is_available ? __('messages.marketplace.available_immediately') : __('messages.marketplace.currently_reserved') }}
                         </span>
                     </div>
 
                     <div class="card-body p-4">
-                        <h4 class="fw-bold mb-3" style="color: #10202B;">Description du Matériel</h4>
+                        <h4 class="fw-bold mb-3" style="color: #10202B;">{{ __('messages.marketplace.description_heading') }}</h4>
                         <div style="color: #334155; line-height: 1.7; font-size: 0.98rem; white-space: pre-line;">
-                            {{ $equipment->description ?: 'Aucune description spécifique fournie pour cet équipement.' }}
+                            {{ $equipment->description ?: __('messages.marketplace.no_description') }}
                         </div>
                     </div>
                 </div>
 
                 <!-- Technical Specs Box -->
                 <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
-                    <h5 class="fw-bold mb-3" style="color: #10202B;">Spécifications Techniques</h5>
+                    <h5 class="fw-bold mb-3" style="color: #10202B;">{{ __('messages.marketplace.specs_heading') }}</h5>
                     <div class="row g-3">
                         <div class="col-sm-6">
                             <div class="p-3 rounded-3" style="background: #F8FAFC; border: 1px solid #E2E8F0;">
-                                <span class="d-block text-muted small fw-bold text-uppercase">Marque / Fabricant</span>
-                                <strong class="fs-5 text-dark">{{ $equipment->brand ?: 'Non spécifiée' }}</strong>
+                                <span class="d-block text-muted small fw-bold text-uppercase">{{ __('messages.marketplace.spec_brand') }}</span>
+                                <strong class="fs-5 text-dark">{{ $equipment->brand ?: __('messages.marketplace.not_specified_f') }}</strong>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="p-3 rounded-3" style="background: #F8FAFC; border: 1px solid #E2E8F0;">
-                                <span class="d-block text-muted small fw-bold text-uppercase">Catégorie</span>
-                                <strong class="fs-5 text-dark">{{ $equipment->category?->name ?? 'Général' }}</strong>
+                                <span class="d-block text-muted small fw-bold text-uppercase">{{ __('messages.marketplace.spec_category') }}</span>
+                                <strong class="fs-5 text-dark">{{ $equipment->category?->localized_name ?? __('messages.marketplace.general_category') }}</strong>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="p-3 rounded-3" style="background: #F8FAFC; border: 1px solid #E2E8F0;">
-                                <span class="d-block text-muted small fw-bold text-uppercase">Puissance Nominale</span>
-                                <strong class="fs-5 text-dark">{{ $equipment->power_watts ? $equipment->power_watts . ' Watts' : 'Non précisé' }}</strong>
+                                <span class="d-block text-muted small fw-bold text-uppercase">{{ __('messages.marketplace.spec_power') }}</span>
+                                <strong class="fs-5 text-dark">{{ $equipment->power_watts ? __('messages.marketplace.watts_value', ['value' => $equipment->power_watts]) : __('messages.marketplace.not_specified') }}</strong>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="p-3 rounded-3" style="background: #F8FAFC; border: 1px solid #E2E8F0;">
-                                <span class="d-block text-muted small fw-bold text-uppercase">Capacité Batterie</span>
-                                <strong class="fs-5 text-dark">{{ $equipment->capacity_wh ? $equipment->capacity_wh . ' Wh' : 'Non précisé' }}</strong>
+                                <span class="d-block text-muted small fw-bold text-uppercase">{{ __('messages.marketplace.spec_capacity') }}</span>
+                                <strong class="fs-5 text-dark">{{ $equipment->capacity_wh ? __('messages.marketplace.wh_value', ['value' => $equipment->capacity_wh]) : __('messages.marketplace.not_specified') }}</strong>
                             </div>
                         </div>
                     </div>
@@ -95,7 +95,7 @@
             <div class="col-lg-5">
                 <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4" style="position: sticky; top: 96px;">
                     <div style="font-size: 0.82rem; font-weight: 700; color: #0F5C6B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem;">
-                        {{ $equipment->brand }}
+                        {{ $equipment->brand ?: __('messages.marketplace.certified_gear') }}
                     </div>
                     <h1 class="h3 fw-bold text-dark mb-3">{{ $equipment->name }}</h1>
 
@@ -105,87 +105,87 @@
                             <span style="font-size: 2.2rem; font-weight: 800; color: #C2410C; line-height: 1;">
                                 {{ number_format($equipment->daily_rate, 2) }}
                             </span>
-                            <span style="font-size: 1rem; color: #7C2D12; font-weight: 700;">TND / jour</span>
+                            <span style="font-size: 1rem; color: #7C2D12; font-weight: 700;">{{ __('messages.marketplace.tnd_per_day') }}</span>
                         </div>
                         <span class="d-block mt-2 text-muted small">
-                            Montant de la caution requise : <strong>{{ number_format($equipment->deposit_amount, 2) }} TND</strong> (bloquée et restituée après inspection).
+                            {!! __('messages.marketplace.deposit_notice', ['amount' => number_format($equipment->deposit_amount, 2)]) !!}
                         </span>
                     </div>
 
                     <!-- Owner Profile -->
                     <div class="d-flex align-items-center gap-3 p-3 rounded-3 mb-4" style="background: #F8FAFC; border: 1px solid #E2E8F0;">
                         <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #FFB020, #FF6B3D); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; flex-shrink: 0;">
-                            {{ strtoupper(substr($equipment->user?->name ?? 'P', 0, 1)) }}
+                            {{ mb_strtoupper(mb_substr($equipment->user?->name ?? 'P', 0, 1)) }}
                         </div>
                         <div>
-                            <span class="d-block text-muted small fw-bold">Mis à disposition par</span>
-                            <strong class="text-dark d-block">{{ $equipment->user?->name ?? 'Membre SolarShare' }}</strong>
+                            <span class="d-block text-muted small fw-bold">{{ __('messages.marketplace.provided_by') }}</span>
+                            <strong class="text-dark d-block">{{ $equipment->user?->name ?? __('messages.marketplace.solarshare_member') }}</strong>
                         </div>
                     </div>
 
                     <!-- Rental Action Button -->
                     @if($equipment->status !== 'approved')
-                        <div class="alert alert-warning border-0 rounded-4 p-3 mb-3 text-start shadow-sm" style="background: #FFFBEB; border-left: 4px solid #F59E0B !important; color: #92400E; font-size: 0.88rem;">
+                        <div class="alert alert-warning border-0 rounded-4 p-3 mb-3 text-start shadow-sm" style="background: #FFFBEB; border-inline-start: 4px solid #F59E0B !important; color: #92400E; font-size: 0.88rem;">
                             <div class="d-flex align-items-center gap-2 fw-bold mb-1" style="font-size: 0.92rem;">
                                 <span>⏳</span>
-                                <span>En cours de validation administrateur</span>
+                                <span>{{ __('messages.marketplace.pending_admin_title') }}</span>
                             </div>
                             <p class="mb-0" style="line-height: 1.45;">
-                                Cet équipement est actuellement avec le statut <strong>« Non traité »</strong> et n'est pas encore publié sur le catalogue public. Il ne peut être réservé qu'une fois approuvé.
+                                {!! __('messages.marketplace.pending_admin_desc', ['status' => e($equipment->status_label)]) !!}
                             </p>
                         </div>
                         <button type="button" class="btn btn-secondary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" disabled style="opacity: 0.7; cursor: not-allowed; background: #94A3B8; border: none;">
-                            ⏳ Réservation bloquée (Non validé)
+                            ⏳ {{ __('messages.marketplace.booking_blocked_unapproved') }}
                         </button>
                     @elseif($equipment->is_available)
                         @auth
                             @if(auth()->user()->isRenter())
                                 <a href="{{ route('rentals.create', ['equipment_id' => $equipment->id]) }}" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 1.05rem; box-shadow: 0 6px 20px rgba(255, 107, 61, 0.35); text-decoration: none;">
-                                    ⚡ Réserver cet équipement
+                                    ⚡ {{ __('messages.marketplace.book_this_equipment') }}
                                 </a>
                             @else
-                                <div class="alert alert-warning border-0 rounded-4 p-3 mb-3 text-start shadow-sm" style="background: #FFFBEB; border-left: 4px solid #F59E0B !important; color: #92400E; font-size: 0.88rem;">
+                                <div class="alert alert-warning border-0 rounded-4 p-3 mb-3 text-start shadow-sm" style="background: #FFFBEB; border-inline-start: 4px solid #F59E0B !important; color: #92400E; font-size: 0.88rem;">
                                     <div class="d-flex align-items-center gap-2 fw-bold mb-1" style="font-size: 0.92rem;">
                                         <span>🔒</span>
-                                        <span>Réservation non autorisée</span>
+                                        <span>{{ __('messages.marketplace.booking_not_allowed_title') }}</span>
                                     </div>
                                     <p class="mb-0" style="line-height: 1.45;">
-                                        Votre compte a le rôle <strong>Prêteur (Lend)</strong>. Seuls les utilisateurs ayant le rôle <strong>Emprunteur (Rent)</strong> ou <strong>Les deux (Both)</strong> peuvent réserver des équipements.
+                                        {!! __('messages.marketplace.booking_not_allowed_desc') !!}
                                     </p>
                                 </div>
                                 <button type="button" class="btn btn-secondary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" disabled style="opacity: 0.7; cursor: not-allowed; background: #94A3B8; border: none;">
-                                    ⚡ Réservation réservée aux emprunteurs
+                                    ⚡ {{ __('messages.marketplace.booking_renters_only') }}
                                 </button>
                             @endif
                         @endauth
                         @guest
                             <a href="{{ route('login') }}" class="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520; font-size: 1.05rem; box-shadow: 0 6px 20px rgba(255, 107, 61, 0.35); text-decoration: none;">
-                                ⚡ Connectez-vous pour louer
+                                ⚡ {{ __('messages.marketplace.login_to_rent') }}
                             </a>
                         @endguest
                     @else
                         <button type="button" class="btn btn-secondary w-100 rounded-pill py-3 fw-bold mb-3" disabled>
-                            Actuellement indisponible
+                            {{ __('messages.marketplace.currently_unavailable') }}
                         </button>
                     @endif
 
                     <a href="{{ route('marketplace') }}" class="btn btn-outline-secondary w-100 rounded-pill py-2 text-center" style="font-size: 0.9rem;">
-                        &larr; Retour au catalogue
+                        {!! app()->getLocale() === 'ar' ? '&rarr;' : '&larr;' !!} {{ __('messages.marketplace.back_to_catalog') }}
                     </a>
 
                     <!-- Reassurance Items -->
                     <div class="mt-4 pt-3 border-top" style="font-size: 0.82rem; color: #64748B;">
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <span>🛡️</span>
-                            <span>Contrat de prêt sécurisé et caution garantie</span>
+                            <span>{{ __('messages.marketplace.reassurance_1') }}</span>
                         </div>
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <span>🔍</span>
-                            <span>État des lieux numérique avant et après le prêt</span>
+                            <span>{{ __('messages.marketplace.reassurance_2') }}</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <span>🤝</span>
-                            <span>Partage d'énergie éco-responsable et local</span>
+                            <span>{{ __('messages.marketplace.reassurance_3') }}</span>
                         </div>
                     </div>
 
@@ -197,7 +197,7 @@
         <!-- Related Equipment -->
         @if($related->count() > 0)
             <div class="mt-5 pt-4 border-top">
-                <h3 class="fw-bold mb-4" style="color: #10202B;">Autres équipements dans la même catégorie</h3>
+                <h3 class="fw-bold mb-4" style="color: #10202B;">{{ __('messages.marketplace.related_heading') }}</h3>
                 <div class="row g-4">
                     @foreach($related as $rel)
                         <div class="col-md-4">
@@ -210,11 +210,11 @@
                                     @endif
                                 </div>
                                 <div class="card-body p-3">
-                                    <span class="text-primary small fw-bold text-uppercase">{{ $rel->brand }}</span>
+                                    <span class="text-primary small fw-bold text-uppercase">{{ $rel->brand ?: __('messages.marketplace.certified_gear') }}</span>
                                     <h6 class="fw-bold text-dark mb-2">{{ $rel->name }}</h6>
                                     <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
-                                        <strong class="text-dark">{{ number_format($rel->daily_rate, 2) }} TND/j</strong>
-                                        <a href="{{ route('marketplace.show', $rel) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">Voir</a>
+                                        <strong class="text-dark">{{ number_format($rel->daily_rate, 2) }} {{ __('messages.marketplace.tnd_per_day_short') }}</strong>
+                                        <a href="{{ route('marketplace.show', $rel) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">{{ __('messages.marketplace.view_btn') }}</a>
                                     </div>
                                 </div>
                             </div>

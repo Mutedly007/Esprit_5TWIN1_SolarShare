@@ -52,6 +52,7 @@ class SetLocale
         }
 
         App::setLocale($locale);
+        \Carbon\Carbon::setLocale($locale);
 
         $response = $next($request);
 
