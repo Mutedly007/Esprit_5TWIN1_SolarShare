@@ -140,4 +140,38 @@ class MarketplaceTest extends TestCase
             ->assertSee('Sqnty x')
             ->assertSee('50.00');
     }
+
+    public function test_marketplace_advanced_filter_by_brand_and_price(): void
+    {
+        $expensive = Equipment::create([
+            'user_id' => $this->lender->id,
+            'category_id' => $this->category->id,
+            'name' => 'EcoFlow Delta Pro',
+            'brand' => 'EcoFlow',
+            'power_watts' => 3600,
+            'capacity_wh' => 3600,
+            'daily_rate' => 150.00,
+            'deposit_amount' => 500.00,
+            'is_available' => true,
+            'status' => 'approved',
+        ]);
+
+        // Filter by brand
+        $responseBrand = $this->get(route('marketplace', ['brand' => 'EcoFlow']));
+        $responseBrand->assertOk();
+        $responseBrand->assertSee('EcoFlow Delta Pro');
+        $responseBrand->assertDontSee('test solaire 200W');
+
+        // Filter by price range
+        $responsePrice = $this->get(route('marketplace', ['min_price' => 100, 'max_price' => 200]));
+        $responsePrice->assertOk();
+        $responsePrice->assertSee('EcoFlow Delta Pro');
+        $responsePrice->assertDontSee('test solaire 200W');
+
+        // Filter by minimum power
+        $responsePower = $this->get(route('marketplace', ['min_power' => 1000]));
+        $responsePower->assertOk();
+        $responsePower->assertSee('EcoFlow Delta Pro');
+        $responsePower->assertDontSee('test solaire 200W');
+    }
 }

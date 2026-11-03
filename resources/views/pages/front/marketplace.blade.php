@@ -82,8 +82,160 @@
 <section style="background: #F8FAFC; padding: 3rem 0 5rem 0; min-height: 55vh;">
     <div class="container">
 
-        <!-- Controls Bar -->
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+        <!-- Advanced Filter & Controls Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-3 p-md-4 bg-white mb-4">
+            <form method="GET" action="{{ route('marketplace') }}" id="marketplace-filter-form">
+                @if(request('category'))
+                    <input type="hidden" name="category" value="{{ request('category') }}">
+                @endif
+
+                <div class="row g-2 align-items-center">
+                    <!-- Search Input -->
+                    <div class="col-12 col-md-5 col-lg-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3 text-muted">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" 
+                                   name="search" 
+                                   class="form-control bg-light border-start-0 py-2" 
+                                   placeholder="Rechercher par nom, marque, description..." 
+                                   value="{{ request('search') }}"
+                                   aria-label="Recherche">
+                            @if(request('search'))
+                                <a href="{{ route('marketplace', request()->except('search', 'page')) }}" 
+                                   class="input-group-text bg-light border-start-0 text-muted" 
+                                   title="Effacer la recherche">
+                                    <i class="bi bi-x-circle-fill"></i>
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Sorting Dropdown -->
+                    <div class="col-6 col-md-3 col-lg-3">
+                        <select name="sort" class="form-select bg-light rounded-pill py-2" onchange="this.form.submit()">
+                            <option value="latest" {{ ($sort ?? 'latest') === 'latest' ? 'selected' : '' }}>✨ Plus récents</option>
+                            <option value="price_asc" {{ ($sort ?? '') === 'price_asc' ? 'selected' : '' }}>💶 Prix : Moins cher</option>
+                            <option value="price_desc" {{ ($sort ?? '') === 'price_desc' ? 'selected' : '' }}>💶 Prix : Plus cher</option>
+                            <option value="power_desc" {{ ($sort ?? '') === 'power_desc' ? 'selected' : '' }}>⚡ Puissance max (Watts)</option>
+                            <option value="capacity_desc" {{ ($sort ?? '') === 'capacity_desc' ? 'selected' : '' }}>🔋 Capacité max (Wh)</option>
+                        </select>
+                    </div>
+
+                    <!-- Buttons: Toggle Advanced Filters + Submit -->
+                    <div class="col-6 col-md-4 col-lg-4 d-flex gap-2">
+                        <button type="button" 
+                                class="btn {{ $activeFiltersCount > 0 ? 'btn-outline-primary border-primary' : 'btn-outline-secondary' }} rounded-pill px-3 py-2 flex-grow-1 d-flex align-items-center justify-content-center gap-2" 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#marketplaceFiltersCollapse" 
+                                aria-expanded="{{ $activeFiltersCount > 0 ? 'true' : 'false' }}" 
+                                aria-controls="marketplaceFiltersCollapse">
+                            <i class="bi bi-sliders2"></i>
+                            <span>Filtres avancés</span>
+                            @if($activeFiltersCount > 0)
+                                <span class="badge rounded-pill bg-primary text-white" style="font-size: 0.72rem;">{{ $activeFiltersCount }}</span>
+                            @endif
+                        </button>
+
+                        <button type="submit" class="btn btn-primary rounded-pill px-3 py-2 fw-semibold d-flex align-items-center gap-1" style="background: linear-gradient(135deg, #FFB020, #FF6B3D); border: none; color: #071520;">
+                            <i class="bi bi-funnel-fill"></i>
+                            <span class="d-none d-sm-inline">Filtrer</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Collapsible Advanced Filters Section -->
+                <div class="collapse {{ $activeFiltersCount > 0 ? 'show' : '' }} mt-3 pt-3 border-top" id="marketplaceFiltersCollapse">
+                    <div class="row g-3">
+                        <!-- Brand Select -->
+                        <div class="col-12 col-md-3">
+                            <label class="form-label small fw-bold text-dark mb-1">
+                                <i class="bi bi-tag-fill me-1 text-primary"></i>Marque du matériel
+                            </label>
+                            <select name="brand" class="form-select form-select-sm rounded-3">
+                                <option value="">Toutes les marques</option>
+                                @foreach($brands as $b)
+                                    <option value="{{ $b }}" {{ request('brand') === $b ? 'selected' : '' }}>
+                                        {{ $b }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Price Range -->
+                        <div class="col-12 col-md-3">
+                            <label class="form-label small fw-bold text-dark mb-1">
+                                <i class="bi bi-cash-stack me-1 text-success"></i>Tarif journalier (TND / j)
+                            </label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" step="0.5" min="0" name="min_price" class="form-control rounded-start-3" placeholder="Min" value="{{ request('min_price') }}">
+                                <span class="input-group-text bg-light text-muted">à</span>
+                                <input type="number" step="0.5" min="0" name="max_price" class="form-control rounded-end-3" placeholder="Max" value="{{ request('max_price') }}">
+                            </div>
+                        </div>
+
+                        <!-- Minimum Power -->
+                        <div class="col-12 col-md-2">
+                            <label class="form-label small fw-bold text-dark mb-1">
+                                <i class="bi bi-lightning-charge-fill me-1 text-warning"></i>Puissance min.
+                            </label>
+                            <select name="min_power" class="form-select form-select-sm rounded-3">
+                                <option value="">Indifférent</option>
+                                <option value="100" {{ (int)request('min_power') === 100 ? 'selected' : '' }}>&ge; 100 W</option>
+                                <option value="200" {{ (int)request('min_power') === 200 ? 'selected' : '' }}>&ge; 200 W</option>
+                                <option value="400" {{ (int)request('min_power') === 400 ? 'selected' : '' }}>&ge; 400 W</option>
+                                <option value="800" {{ (int)request('min_power') === 800 ? 'selected' : '' }}>&ge; 800 W</option>
+                            </select>
+                        </div>
+
+                        <!-- Minimum Capacity -->
+                        <div class="col-12 col-md-2">
+                            <label class="form-label small fw-bold text-dark mb-1">
+                                <i class="bi bi-battery-charging me-1 text-info"></i>Capacité min.
+                            </label>
+                            <select name="min_capacity" class="form-select form-select-sm rounded-3">
+                                <option value="">Indifférent</option>
+                                <option value="250" {{ (int)request('min_capacity') === 250 ? 'selected' : '' }}>&ge; 250 Wh</option>
+                                <option value="500" {{ (int)request('min_capacity') === 500 ? 'selected' : '' }}>&ge; 500 Wh</option>
+                                <option value="1000" {{ (int)request('min_capacity') === 1000 ? 'selected' : '' }}>&ge; 1000 Wh</option>
+                                <option value="2000" {{ (int)request('min_capacity') === 2000 ? 'selected' : '' }}>&ge; 2000 Wh</option>
+                            </select>
+                        </div>
+
+                        <!-- Availability & Max Deposit -->
+                        <div class="col-12 col-md-2 d-flex flex-column justify-content-end gap-1">
+                            <div class="form-check form-switch mb-1">
+                                <input class="form-check-input" type="checkbox" name="available" id="filter-marketplace-available" value="1" {{ request('available') == '1' ? 'checked' : '' }}>
+                                <label class="form-check-label small fw-semibold text-dark" for="filter-marketplace-available">
+                                    ⚡ Disponible de suite
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Bar inside Collapse -->
+                    <div class="d-flex justify-content-between align-items-center gap-2 mt-3 pt-2 border-top">
+                        <div>
+                            @if($activeFiltersCount > 0)
+                                <a href="{{ route('marketplace', request('category') ? ['category' => request('category')] : []) }}" 
+                                   class="btn btn-sm btn-link text-muted text-decoration-none small p-0">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i>Réinitialiser les filtres
+                                </a>
+                            @endif
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-sm btn-dark rounded-pill px-4 py-1 fw-semibold">
+                                Appliquer les filtres
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Active Filter Pills & Results Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
             <div>
                 <h2 style="font-size: 1.35rem; font-weight: 800; color: #10202B; margin-bottom: 0.2rem;">
                     @if($selectedCategory)
@@ -95,31 +247,53 @@
                     @endif
                 </h2>
                 <span style="font-size: 0.88rem; color: #64748B;">
-                    {{ $equipment->total() }} équipement(s) répertorié(s)
+                    <strong>{{ $equipment->total() }}</strong> équipement(s) répertorié(s)
                 </span>
             </div>
 
-            <!-- Sort & Availability Form -->
-            <form method="GET" action="{{ route('marketplace') }}" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                @if(request('category'))
-                    <input type="hidden" name="category" value="{{ request('category') }}">
-                @endif
+            <div class="d-flex flex-wrap align-items-center gap-2">
                 @if(request('search'))
-                    <input type="hidden" name="search" value="{{ request('search') }}">
-                @endif
-
-                <select name="sort" class="form-select form-select-sm" style="width: auto; border-radius: 10px; font-size: 0.88rem; font-weight: 600; padding: 0.45rem 2rem 0.45rem 0.85rem;" onchange="this.form.submit()">
-                    <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Plus récents</option>
-                    <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Prix : Moins cher</option>
-                    <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Prix : Plus cher</option>
-                </select>
-
-                @if(request('search') || request('category') || request('sort'))
-                    <a href="{{ route('marketplace') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size: 0.82rem;">
-                        Réinitialiser
+                    <a href="{{ route('marketplace', request()->except('search', 'page')) }}" class="badge rounded-pill bg-white text-dark border px-3 py-2 text-decoration-none small shadow-xs">
+                        Recherche : "{{ Str::limit(request('search'), 20) }}" <i class="bi bi-x ms-1"></i>
                     </a>
                 @endif
-            </form>
+
+                @if(request('brand'))
+                    <a href="{{ route('marketplace', request()->except('brand', 'page')) }}" class="badge rounded-pill bg-white text-dark border px-3 py-2 text-decoration-none small shadow-xs">
+                        Marque : {{ request('brand') }} <i class="bi bi-x ms-1"></i>
+                    </a>
+                @endif
+
+                @if(request('min_price') || request('max_price'))
+                    <a href="{{ route('marketplace', request()->except('min_price', 'max_price', 'page')) }}" class="badge rounded-pill bg-white text-dark border px-3 py-2 text-decoration-none small shadow-xs">
+                        Prix : {{ request('min_price') ?? 0 }} à {{ request('max_price') ? request('max_price') . ' TND' : 'illimité' }} <i class="bi bi-x ms-1"></i>
+                    </a>
+                @endif
+
+                @if(request('min_power'))
+                    <a href="{{ route('marketplace', request()->except('min_power', 'page')) }}" class="badge rounded-pill bg-white text-dark border px-3 py-2 text-decoration-none small shadow-xs">
+                        Puissance &ge; {{ request('min_power') }} W <i class="bi bi-x ms-1"></i>
+                    </a>
+                @endif
+
+                @if(request('min_capacity'))
+                    <a href="{{ route('marketplace', request()->except('min_capacity', 'page')) }}" class="badge rounded-pill bg-white text-dark border px-3 py-2 text-decoration-none small shadow-xs">
+                        Capacité &ge; {{ request('min_capacity') }} Wh <i class="bi bi-x ms-1"></i>
+                    </a>
+                @endif
+
+                @if(request('available') == '1')
+                    <a href="{{ route('marketplace', request()->except('available', 'page')) }}" class="badge rounded-pill bg-white text-dark border px-3 py-2 text-decoration-none small shadow-xs">
+                        Disponible de suite <i class="bi bi-x ms-1"></i>
+                    </a>
+                @endif
+
+                @if($activeFiltersCount > 0)
+                    <a href="{{ route('marketplace', request('category') ? ['category' => request('category')] : []) }}" class="btn btn-sm btn-link text-danger text-decoration-none p-0 ms-1 small fw-semibold">
+                        Tout effacer
+                    </a>
+                @endif
+            </div>
         </div>
 
         <!-- Equipment Cards Grid -->
