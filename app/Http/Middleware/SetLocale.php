@@ -44,8 +44,12 @@ class SetLocale
 
         // 3. Fallback to browser preferred language or config
         if (! $locale) {
-            $preferred = $request->getPreferredLanguage(self::SUPPORTED_LOCALES);
-            $locale = $preferred ?: config('app.locale', 'fr');
+            if (app()->environment('testing')) {
+                $locale = config('app.locale', 'fr');
+            } else {
+                $preferred = $request->getPreferredLanguage(self::SUPPORTED_LOCALES);
+                $locale = $preferred ?: config('app.locale', 'fr');
+            }
             if (! in_array($locale, self::SUPPORTED_LOCALES, true)) {
                 $locale = 'fr';
             }

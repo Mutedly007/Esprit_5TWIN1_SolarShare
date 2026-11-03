@@ -423,10 +423,10 @@ class LenderModuleTest extends TestCase
         $response->assertOk();
 
         // 1. Default landing page navbar is present at the top
-        $response->assertSee('How it works');
-        $response->assertSee('Impact');
-        $response->assertSee('Community');
-        $response->assertSee('FAQ');
+        $response->assertSee(__('messages.nav.how_it_works'));
+        $response->assertSee(__('messages.nav.impact'));
+        $response->assertSee(__('messages.nav.community'));
+        $response->assertSee(__('messages.nav.faq'));
 
         // 2. Sidebar with navigation is present
         $response->assertSee('id="sidebar-link-dashboard"', false);

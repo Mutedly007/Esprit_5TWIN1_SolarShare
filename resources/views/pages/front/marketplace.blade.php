@@ -247,7 +247,6 @@
                     @endif
                 </h2>
                 <span style="font-size: 0.88rem; color: #64748B;">
-                    <strong>{{ $equipment->total() }}</strong> équipement(s) répertorié(s)
                     {{ __('messages.marketplace.listed_count', ['count' => $equipment->total()]) }}
                 </span>
             </div>
@@ -268,15 +267,6 @@
                 @if(request('min_price') || request('max_price'))
                     <a href="{{ route('marketplace', request()->except('min_price', 'max_price', 'page')) }}" class="badge rounded-pill bg-white text-dark border px-3 py-2 text-decoration-none small shadow-xs">
                         Prix : {{ request('min_price') ?? 0 }} à {{ request('max_price') ? request('max_price') . ' TND' : 'illimité' }} <i class="bi bi-x ms-1"></i>
-                <select name="sort" class="form-select form-select-sm" style="width: auto; border-radius: 10px; font-size: 0.88rem; font-weight: 600; padding-block: 0.45rem; padding-inline-start: 0.85rem; padding-inline-end: 2rem;" onchange="this.form.submit()">
-                    <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>{{ __('messages.marketplace.sort_latest') }}</option>
-                    <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>{{ __('messages.marketplace.sort_price_asc') }}</option>
-                    <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>{{ __('messages.marketplace.sort_price_desc') }}</option>
-                </select>
-
-                @if(request('search') || request('category') || request('sort'))
-                    <a href="{{ route('marketplace') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size: 0.82rem;">
-                        {{ __('messages.marketplace.reset_btn') }}
                     </a>
                 @endif
 
