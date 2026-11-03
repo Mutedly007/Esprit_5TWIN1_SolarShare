@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\LocalizationController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\RenterChatbotController;
 use Illuminate\Support\Facades\Route;
 
 // Multilingual language switcher (FR, EN, AR)
@@ -126,12 +129,30 @@ Route::get('/', function () {
 Route::get('/marketplace', [\App\Http\Controllers\MarketplaceController::class, 'index'])->name('marketplace');
 Route::get('/marketplace/{equipment}', [\App\Http\Controllers\MarketplaceController::class, 'show'])->name('marketplace.show');
 
+// AI Assistant for Borrowers (Gemini Chatbot)
+Route::post('/renter/chat', [RenterChatbotController::class, 'ask'])->name('renter.chat');
+
 Route::get('/login', [AuthController::class, 'show'])->defaults('tab', 'login')->name('login');
 Route::get('/register', [AuthController::class, 'show'])->defaults('tab', 'register')->name('register');
 
 Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
 Route::post('/register', [AuthController::class, 'register'])->name('register.store');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Password Reset Routes
+Route::middleware('guest')->group(function () {
+    Route::get('/forgot-password', [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
+});
+
+// Email Verification Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->middleware('signed')->name('verification.verify');
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'send'])->middleware('throttle:6,1')->name('verification.send');
+});
 
 Route::get('/auth/{provider}/redirect', [AuthController::class, 'redirectToProvider'])
     ->whereIn('provider', ['google', 'github'])
@@ -172,6 +193,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('lender')->group(function () {
         Route::get('/lender', [\App\Http\Controllers\LenderDashboardController::class, 'index'])->name('lender.dashboard');
         Route::resource('categories', \App\Http\Controllers\CategoryController::class);
+        Route::post('equipment/analyze-photo', [\App\Http\Controllers\EquipmentController::class, 'analyzePhoto'])->name('equipment.analyze-photo');
         Route::resource('equipment', \App\Http\Controllers\EquipmentController::class);
         Route::get('/lender/rentals', [\App\Http\Controllers\LenderRentalController::class, 'index'])->name('lender.rentals.index');
         Route::patch('/lender/pack-reservations/{reservation}/status', [\App\Http\Controllers\LenderRentalController::class, 'updateKitReservationStatus'])->name('lender.kit-reservations.status');

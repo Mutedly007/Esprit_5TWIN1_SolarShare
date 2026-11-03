@@ -208,6 +208,9 @@
         <i class="bi bi-arrow-up"></i>
     </a>
 
+    <!-- SolarShare Renter Assistant Chatbot (Gemini AI) -->
+    @include('partials.chatbot.renter_chat')
+
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="{{ asset('solartec/lib/wow/wow.min.js') }}"></script>
